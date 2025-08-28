@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
+import { useAudio } from '@/contexts/AudioContext';
 import BingoCard from './BingoCard';
+import GamePauseModal from './GamePauseModal';
+import AudioSettingsModal from './AudioSettingsModal';
 import { toast } from '@/components/ui/use-toast';
+import { Pause, Settings } from 'lucide-react';
 
 interface GameMode {
   id: string;
@@ -17,6 +21,14 @@ interface GameInterfaceProps {
 
 const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const { isAuthenticated, startGame, endGame, currentGame } = useAppContext();
+  const { 
+    playBackgroundMusic, 
+    stopBackgroundMusic, 
+    playCountdown, 
+    playGameStart, 
+    playBingo, 
+    playNumberCall 
+  } = useAudio();
   
   // Safety check for gameMode
   if (!gameMode) {
@@ -39,6 +51,11 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const [timeLeft, setTimeLeft] = useState<number>(gameMode.duration);
   const [score, setScore] = useState<number>(0);
   const [gameActive, setGameActive] = useState(false);
+  const [gamePaused, setGamePaused] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdownNumber, setCountdownNumber] = useState(3);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [showAudioSettings, setShowAudioSettings] = useState(false);
   const [powerUps, setPowerUps] = useState({
     magicBall: 3,
     magicDauber: 2,
@@ -56,17 +73,32 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     return availableNumbers[randomIndex];
   }, [calledNumbers]);
 
-  // Start the game
-  const handleStartGame = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Please Sign In",
-        description: "You need to be signed in to play.",
-        variant: "destructive",
+  // Handle countdown animation
+  const startCountdown = () => {
+    setShowCountdown(true);
+    setCountdownNumber(3);
+    
+    const countdownInterval = setInterval(() => {
+      setCountdownNumber(prev => {
+        if (prev > 1) {
+          playCountdown();
+          return prev - 1;
+        } else {
+          clearInterval(countdownInterval);
+          setTimeout(() => {
+            setShowCountdown(false);
+            startGameAfterCountdown();
+          }, 1000);
+          return 0;
+        }
       });
-      return;
-    }
+    }, 1000);
+  };
 
+  const startGameAfterCountdown = () => {
+    playGameStart();
+    playBackgroundMusic();
+    
     startGame(gameMode.id);
     setGameActive(true);
     setScore(0);
@@ -83,27 +115,73 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     if (firstNumber) {
       setCurrentNumber(firstNumber);
       setCalledNumbers([firstNumber]);
+      playNumberCall(firstNumber);
     }
+  };
+
+  // Start the game
+  const handleStartGame = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to be signed in to play.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    startCountdown();
+  };
+
+  // Handle pause/resume
+  const togglePause = () => {
+    if (gameActive && !gamePaused) {
+      setGamePaused(true);
+      setShowPauseModal(true);
+    } else if (gameActive && gamePaused) {
+      setGamePaused(false);
+      setShowPauseModal(false);
+    }
+  };
+
+  // Handle resume from pause modal
+  const handleResume = () => {
+    setGamePaused(false);
+    setShowPauseModal(false);
+  };
+
+  // Handle quit game
+  const handleQuit = () => {
+    stopBackgroundMusic();
+    setGameActive(false);
+    setGamePaused(false);
+    setShowPauseModal(false);
+    setCurrentNumber(null);
+    setCalledNumbers([]);
+    setTimeLeft(gameMode.duration);
+    setScore(0);
   };
 
   // Call next number
   const callNextNumber = useCallback(() => {
-    if (!gameActive) return;
+    if (!gameActive || gamePaused) return;
     
     const nextNumber = generateNumber();
     if (nextNumber) {
       setCurrentNumber(nextNumber);
       setCalledNumbers(prev => [...prev, nextNumber]);
       setScore(prev => prev + 10); // Base score for each number
+      playNumberCall(nextNumber);
     } else {
       // Game over - all numbers called
       handleGameOver();
     }
-  }, [gameActive, generateNumber]);
+  }, [gameActive, gamePaused, generateNumber]);
 
   // Handle game over
   const handleGameOver = () => {
     setGameActive(false);
+    stopBackgroundMusic();
     
     // Calculate final score with time bonus
     const timeBonus = Math.floor(timeLeft * 2); // 2 points per second remaining
@@ -126,7 +204,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
 
   // Use power-up
   const usePowerUp = (type: keyof typeof powerUps) => {
-    if (powerUps[type] <= 0) return;
+    if (powerUps[type] <= 0 || gamePaused) return;
     
     setPowerUps(prev => ({ ...prev, [type]: prev[type] - 1 }));
     
@@ -157,7 +235,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
 
   // Timer effect
   useEffect(() => {
-    if (!gameActive || timeLeft <= 0) return;
+    if (!gameActive || timeLeft <= 0 || gamePaused) return;
     
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -170,18 +248,30 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [gameActive, timeLeft]);
+  }, [gameActive, timeLeft, gamePaused]);
 
   // Auto-call numbers effect
   useEffect(() => {
-    if (!gameActive) return;
+    if (!gameActive || gamePaused) return;
     
     const interval = setInterval(() => {
       callNextNumber();
     }, 3000); // Call number every 3 seconds
     
     return () => clearInterval(interval);
-  }, [gameActive, callNextNumber]);
+  }, [gameActive, gamePaused, callNextNumber]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && gameActive) {
+        togglePause();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [gameActive, gamePaused]);
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -189,6 +279,22 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Countdown overlay
+  if (showCountdown) {
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div className="text-center">
+          <div className="text-9xl font-black text-white mb-4 animate-pulse">
+            {countdownNumber > 0 ? countdownNumber : 'GO!'}
+          </div>
+          <div className="text-2xl text-white/80">
+            {countdownNumber > 0 ? 'Get Ready!' : 'Game Starting!'}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
@@ -217,14 +323,37 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
             </div>
           </div>
           
-          {!gameActive ? (
-            <button
-              onClick={handleStartGame}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black py-4 px-12 rounded-full text-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              🚀 START GAME
-            </button>
-          ) : (
+          {/* Game Controls */}
+          <div className="flex justify-center items-center gap-4 mb-6">
+            {!gameActive ? (
+              <button
+                onClick={handleStartGame}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black py-4 px-12 rounded-full text-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                🚀 START GAME
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={togglePause}
+                  className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <Pause className="w-5 h-5 mr-2 inline" />
+                  {gamePaused ? 'Resume' : 'Pause'}
+                </button>
+                
+                <button
+                  onClick={() => setShowAudioSettings(true)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <Settings className="w-5 h-5 mr-2 inline" />
+                  Audio
+                </button>
+              </>
+            )}
+          </div>
+          
+          {gameActive && (
             <div className="flex justify-center items-center gap-8 text-white">
               <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-400">⏰ {formatTime(timeLeft)}</div>
@@ -270,9 +399,9 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
               <div className="space-y-3">
                 <button 
                   onClick={() => usePowerUp('magicBall')}
-                  disabled={powerUps.magicBall <= 0 || !gameActive}
+                  disabled={powerUps.magicBall <= 0 || !gameActive || gamePaused}
                   className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.magicBall > 0 && gameActive
+                    powerUps.magicBall > 0 && gameActive && !gamePaused
                       ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   }`}
@@ -281,9 +410,9 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
                 </button>
                 <button 
                   onClick={() => usePowerUp('magicDauber')}
-                  disabled={powerUps.magicDauber <= 0 || !gameActive}
+                  disabled={powerUps.magicDauber <= 0 || !gameActive || gamePaused}
                   className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.magicDauber > 0 && gameActive
+                    powerUps.magicDauber > 0 && gameActive && !gamePaused
                       ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white hover:from-blue-600 hover:to-cyan-700'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   }`}
@@ -292,9 +421,9 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
                 </button>
                 <button 
                   onClick={() => usePowerUp('tripleTime')}
-                  disabled={powerUps.tripleTime <= 0 || !gameActive}
+                  disabled={powerUps.tripleTime <= 0 || !gameActive || gamePaused}
                   className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.tripleTime > 0 && gameActive
+                    powerUps.tripleTime > 0 && gameActive && !gamePaused
                       ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   }`}
@@ -309,10 +438,11 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
           <div className="lg:col-span-2">
             <BingoCard 
               calledNumbers={calledNumbers}
-              gameActive={gameActive}
+              gameActive={gameActive && !gamePaused}
               onBingo={(lines) => {
                 const bingoBonus = lines * 100;
                 setScore(prev => prev + bingoBonus);
+                playBingo();
                 toast({
                   title: `BINGO! ${lines} Line${lines > 1 ? 's' : ''}!`,
                   description: `+${bingoBonus} points!`,
@@ -333,6 +463,21 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <GamePauseModal
+        isOpen={showPauseModal}
+        onClose={() => setShowPauseModal(false)}
+        onResume={handleResume}
+        onQuit={handleQuit}
+        onAudioSettings={() => setShowAudioSettings(true)}
+        isPaused={gamePaused}
+      />
+
+      <AudioSettingsModal
+        isOpen={showAudioSettings}
+        onClose={() => setShowAudioSettings(false)}
+      />
     </div>
   );
 };
