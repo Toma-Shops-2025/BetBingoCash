@@ -50,6 +50,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentGame, setCurrentGame] = useState<any>(null);
   const [gameHistory, setGameHistory] = useState<any[]>([]);
 
+  // Debug authentication state
+  console.log('AppProvider - user state:', user, 'isAuthenticated will be:', !!user);
+
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev);
   };
@@ -203,70 +206,75 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Check authentication status on mount
   useEffect(() => {
+    // Check for existing session first
+    const checkExistingSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('Existing session found on mount:', session.user.id);
+        
+        // Create basic profile immediately
+        const basicProfile = {
+          id: session.user.id,
+          email: session.user.email || '',
+          username: session.user.user_metadata?.username || 'User',
+          balance: 55.00,
+          gems: 160,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        
+        setUser(basicProfile);
+        setBalance(basicProfile.balance);
+        setGems(basicProfile.gems);
+        console.log('Basic profile set from existing session');
+      }
+    };
+    
+    checkExistingSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
         
         if (session?.user) {
+          console.log('Session found, creating user profile...');
+          
+          // Immediately create a basic user profile to avoid delays
+          const basicProfile = {
+            id: session.user.id,
+            email: session.user.email || '',
+            username: session.user.user_metadata?.username || 'User',
+            balance: 55.00, // $50 bonus + $5 starting balance
+            gems: 160,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          
+          // Set user state immediately
+          setUser(basicProfile);
+          setBalance(basicProfile.balance);
+          setGems(basicProfile.gems);
+          
+          console.log('Basic profile set immediately:', basicProfile);
+          
+          // Try to fetch from database in background
           try {
-            // Try to fetch user profile from database
             const { data: profile, error: profileError } = await supabase
               .from('users')
               .select('*')
               .eq('id', session.user.id)
               .single();
 
-            if (profileError && profileError.code === 'PGRST116') {
-              // Table doesn't exist, create basic profile
-              console.log('Users table not found, using basic profile');
-              const basicProfile = {
-                id: session.user.id,
-                email: session.user.email || '',
-                username: session.user.user_metadata?.username || 'User',
-                balance: 55.00, // $50 bonus + $5 starting balance
-                gems: 160,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              };
-              setUser(basicProfile);
-              setBalance(basicProfile.balance);
-              setGems(basicProfile.gems);
-            } else if (profile) {
-              console.log('Profile found in auth state change:', profile);
+            if (profile && !profileError) {
+              console.log('Database profile found, updating:', profile);
               setUser(profile);
               setBalance(profile.balance || 0);
               setGems(profile.gems || 0);
             } else {
-              // No profile found, create basic one
-              console.log('No profile found in auth state change, creating basic profile');
-              const basicProfile = {
-                id: session.user.id,
-                email: session.user.email || '',
-                username: session.user.user_metadata?.username || 'User',
-                balance: 55.00, // $50 bonus + $5 starting balance
-                gems: 160,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              };
-              setUser(basicProfile);
-              setBalance(basicProfile.balance);
-              setGems(basicProfile.gems);
+              console.log('No database profile, keeping basic profile');
             }
           } catch (dbError) {
-            console.log('Database error in auth state change, using basic profile:', dbError);
-            // Use basic profile if database is not set up
-            const basicProfile = {
-              id: session.user.id,
-              email: session.user.email || '',
-              username: session.user.user_metadata?.username || 'User',
-              balance: 55.00, // $50 bonus + $5 starting balance
-              gems: 160,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            };
-            setUser(basicProfile);
-            setBalance(basicProfile.balance);
-            setGems(basicProfile.gems);
+            console.log('Database error, keeping basic profile:', dbError);
           }
         } else {
           console.log('No session, clearing user state');
