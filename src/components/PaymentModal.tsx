@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +21,22 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
+
+  // Load PayPal script
+  useEffect(() => {
+    if (isOpen && !paypalLoaded) {
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID}&currency=USD`;
+      script.async = true;
+      script.onload = () => setPaypalLoaded(true);
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [isOpen, paypalLoaded]);
 
   const handlePayment = async () => {
     setIsLoading(true);
@@ -39,16 +55,36 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
   };
 
   const handlePayPalPayment = () => {
-    // In a real app, this would redirect to PayPal
+    if (!paypalLoaded) {
+      toast({
+        title: "PayPal Loading",
+        description: "Please wait for PayPal to load...",
+      });
+      return;
+    }
+
+    // PayPal will handle the payment flow
     toast({
-      title: "Redirecting to PayPal",
-      description: "You will be redirected to complete your payment.",
+      title: "PayPal Ready",
+      description: "PayPal payment button will appear below.",
     });
-    
-    // Simulate PayPal redirect
-    setTimeout(() => {
-      handlePayment();
-    }, 1000);
+  };
+
+  const renderPayPalButton = () => {
+    if (!paypalLoaded) {
+      return (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="text-white/60 text-sm mt-2">Loading PayPal...</p>
+        </div>
+      );
+    }
+
+    return (
+      <div id="paypal-button-container" className="w-full">
+        {/* PayPal button will be rendered here */}
+      </div>
+    );
   };
 
   return (
@@ -75,15 +111,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
             <div className="text-center space-y-4">
               <div className="text-6xl">💳</div>
               <div className="text-white/80">
-                Pay securely with PayPal. You'll be redirected to complete your payment.
+                Pay securely with PayPal. Complete your payment below.
               </div>
-              <Button 
-                onClick={handlePayPalPayment}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                disabled={isLoading}
-              >
-                {isLoading ? "Processing..." : "Pay with PayPal"}
-              </Button>
+              
+              {renderPayPalButton()}
+              
+              <div className="text-xs text-white/60">
+                🔒 Secure payment powered by PayPal
+              </div>
             </div>
           </TabsContent>
           
