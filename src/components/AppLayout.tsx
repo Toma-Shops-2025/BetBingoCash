@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import HeroSection from './HeroSection';
+import PromoBanner from './PromoBanner';
 import GameModes from './GameModes';
 import FeaturesSection from './FeaturesSection';
-import LiveGames from './LiveGames';
-import TestimonialsSection from './TestimonialsSection';
-import PromoBanner from './PromoBanner';
 import GameStats from './GameStats';
 import TournamentLobby from './TournamentLobby';
 import Leaderboard from './Leaderboard';
-import GameInterface from './GameInterface';
-import CashoutSection from './CashoutSection';
+import TestimonialsSection from './TestimonialsSection';
 import DailyRewards from './DailyRewards';
+import CashoutSection from './CashoutSection';
 import Footer from './Footer';
 import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
@@ -146,7 +144,6 @@ const AppLayout: React.FC = () => {
           <Leaderboard />
         </div>
         <TestimonialsSection />
-        <GameInterface />
         <div id="rewards">
           <DailyRewards />
         </div>

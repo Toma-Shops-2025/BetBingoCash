@@ -17,6 +17,23 @@ interface GameInterfaceProps {
 
 const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const { isAuthenticated, startGame, endGame, currentGame } = useAppContext();
+  
+  // Safety check for gameMode
+  if (!gameMode) {
+    return (
+      <div className="py-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-black text-white mb-4">
+            🎯 Game Loading...
+          </h2>
+          <p className="text-xl text-gray-300">
+            Please select a game mode to start playing.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   const [currentNumber, setCurrentNumber] = useState<number | null>(null);
   const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(gameMode.duration);
