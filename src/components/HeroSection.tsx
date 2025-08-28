@@ -20,6 +20,11 @@ const HeroSection: React.FC = () => {
       
       {/* Content */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+        <img 
+          src="/logo.png" 
+          alt="BetBingoCash Logo" 
+          className="h-20 w-auto mb-6 drop-shadow-lg"
+        />
         <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-lg">
           BET BINGO
           <span className="block text-yellow-400">CASH</span>

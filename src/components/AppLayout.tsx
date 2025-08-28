@@ -34,7 +34,11 @@ const AppLayout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="text-3xl">🎯</div>
+              <img 
+                src="/logo.png" 
+                alt="BetBingoCash Logo" 
+                className="h-10 w-auto"
+              />
               <div className="text-xl font-black text-white">
                 BET BINGO<span className="text-yellow-400">CASH</span>
               </div>
