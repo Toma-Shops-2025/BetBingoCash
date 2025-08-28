@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
+import { useAppContext } from '@/contexts/AppContext';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface PaymentModalProps {
 }
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, onSuccess }) => {
+  const { updateBalance } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('paypal');
   const [cardNumber, setCardNumber] = useState('');
@@ -22,6 +24,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const paypalButtonRef = useRef<HTMLDivElement>(null);
 
   // Load PayPal script
   useEffect(() => {
@@ -29,22 +32,106 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
       const script = document.createElement('script');
       script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID}&currency=USD`;
       script.async = true;
-      script.onload = () => setPaypalLoaded(true);
+      script.onload = () => {
+        setPaypalLoaded(true);
+        renderPayPalButton();
+      };
       document.body.appendChild(script);
 
       return () => {
-        document.body.removeChild(script);
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
       };
     }
   }, [isOpen, paypalLoaded]);
+
+  // Render PayPal button when loaded
+  useEffect(() => {
+    if (paypalLoaded && paypalButtonRef.current) {
+      renderPayPalButton();
+    }
+  }, [paypalLoaded, amount]);
+
+  const renderPayPalButton = () => {
+    if (!paypalLoaded || !paypalButtonRef.current) return;
+
+    // Clear previous button
+    paypalButtonRef.current.innerHTML = '';
+
+    // @ts-ignore - PayPal types
+    if (window.paypal) {
+      // @ts-ignore
+      window.paypal.Buttons({
+        style: {
+          layout: 'vertical',
+          color: 'blue',
+          shape: 'rect',
+          label: 'pay',
+        },
+        createOrder: (data: any, actions: any) => {
+          return actions.order.create({
+            purchase_units: [
+              {
+                amount: {
+                  value: amount.toFixed(2),
+                  currency_code: 'USD',
+                },
+                description: `Add funds to BetBingoCash account`,
+              },
+            ],
+          });
+        },
+        onApprove: async (data: any, actions: any) => {
+          try {
+            setIsLoading(true);
+            const order = await actions.order.capture();
+
+            if (order.status === 'COMPLETED') {
+              // Update user balance
+              updateBalance(amount);
+              
+              toast({
+                title: "Payment Successful! 🎉",
+                description: `$${amount.toFixed(2)} has been added to your balance.`,
+              });
+              
+              onSuccess(amount);
+              onClose();
+            }
+          } catch (error: any) {
+            console.error('PayPal payment error:', error);
+            toast({
+              title: "Payment Failed",
+              description: "There was an error processing your payment. Please try again.",
+              variant: "destructive",
+            });
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        onError: (err: any) => {
+          console.error('PayPal error:', err);
+          toast({
+            title: "PayPal Error",
+            description: "There was an error with PayPal. Please try again.",
+            variant: "destructive",
+          });
+        },
+      }).render(paypalButtonRef.current);
+    }
+  };
 
   const handlePayment = async () => {
     setIsLoading(true);
     
     // Simulate payment processing
     setTimeout(() => {
+      // Update user balance
+      updateBalance(amount);
+      
       toast({
-        title: "Payment Successful!",
+        title: "Payment Successful! 🎉",
         description: `$${amount.toFixed(2)} has been added to your balance.`,
       });
       
@@ -52,39 +139,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
       onClose();
       setIsLoading(false);
     }, 2000);
-  };
-
-  const handlePayPalPayment = () => {
-    if (!paypalLoaded) {
-      toast({
-        title: "PayPal Loading",
-        description: "Please wait for PayPal to load...",
-      });
-      return;
-    }
-
-    // PayPal will handle the payment flow
-    toast({
-      title: "PayPal Ready",
-      description: "PayPal payment button will appear below.",
-    });
-  };
-
-  const renderPayPalButton = () => {
-    if (!paypalLoaded) {
-      return (
-        <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="text-white/60 text-sm mt-2">Loading PayPal...</p>
-        </div>
-      );
-    }
-
-    return (
-      <div id="paypal-button-container" className="w-full">
-        {/* PayPal button will be rendered here */}
-      </div>
-    );
   };
 
   return (
@@ -118,7 +172,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
                 Pay securely with PayPal. Complete your payment below.
               </div>
               
-              {renderPayPalButton()}
+              {!paypalLoaded ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-white/60 text-sm mt-2">Loading PayPal...</p>
+                </div>
+              ) : (
+                <div ref={paypalButtonRef} className="w-full" />
+              )}
               
               <div className="text-xs text-white/60">
                 🔒 Secure payment powered by PayPal
