@@ -64,17 +64,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (error) throw error;
 
       if (data.user) {
-        // Fetch user profile from database
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
+        // Create or fetch user profile
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
 
-        if (profile) {
-          setUser(profile);
-          setBalance(profile.balance || 0);
-          setGems(profile.gems || 0);
+          if (profileError && profileError.code === 'PGRST116') {
+            // Table doesn't exist yet, create a basic user profile
+            console.log('Users table not found, creating basic profile');
+            const basicProfile = {
+              id: data.user.id,
+              email: data.user.email || '',
+              username: data.user.user_metadata?.username || 'User',
+              balance: 55.00, // $50 bonus + $5 starting balance
+              gems: 160,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            setUser(basicProfile);
+            setBalance(basicProfile.balance);
+            setGems(basicProfile.gems);
+            
+            // Show welcome bonus message
+            toast({
+              title: "🎉 Welcome to BetBingoCash!",
+              description: "You've received a $50 welcome bonus!",
+            });
+          } else if (profile) {
+            setUser(profile);
+            setBalance(profile.balance || 0);
+            setGems(profile.gems || 0);
+          }
+        } catch (dbError) {
+          console.log('Database error, using basic profile:', dbError);
+          // Use basic profile if database is not set up
+          setUser({
+            id: data.user.id,
+            email: data.user.email || '',
+            username: data.user.user_metadata?.username || 'User',
+            balance: 5.00,
+            gems: 160,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
         }
       }
     } catch (error: any) {
@@ -143,18 +178,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
+        
         if (session?.user) {
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+          try {
+            // Try to fetch user profile from database
+            const { data: profile, error: profileError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
 
-          if (profile) {
-            setUser(profile);
-            setBalance(profile.balance || 0);
-            setGems(profile.gems || 0);
+            if (profileError && profileError.code === 'PGRST116') {
+              // Table doesn't exist, create basic profile
+              console.log('Users table not found, using basic profile');
+              const basicProfile = {
+                id: session.user.id,
+                email: session.user.email || '',
+                username: session.user.user_metadata?.username || 'User',
+                balance: 55.00, // $50 bonus + $5 starting balance
+                gems: 160,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              };
+              setUser(basicProfile);
+              setBalance(basicProfile.balance);
+              setGems(basicProfile.gems);
+            } else if (profile) {
+              setUser(profile);
+              setBalance(profile.balance || 0);
+              setGems(profile.gems || 0);
+            }
+          } catch (dbError) {
+            console.log('Database error, using basic profile:', dbError);
+            // Use basic profile if database is not set up
+            const basicProfile = {
+              id: session.user.id,
+              email: session.user.email || '',
+              username: session.user.user_metadata?.username || 'User',
+              balance: 55.00, // $50 bonus + $5 starting balance
+              gems: 160,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            setUser(basicProfile);
+            setBalance(basicProfile.balance);
+            setGems(basicProfile.gems);
           }
         } else {
           setUser(null);

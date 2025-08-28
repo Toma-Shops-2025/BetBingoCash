@@ -16,12 +16,17 @@ import DailyRewards from './DailyRewards';
 import Footer from './Footer';
 import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
+import UserProfileModal from './UserProfileModal';
 
 const AppLayout: React.FC = () => {
   const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout } = useAppContext();
   const isMobile = useIsMobile();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+  // Debug authentication state
+  console.log('AppLayout - isAuthenticated:', isAuthenticated, 'user:', user);
 
   const handleLogout = async () => {
     await logout();
@@ -53,16 +58,16 @@ const AppLayout: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              {isAuthenticated ? (
+              {isAuthenticated && user ? (
                 <>
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                <div className="text-yellow-400">💎</div>
+                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
+                    <div className="text-yellow-400">💎</div>
                     <span className="text-white font-bold">{gems}</span>
-                <div className="w-px h-4 bg-white/30"></div>
-                <div className="text-green-400">💰</div>
+                    <div className="w-px h-4 bg-white/30"></div>
+                    <div className="text-green-400">💰</div>
                     <span className="text-white font-bold">${balance.toFixed(2)}</span>
-              </div>
-              
+                  </div>
+                  
                   <button 
                     onClick={() => setPaymentModalOpen(true)}
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
@@ -82,10 +87,29 @@ const AppLayout: React.FC = () => {
                         <div className="text-white font-semibold">{user?.username || 'User'}</div>
                         <div className="text-white/60 text-sm">{user?.email}</div>
                       </div>
-                      <div className="p-2">
+                      <div className="p-2 space-y-1">
+                        <button 
+                          onClick={() => setProfileModalOpen(true)}
+                          className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                        >
+                          👤 My Profile
+                        </button>
+                        <button 
+                          onClick={() => {/* TODO: Open account settings */}}
+                          className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                        >
+                          ⚙️ Account Settings
+                        </button>
+                        <button 
+                          onClick={() => {/* TODO: Open withdrawal modal */}}
+                          className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                        >
+                          💰 Withdraw Funds
+                        </button>
+                        <div className="border-t border-gray-700 my-1"></div>
                         <button 
                           onClick={handleLogout}
-                          className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                          className="w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-gray-700 rounded-md transition-colors"
                         >
                           🚪 Sign Out
                         </button>
@@ -100,7 +124,7 @@ const AppLayout: React.FC = () => {
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-6 rounded-full text-sm transition-all duration-200"
                   >
                     🔐 Sign In
-              </button>
+                  </button>
                 </>
               )}
             </div>
@@ -147,6 +171,11 @@ const AppLayout: React.FC = () => {
           // Handle successful payment
           console.log(`Payment successful: $${amount}`);
         }}
+      />
+
+      <UserProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
       />
     </div>
   );
