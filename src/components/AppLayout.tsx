@@ -55,14 +55,14 @@ const AppLayout: React.FC = () => {
             <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <>
-                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                    <div className="text-yellow-400">💎</div>
+              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
+                <div className="text-yellow-400">💎</div>
                     <span className="text-white font-bold">{gems}</span>
-                    <div className="w-px h-4 bg-white/30"></div>
-                    <div className="text-green-400">💰</div>
+                <div className="w-px h-4 bg-white/30"></div>
+                <div className="text-green-400">💰</div>
                     <span className="text-white font-bold">${balance.toFixed(2)}</span>
-                  </div>
-                  
+              </div>
+              
                   <button 
                     onClick={() => setPaymentModalOpen(true)}
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
@@ -100,7 +100,7 @@ const AppLayout: React.FC = () => {
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-6 rounded-full text-sm transition-all duration-200"
                   >
                     🔐 Sign In
-                  </button>
+              </button>
                 </>
               )}
             </div>
