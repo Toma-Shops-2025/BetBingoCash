@@ -3,11 +3,23 @@ import { useAppContext } from '@/contexts/AppContext';
 import BingoCard from './BingoCard';
 import { toast } from '@/components/ui/use-toast';
 
-const GameInterface: React.FC = () => {
+interface GameMode {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  prize: string;
+}
+
+interface GameInterfaceProps {
+  gameMode: GameMode;
+}
+
+const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const { isAuthenticated, startGame, endGame, currentGame } = useAppContext();
   const [currentNumber, setCurrentNumber] = useState<number | null>(null);
   const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(120); // 2 minutes
+  const [timeLeft, setTimeLeft] = useState<number>(gameMode.duration);
   const [score, setScore] = useState<number>(0);
   const [gameActive, setGameActive] = useState(false);
   const [powerUps, setPowerUps] = useState({
@@ -38,11 +50,11 @@ const GameInterface: React.FC = () => {
       return;
     }
 
-    startGame('bingo');
+    startGame(gameMode.id);
     setGameActive(true);
     setScore(0);
     setCalledNumbers([]);
-    setTimeLeft(120);
+    setTimeLeft(gameMode.duration);
     setPowerUps({
       magicBall: 3,
       magicDauber: 2,
@@ -75,11 +87,24 @@ const GameInterface: React.FC = () => {
   // Handle game over
   const handleGameOver = () => {
     setGameActive(false);
-    endGame(score);
+    
+    // Calculate final score with time bonus
+    const timeBonus = Math.floor(timeLeft * 2); // 2 points per second remaining
+    const finalScore = score + timeBonus;
+    
+    endGame(finalScore);
+    
+    // Show game results
     toast({
-      title: "Game Over!",
-      description: `Final Score: ${score.toLocaleString()}`,
+      title: "Game Complete! 🎉",
+      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})`,
     });
+    
+    // Reset game state
+    setCurrentNumber(null);
+    setCalledNumbers([]);
+    setTimeLeft(gameMode.duration);
+    setScore(0);
   };
 
   // Use power-up
@@ -153,8 +178,27 @@ const GameInterface: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-black text-white mb-4">
-            🎯 LIVE BINGO GAME
+            🎯 {gameMode.title}
           </h2>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
+            {gameMode.description}
+          </p>
+          
+          {/* Game Stats */}
+          <div className="flex justify-center items-center gap-8 text-white mb-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-400">💰 {gameMode.prize}</div>
+              <div className="text-sm text-white/80">Prize Pool</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-400">⏱️ {Math.floor(gameMode.duration / 60)}m {gameMode.duration % 60}s</div>
+              <div className="text-sm text-white/80">Game Duration</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">🎯 {gameMode.id.includes('jackpot') ? 'Progressive' : 'Fixed'}</div>
+              <div className="text-sm text-white/80">Prize Type</div>
+            </div>
+          </div>
           
           {!gameActive ? (
             <button

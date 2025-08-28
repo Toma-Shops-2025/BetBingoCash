@@ -176,8 +176,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       score: 0,
       numbersCalled: [],
       bingoLines: 0,
+      // Add game-specific configurations
+      config: {
+        'speed-bingo': { duration: 60, prize: 500, difficulty: 'easy' },
+        'classic-75': { duration: 120, prize: 1200, difficulty: 'medium' },
+        'pattern-bingo': { duration: 90, prize: 800, difficulty: 'medium' },
+        'jackpot-room': { duration: 180, prize: 10000, difficulty: 'hard' },
+      }[gameType] || { duration: 120, prize: 1000, difficulty: 'medium' }
     };
     setCurrentGame(game);
+    console.log(`Game started: ${gameType}`, game);
   };
 
   const endGame = (score: number) => {
