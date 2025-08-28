@@ -21,7 +21,7 @@ interface GameInterfaceProps {
 }
 
 const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
-  const { isAuthenticated, startGame, endGame, currentGame, updateBalance } = useAppContext();
+  const { isAuthenticated, startGame, endGame, currentGame, updateBalance, updateGems } = useAppContext();
   const { 
     playBackgroundMusic, 
     stopBackgroundMusic, 
@@ -191,40 +191,71 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     // Calculate prize based on game mode and performance
     let prizeAmount = 0;
     let prizeMessage = '';
+    let gemsEarned = 0;
     
     if (gameMode.id === 'speed-bingo') {
       // Winner takes 80%, Runner-up 20%
       if (finalScore >= 500) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.8;
         prizeMessage = `🏆 WINNER! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 100; // Bonus gems for winning
       } else if (finalScore >= 300) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.2;
         prizeMessage = `🥈 Runner-up! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 50; // Gems for runner-up
+      } else if (finalScore >= 200) {
+        gemsEarned = 25; // Participation gems
       }
     } else if (gameMode.id === 'classic-75') {
       // 1st: 60%, 2nd: 25%, 3rd: 15%
       if (finalScore >= 800) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.6;
         prizeMessage = `🥇 1st Place! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 150; // Bonus gems for 1st place
       } else if (finalScore >= 600) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.25;
         prizeMessage = `🥈 2nd Place! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 75; // Gems for 2nd place
       } else if (finalScore >= 400) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.15;
         prizeMessage = `🥉 3rd Place! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 50; // Gems for 3rd place
+      } else if (finalScore >= 200) {
+        gemsEarned = 30; // Participation gems
       }
     } else if (gameMode.id === 'pattern-bingo') {
       // Winner takes 70%, Pattern bonus 30%
       if (finalScore >= 600) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.7;
         prizeMessage = `🎯 Pattern Master! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 120; // Bonus gems for pattern mastery
+      } else if (finalScore >= 400) {
+        gemsEarned = 60; // Gems for good pattern performance
+      } else if (finalScore >= 200) {
+        gemsEarned = 25; // Participation gems
       }
     } else if (gameMode.id === 'jackpot-room') {
       // Progressive jackpot - simplified calculation
       if (finalScore >= 1000) {
         prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', ''));
         prizeMessage = `💎 JACKPOT! You won $${prizeAmount.toFixed(2)}!`;
+        gemsEarned = 500; // Massive gem bonus for jackpot
+      } else if (finalScore >= 700) {
+        gemsEarned = 200; // High performance gems
+      } else if (finalScore >= 400) {
+        gemsEarned = 100; // Good performance gems
+      } else if (finalScore >= 200) {
+        gemsEarned = 50; // Participation gems
       }
+    }
+    
+    // Award gems based on performance
+    if (gemsEarned > 0) {
+      updateGems(gemsEarned);
+      toast({
+        title: "💎 Gems Earned!",
+        description: `+${gemsEarned} gems for your performance!`,
+      });
     }
     
     // Award prize if won
@@ -241,7 +272,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     // Show game results
     toast({
       title: "Game Complete! 🎯",
-      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})${prizeAmount > 0 ? ` | Prize: $${prizeAmount.toFixed(2)}` : ''}`,
+      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})${prizeAmount > 0 ? ` | Prize: $${prizeAmount.toFixed(2)}` : ''}${gemsEarned > 0 ? ` | Gems: +${gemsEarned}` : ''}`,
     });
     
     // Reset game state

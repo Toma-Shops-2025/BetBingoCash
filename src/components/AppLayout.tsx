@@ -15,6 +15,7 @@ import Footer from './Footer';
 import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
 import UserProfileModal from './UserProfileModal';
+import GemShopModal from './GemShopModal';
 
 const AppLayout: React.FC = () => {
   const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout } = useAppContext();
@@ -22,6 +23,7 @@ const AppLayout: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [gemShopModalOpen, setGemShopModalOpen] = useState(false);
 
   // Debug authentication state
   console.log('AppLayout - isAuthenticated:', isAuthenticated, 'user:', user);
@@ -59,14 +61,26 @@ const AppLayout: React.FC = () => {
               {isAuthenticated && user ? (
                 <>
                   <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                    <div className="text-yellow-400">💎</div>
-                    <span className="text-white font-bold">{gems}</span>
+                    <button
+                      onClick={() => setGemShopModalOpen(true)}
+                      className="flex items-center gap-2 hover:bg-white/20 rounded-full px-2 py-1 transition-colors"
+                    >
+                      <div className="text-yellow-400">💎</div>
+                      <span className="text-white font-bold">{gems}</span>
+                    </button>
                     <div className="w-px h-4 bg-white/30"></div>
                     <div className="text-green-400">💰</div>
                     <span className="text-white font-bold">${balance.toFixed(2)}</span>
                   </div>
-                  
-                  <button 
+
+                  <button
+                    onClick={() => setGemShopModalOpen(true)}
+                    className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
+                  >
+                    💎 Gem Shop
+                  </button>
+
+                  <button
                     onClick={() => setPaymentModalOpen(true)}
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
                   >
@@ -173,6 +187,11 @@ const AppLayout: React.FC = () => {
       <UserProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
+      />
+
+      <GemShopModal
+        isOpen={gemShopModalOpen}
+        onClose={() => setGemShopModalOpen(false)}
       />
     </div>
   );
