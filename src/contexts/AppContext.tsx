@@ -64,6 +64,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (error) throw error;
 
       if (data.user) {
+        console.log('Login successful, user:', data.user.id);
+        
         // Create or fetch user profile
         try {
           const { data: profile, error: profileError } = await supabase
@@ -94,25 +96,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               description: "You've received a $50 welcome bonus!",
             });
           } else if (profile) {
+            console.log('Profile found:', profile);
             setUser(profile);
             setBalance(profile.balance || 0);
             setGems(profile.gems || 0);
+          } else {
+            // No profile found, create basic one
+            console.log('No profile found, creating basic profile');
+            const basicProfile = {
+              id: data.user.id,
+              email: data.user.email || '',
+              username: data.user.user_metadata?.username || 'User',
+              balance: 55.00, // $50 bonus + $5 starting balance
+              gems: 160,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            setUser(basicProfile);
+            setBalance(basicProfile.balance);
+            setGems(basicProfile.gems);
           }
         } catch (dbError) {
           console.log('Database error, using basic profile:', dbError);
           // Use basic profile if database is not set up
-          setUser({
+          const basicProfile = {
             id: data.user.id,
             email: data.user.email || '',
             username: data.user.user_metadata?.username || 'User',
-            balance: 5.00,
+            balance: 55.00, // $50 bonus + $5 starting balance
             gems: 160,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
+          };
+          setUser(basicProfile);
+          setBalance(basicProfile.balance);
+          setGems(basicProfile.gems);
+          
+          toast({
+            title: "🎉 Welcome to BetBingoCash!",
+            description: "You've received a $50 welcome bonus!",
           });
         }
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -205,12 +232,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               setBalance(basicProfile.balance);
               setGems(basicProfile.gems);
             } else if (profile) {
+              console.log('Profile found in auth state change:', profile);
               setUser(profile);
               setBalance(profile.balance || 0);
               setGems(profile.gems || 0);
+            } else {
+              // No profile found, create basic one
+              console.log('No profile found in auth state change, creating basic profile');
+              const basicProfile = {
+                id: session.user.id,
+                email: session.user.email || '',
+                username: session.user.user_metadata?.username || 'User',
+                balance: 55.00, // $50 bonus + $5 starting balance
+                gems: 160,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              };
+              setUser(basicProfile);
+              setBalance(basicProfile.balance);
+              setGems(basicProfile.gems);
             }
           } catch (dbError) {
-            console.log('Database error, using basic profile:', dbError);
+            console.log('Database error in auth state change, using basic profile:', dbError);
             // Use basic profile if database is not set up
             const basicProfile = {
               id: session.user.id,
@@ -226,6 +269,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setGems(basicProfile.gems);
           }
         } else {
+          console.log('No session, clearing user state');
           setUser(null);
           setBalance(0);
           setGems(0);
