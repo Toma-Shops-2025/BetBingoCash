@@ -27,7 +27,7 @@ export interface Game {
   game_type: 'bingo' | 'tournament' | 'daily'
   status: 'active' | 'completed' | 'cancelled'
   score: number
-  numbers_called: number[] = []
+  numbers_called: number[]
   bingo_lines: number
   created_at: string
   completed_at?: string
