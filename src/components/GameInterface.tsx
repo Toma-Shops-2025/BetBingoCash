@@ -13,6 +13,7 @@ interface GameMode {
   description: string;
   duration: number;
   prize: string;
+  entryFee: number;
 }
 
 interface GameInterfaceProps {
@@ -20,7 +21,7 @@ interface GameInterfaceProps {
 }
 
 const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
-  const { isAuthenticated, startGame, endGame, currentGame } = useAppContext();
+  const { isAuthenticated, startGame, endGame, currentGame, updateBalance } = useAppContext();
   const { 
     playBackgroundMusic, 
     stopBackgroundMusic, 
@@ -187,12 +188,60 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     const timeBonus = Math.floor(timeLeft * 2); // 2 points per second remaining
     const finalScore = score + timeBonus;
     
+    // Calculate prize based on game mode and performance
+    let prizeAmount = 0;
+    let prizeMessage = '';
+    
+    if (gameMode.id === 'speed-bingo') {
+      // Winner takes 80%, Runner-up 20%
+      if (finalScore >= 500) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.8;
+        prizeMessage = `🏆 WINNER! You won $${prizeAmount.toFixed(2)}!`;
+      } else if (finalScore >= 300) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.2;
+        prizeMessage = `🥈 Runner-up! You won $${prizeAmount.toFixed(2)}!`;
+      }
+    } else if (gameMode.id === 'classic-75') {
+      // 1st: 60%, 2nd: 25%, 3rd: 15%
+      if (finalScore >= 800) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.6;
+        prizeMessage = `🥇 1st Place! You won $${prizeAmount.toFixed(2)}!`;
+      } else if (finalScore >= 600) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.25;
+        prizeMessage = `🥈 2nd Place! You won $${prizeAmount.toFixed(2)}!`;
+      } else if (finalScore >= 400) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.15;
+        prizeMessage = `🥉 3rd Place! You won $${prizeAmount.toFixed(2)}!`;
+      }
+    } else if (gameMode.id === 'pattern-bingo') {
+      // Winner takes 70%, Pattern bonus 30%
+      if (finalScore >= 600) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.7;
+        prizeMessage = `🎯 Pattern Master! You won $${prizeAmount.toFixed(2)}!`;
+      }
+    } else if (gameMode.id === 'jackpot-room') {
+      // Progressive jackpot - simplified calculation
+      if (finalScore >= 1000) {
+        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', ''));
+        prizeMessage = `💎 JACKPOT! You won $${prizeAmount.toFixed(2)}!`;
+      }
+    }
+    
+    // Award prize if won
+    if (prizeAmount > 0) {
+      updateBalance(prizeAmount);
+      toast({
+        title: "🎉 PRIZE WON!",
+        description: prizeMessage,
+      });
+    }
+    
     endGame(finalScore);
     
     // Show game results
     toast({
-      title: "Game Complete! 🎉",
-      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})`,
+      title: "Game Complete! 🎯",
+      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})${prizeAmount > 0 ? ` | Prize: $${prizeAmount.toFixed(2)}` : ''}`,
     });
     
     // Reset game state
@@ -310,7 +359,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
           {/* Game Stats */}
           <div className="flex justify-center items-center gap-8 text-white mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">💰 {gameMode.prize}</div>
+              <div className="text-2xl font-bold text-green-400">💰 {gameMode.prize}</div>
               <div className="text-sm text-white/80">Prize Pool</div>
             </div>
             <div className="text-center">
@@ -318,7 +367,11 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
               <div className="text-sm text-white/80">Game Duration</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">🎯 {gameMode.id.includes('jackpot') ? 'Progressive' : 'Fixed'}</div>
+              <div className="text-2xl font-bold text-yellow-400">🎫 ${gameMode.entryFee}</div>
+              <div className="text-sm text-white/80">Entry Fee</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">🎯 {gameMode.id.includes('jackpot') ? 'Progressive' : 'Fixed'}</div>
               <div className="text-sm text-white/80">Prize Type</div>
             </div>
           </div>

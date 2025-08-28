@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/use-toast';
 import GameInterface from './GameInterface';
 
 const GameModes: React.FC = () => {
-  const { isAuthenticated, startGame } = useAppContext();
+  const { isAuthenticated, startGame, balance, updateBalance } = useAppContext();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   
   const gameModes = [
@@ -13,41 +13,57 @@ const GameModes: React.FC = () => {
       id: 'speed-bingo',
       title: "Speed Bingo",
       description: "Fast-paced games with quick wins",
+      entryFee: 5.00,
       prize: "$500",
+      minPlayers: 10,
+      maxPlayers: 100,
       players: "125",
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342029898_22dadc29.webp",
       color: "from-red-500 to-pink-600",
-      duration: 60 // 1 minute
+      duration: 60, // 1 minute
+      prizeStructure: "Winner takes 80%, Runner-up 20%"
     },
     {
       id: 'classic-75',
       title: "Classic 75",
       description: "Traditional bingo with big payouts",
+      entryFee: 10.00,
       prize: "$1,200",
+      minPlayers: 20,
+      maxPlayers: 150,
       players: "89",
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342031659_b64c02ed.webp",
       color: "from-blue-500 to-indigo-600",
-      duration: 120 // 2 minutes
+      duration: 120, // 2 minutes
+      prizeStructure: "1st: 60%, 2nd: 25%, 3rd: 15%"
     },
     {
       id: 'pattern-bingo',
       title: "Pattern Bingo",
       description: "Special patterns for bonus wins",
+      entryFee: 7.50,
       prize: "$800",
+      minPlayers: 15,
+      maxPlayers: 120,
       players: "156",
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342033434_cde2517b.webp",
       color: "from-green-500 to-emerald-600",
-      duration: 90 // 1.5 minutes
+      duration: 90, // 1.5 minutes
+      prizeStructure: "Winner takes 70%, Pattern bonus 30%"
     },
     {
       id: 'jackpot-room',
       title: "Jackpot Room",
       description: "Progressive jackpots up to $10K",
+      entryFee: 25.00,
       prize: "$10,000",
+      minPlayers: 50,
+      maxPlayers: 200,
       players: "234",
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342035247_cde2517b.webp",
       color: "from-yellow-500 to-orange-600",
-      duration: 180 // 3 minutes
+      duration: 180, // 3 minutes
+      prizeStructure: "Progressive: 90% of entry fees + house contribution"
     }
   ];
 
@@ -61,13 +77,33 @@ const GameModes: React.FC = () => {
       return;
     }
 
+    // Check if user has enough balance for entry fee
+    if (balance < gameMode.entryFee) {
+      toast({
+        title: "Insufficient Balance",
+        description: `You need $${gameMode.entryFee.toFixed(2)} to play ${gameMode.title}. Add funds to continue.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Confirm entry fee payment
+    const confirmEntry = window.confirm(
+      `Join ${gameMode.title}?\n\nEntry Fee: $${gameMode.entryFee.toFixed(2)}\nPrize Pool: ${gameMode.prize}\n\nYour balance: $${balance.toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+    );
+
+    if (!confirmEntry) return;
+
+    // Deduct entry fee and start game
+    updateBalance(-gameMode.entryFee);
+    
     // Start the selected game
     startGame(gameMode.id);
     setSelectedGame(gameMode.id);
     
     toast({
-      title: `Starting ${gameMode.title}! 🎯`,
-      description: `Get ready to play and win big!`,
+      title: `Entry Fee Paid! 🎯`,
+      description: `$${gameMode.entryFee.toFixed(2)} deducted. Starting ${gameMode.title}!`,
     });
   };
 
@@ -133,10 +169,36 @@ const GameModes: React.FC = () => {
                   <h3 className="text-xl font-bold text-white mb-2">{mode.title}</h3>
                   <p className="text-gray-400 mb-4">{mode.description}</p>
                   
+                  {/* Game Details */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center p-3 bg-gray-800 rounded-lg">
+                      <div className="text-lg font-bold text-green-400">${mode.entryFee}</div>
+                      <div className="text-xs text-gray-500">Entry Fee</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-800 rounded-lg">
+                      <div className="text-lg font-bold text-yellow-400">{mode.players}</div>
+                      <div className="text-xs text-gray-500">Players</div>
+                    </div>
+                  </div>
+                  
+                  {/* Prize Structure */}
+                  <div className="mb-4 p-3 bg-gray-800 rounded-lg">
+                    <div className="text-center">
+                      <div className="text-2xl font-black text-green-400 mb-1">{mode.prize}</div>
+                      <div className="text-xs text-gray-500 mb-2">Prize Pool</div>
+                      <div className="text-xs text-blue-400">{mode.prizeStructure}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Player Limits */}
+                  <div className="text-center text-xs text-gray-500 mb-4">
+                    Min: {mode.minPlayers} | Max: {mode.maxPlayers} players
+                  </div>
+                  
                   <div className="flex justify-between items-center">
                     <div className="text-center">
-                      <div className="text-2xl font-black text-green-400">{mode.prize}</div>
-                      <div className="text-xs text-gray-500">Prize Pool</div>
+                      <div className="text-sm text-white/80">Duration</div>
+                      <div className="text-xs text-gray-500">{Math.floor(mode.duration / 60)}m {mode.duration % 60}s</div>
                     </div>
                     <button 
                       onClick={() => handlePlayGame(mode)}
