@@ -7,6 +7,8 @@ interface AudioSettings {
   musicVolume: number;
   voiceVolume: number;
   soundEffectsVolume: number;
+  backgroundMusicVolume: number; // New: separate background music volume
+  gameMusicVolume: number; // New: game music volume
 }
 
 interface AudioContextType {
@@ -14,6 +16,7 @@ interface AudioContextType {
   updateSettings: (newSettings: Partial<AudioSettings>) => void;
   playBackgroundMusic: () => void;
   stopBackgroundMusic: () => void;
+  setGameMusicMode: (isGameActive: boolean) => void; // New: switch between background and game music
   playVoiceAnnouncement: (text: string) => void;
   playSoundEffect: (effect: string) => void;
   playCountdown: () => void;
@@ -29,6 +32,8 @@ const defaultAudioSettings: AudioSettings = {
   musicVolume: 0.7,
   voiceVolume: 0.8,
   soundEffectsVolume: 0.6,
+  backgroundMusicVolume: 0.3, // Soft background music
+  gameMusicVolume: 0.6, // Louder during games
 };
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -67,10 +72,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!backgroundMusicRef.current) {
       backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
       backgroundMusicRef.current.loop = true;
-      backgroundMusicRef.current.volume = settings.musicVolume;
+      backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
     }
     
-    backgroundMusicRef.current.volume = settings.musicVolume;
+    backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
     backgroundMusicRef.current.play().catch(console.error);
   };
 
@@ -78,6 +83,19 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (backgroundMusicRef.current) {
       backgroundMusicRef.current.pause();
       backgroundMusicRef.current.currentTime = 0;
+    }
+  };
+
+  // Dynamic music volume control
+  const setGameMusicMode = (isGameActive: boolean) => {
+    if (!backgroundMusicRef.current || !settings.musicEnabled) return;
+    
+    if (isGameActive) {
+      // Increase volume for active gameplay
+      backgroundMusicRef.current.volume = settings.gameMusicVolume;
+    } else {
+      // Decrease volume for background ambiance
+      backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
     }
   };
 
@@ -151,9 +169,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Update audio volumes when settings change
   useEffect(() => {
     if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.volume = settings.musicVolume;
+      backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
     }
-  }, [settings.musicVolume]);
+  }, [settings.backgroundMusicVolume]);
 
   return (
     <AudioContext.Provider
@@ -162,6 +180,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateSettings,
         playBackgroundMusic,
         stopBackgroundMusic,
+        setGameMusicMode,
         playVoiceAnnouncement,
         playSoundEffect,
         playCountdown,

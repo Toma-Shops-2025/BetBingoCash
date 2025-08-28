@@ -70,18 +70,36 @@ const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, onClose
             </div>
             
             {settings.musicEnabled && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-white/80 text-sm">
-                  <span>Volume</span>
-                  <span>{Math.round(settings.musicVolume * 100)}%</span>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-white/80 text-sm">
+                    <span>Background Volume</span>
+                    <span>{Math.round(settings.backgroundMusicVolume * 100)}%</span>
+                  </div>
+                  <Slider
+                    value={[settings.backgroundMusicVolume * 100]}
+                    onValueChange={(value) => handleVolumeChange('backgroundMusicVolume', value)}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500">Soft ambient music when not playing</div>
                 </div>
-                <Slider
-                  value={[settings.musicVolume * 100]}
-                  onValueChange={(value) => handleVolumeChange('musicVolume', value)}
-                  max={100}
-                  step={5}
-                  className="w-full"
-                />
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-white/80 text-sm">
+                    <span>Game Volume</span>
+                    <span>{Math.round(settings.gameMusicVolume * 100)}%</span>
+                  </div>
+                  <Slider
+                    value={[settings.gameMusicVolume * 100]}
+                    onValueChange={(value) => handleVolumeChange('gameMusicVolume', value)}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500">Louder music during active gameplay</div>
+                </div>
               </div>
             )}
           </div>

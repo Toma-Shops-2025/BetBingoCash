@@ -25,6 +25,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const { 
     playBackgroundMusic, 
     stopBackgroundMusic, 
+    setGameMusicMode,
     playCountdown, 
     playGameStart, 
     playBingo, 
@@ -100,6 +101,9 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     playGameStart();
     playBackgroundMusic();
     
+    // Switch to game music mode (louder)
+    setGameMusicMode(true);
+    
     startGame(gameMode.id);
     setGameActive(true);
     setScore(0);
@@ -139,9 +143,13 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     if (gameActive && !gamePaused) {
       setGamePaused(true);
       setShowPauseModal(true);
+      // Switch to background music mode when paused
+      setGameMusicMode(false);
     } else if (gameActive && gamePaused) {
       setGamePaused(false);
       setShowPauseModal(false);
+      // Switch back to game music mode when resumed
+      setGameMusicMode(true);
     }
   };
 
@@ -149,6 +157,8 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const handleResume = () => {
     setGamePaused(false);
     setShowPauseModal(false);
+    // Switch back to game music mode when resumed
+    setGameMusicMode(true);
   };
 
   // Handle quit game
@@ -157,6 +167,8 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     setGameActive(false);
     setGamePaused(false);
     setShowPauseModal(false);
+    // Switch back to background music mode when quitting
+    setGameMusicMode(false);
     setCurrentNumber(null);
     setCalledNumbers([]);
     setTimeLeft(gameMode.duration);
@@ -183,6 +195,9 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   const handleGameOver = () => {
     setGameActive(false);
     stopBackgroundMusic();
+    
+    // Switch back to background music mode (softer)
+    setGameMusicMode(false);
     
     // Calculate final score with time bonus
     const timeBonus = Math.floor(timeLeft * 2); // 2 points per second remaining

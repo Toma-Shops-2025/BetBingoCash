@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
+import { useAudio } from '@/contexts/AudioContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import HeroSection from './HeroSection';
 import PromoBanner from './PromoBanner';
@@ -19,6 +20,7 @@ import GemShopModal from './GemShopModal';
 
 const AppLayout: React.FC = () => {
   const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout } = useAppContext();
+  const { playBackgroundMusic, setGameMusicMode } = useAudio();
   const isMobile = useIsMobile();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -27,6 +29,14 @@ const AppLayout: React.FC = () => {
 
   // Debug authentication state
   console.log('AppLayout - isAuthenticated:', isAuthenticated, 'user:', user);
+
+  // Start background music when app loads
+  useEffect(() => {
+    // Start background music with soft volume
+    playBackgroundMusic();
+    // Ensure we're in background music mode (softer volume)
+    setGameMusicMode(false);
+  }, [playBackgroundMusic, setGameMusicMode]);
 
   const handleLogout = async () => {
     await logout();
