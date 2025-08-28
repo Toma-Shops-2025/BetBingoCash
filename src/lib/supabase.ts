@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://nankdjfsdaipjrtvtddu.supabase.co'
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY' // You'll need to add your actual anon key here
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://nankdjfsdaipjrtvtddu.supabase.co'
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+
+if (!supabaseAnonKey) {
+  console.error('Missing VITE_SUPABASE_ANON_KEY environment variable')
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
@@ -23,7 +27,7 @@ export interface Game {
   game_type: 'bingo' | 'tournament' | 'daily'
   status: 'active' | 'completed' | 'cancelled'
   score: number
-  numbers_called: number[]
+  numbers_called: number[] = []
   bingo_lines: number
   created_at: string
   completed_at?: string

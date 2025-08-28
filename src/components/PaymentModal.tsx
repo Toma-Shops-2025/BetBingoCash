@@ -89,12 +89,16 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, on
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-700">
+      <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-700" aria-describedby="payment-description">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl font-bold text-center">
             💳 Add Funds to Your Account
           </DialogTitle>
         </DialogHeader>
+        
+        <div id="payment-description" className="sr-only">
+          Add funds to your BetBingoCash account using PayPal or credit card
+        </div>
         
         <div className="text-center mb-6">
           <div className="text-3xl font-bold text-green-400">${amount.toFixed(2)}</div>

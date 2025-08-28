@@ -83,12 +83,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700">
+      <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700" aria-describedby="auth-description">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl font-bold text-center">
             🎯 Welcome to BetBingoCash
           </DialogTitle>
         </DialogHeader>
+        
+        <div id="auth-description" className="sr-only">
+          Sign in or create an account to start playing BetBingoCash
+        </div>
         
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-gray-800">
