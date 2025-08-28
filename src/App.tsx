@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
-import { Sonner } from '@/components/ui/sonner';
 import { AppProvider } from '@/contexts/AppContext';
 import { AudioProvider } from '@/contexts/AudioContext';
 import Index from '@/pages/Index';
@@ -23,7 +22,6 @@ function App() {
               <BrowserRouter>
                 <Index />
                 <Toaster />
-                <Sonner />
               </BrowserRouter>
             </AppProvider>
           </AudioProvider>
