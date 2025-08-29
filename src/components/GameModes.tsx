@@ -99,10 +99,19 @@ const GameModes: React.FC = () => {
   ];
 
   // Calculate dynamic prize based on entry fee and player count
-  const calculatePrize = (entryFee: number, currentPlayers: number) => {
-    const baseMultiplier = 15; // Base 15x return
-    const playerBonus = Math.max(1, currentPlayers / 10); // Bonus for more players
-    return (entryFee * baseMultiplier * playerBonus).toFixed(2);
+  const calculatePrize = (entryFee: number, currentPlayers: number, roomId: string) => {
+    // Return exact prize amounts as requested by user
+    const exactPrizes: { [key: string]: number } = {
+      'bingo-room-1': 1.50,
+      'bingo-room-2': 5.00,
+      'bingo-room-3': 13.50,
+      'bingo-room-4': 9.00,
+      'bingo-room-5': 13.00,
+      'bingo-room-6': 18.90,
+      'bingo-room-7': 35.00
+    };
+    
+    return exactPrizes[roomId] || (entryFee * 15).toFixed(2);
   };
 
   // Calculate crown points (VIP system)
@@ -144,7 +153,7 @@ const GameModes: React.FC = () => {
 
     // Confirm entry fee payment
     const confirmEntry = window.confirm(
-      `Join ${gameRoom.title}?\n\nEntry Fee: $${gameRoom.entryFee.toFixed(2)}\nPrize Pool: $${calculatePrize(gameRoom.entryFee, gameRoom.currentPlayers)}\nPlayers: ${gameRoom.currentPlayers}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+      `Join ${gameRoom.title}?\n\nEntry Fee: $${gameRoom.entryFee.toFixed(2)}\nPrize Pool: $${calculatePrize(gameRoom.entryFee, gameRoom.currentPlayers, gameRoom.id)}\nPlayers: ${gameRoom.currentPlayers}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
     );
 
     if (!confirmEntry) return;
@@ -195,7 +204,7 @@ const GameModes: React.FC = () => {
                 <div className="text-sm text-gray-500">Entry Fee</div>
               </div>
               <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-400">${calculatePrize(gameRoom?.entryFee || 0, gameRoom?.currentPlayers || 0)}</div>
+                <div className="text-2xl font-bold text-yellow-400">${calculatePrize(gameRoom?.entryFee || 0, gameRoom?.currentPlayers || 0, gameRoom?.id || '')}</div>
                 <div className="text-sm text-gray-500">Prize Pool</div>
               </div>
               <div className="bg-gray-800 p-4 rounded-lg">
@@ -229,7 +238,7 @@ const GameModes: React.FC = () => {
         {/* Game Rooms Grid */}
         <div className="space-y-4">
           {gameRooms.map((room, index) => {
-            const prizeAmount = calculatePrize(room.entryFee, room.currentPlayers);
+            const prizeAmount = calculatePrize(room.entryFee, room.currentPlayers, room.id);
             const crownPoints = calculateCrownPoints(room.entryFee, room.currentPlayers);
             
             return (
