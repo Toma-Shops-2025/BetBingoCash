@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
+import GameModes from './GameModes';
 
 const AppLayout: React.FC = () => {
   const { user, balance, gems, isAuthenticated } = useAppContext();
@@ -35,30 +36,9 @@ const AppLayout: React.FC = () => {
         </div>
       )}
 
+      {/* Full GameModes Component */}
       <div className="mt-8">
-        <h2 className="text-2xl mb-4">Game Modes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-bold mb-2">Speed Bingo</h3>
-            <p className="text-gray-300 mb-2">Fast-paced 2-minute games</p>
-            <p className="text-green-400 font-bold">Entry: $2.00</p>
-            <p className="text-yellow-400 font-bold">Prize: $10.00</p>
-          </div>
-          
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-bold mb-2">Classic 75</h3>
-            <p className="text-gray-300 mb-2">Traditional 75-ball BINGO</p>
-            <p className="text-green-400 font-bold">Entry: $5.00</p>
-            <p className="text-yellow-400 font-bold">Prize: $25.00</p>
-          </div>
-          
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-bold mb-2">Pattern Bingo</h3>
-            <p className="text-gray-300 mb-2">Complete specific patterns</p>
-            <p className="text-green-400 font-bold">Entry: $3.00</p>
-            <p className="text-yellow-400 font-bold">Prize: $15.00</p>
-          </div>
-        </div>
+        <GameModes />
       </div>
     </div>
   );
