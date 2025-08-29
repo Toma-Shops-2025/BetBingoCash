@@ -1,665 +1,431 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import { useAudio } from '@/contexts/AudioContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Home, Play, Pause, Volume2, VolumeX, Settings, Zap, Star, Coins, DollarSign, CreditCard } from 'lucide-react';
 import BingoCard from './BingoCard';
-import GamePauseModal from './GamePauseModal';
-import AudioSettingsModal from './AudioSettingsModal';
-import { toast } from '@/components/ui/use-toast';
-import { Pause, Settings } from 'lucide-react';
-
-interface GameMode {
-  id: string;
-  title: string;
-  description: string;
-  duration: number;
-  prize: string;
-  entryFee: number;
-}
 
 interface GameInterfaceProps {
-  gameMode: GameMode;
+  gameMode: string;
+  onExit: () => void;
 }
 
-const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
-  const { isAuthenticated, startGame, endGame, currentGame, updateBalance, updateGems } = useAppContext();
+export interface GameInterfaceRef {
+  checkBingoLines: () => boolean;
+}
+
+const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMode, onExit }, ref) => {
+  const { balance, gems, updateBalance, updateGems } = useAppContext();
   const { 
-    playBackgroundMusic, 
-    stopBackgroundMusic, 
+    isPlaying, 
+    togglePlay, 
+    backgroundMusicVolume, 
+    gameMusicVolume,
     setGameMusicMode,
-    playCountdown, 
-    playGameStart, 
-    playBingo, 
-    playNumberCall 
+    playNumberCall,
+    playBingoCelebration 
   } = useAudio();
+
+  const [gameState, setGameState] = useState<'waiting' | 'playing' | 'paused' | 'finished'>('waiting');
+  const [calledNumbers, setCalledNumbers] = useState<string[]>([]);
+  const [currentNumber, setCurrentNumber] = useState<string>('');
+  const [ballsRemaining, setBallsRemaining] = useState(75);
+  const [gameSpeed, setGameSpeed] = useState(1);
+  const [autoDaub, setAutoDaub] = useState(true);
+  const [tripleDaubProgress, setTripleDaubProgress] = useState(0);
+  const [powerUpSlots, setPowerUpSlots] = useState<Array<{ id: string; type: string; icon: string }>>([]);
+  const [canCallBingo, setCanCallBingo] = useState(false);
+  const [bingoLines, setBingoLines] = useState<string[]>([]);
   
-  // Safety check for gameMode
-  if (!gameMode) {
-    return (
-      <div className="py-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-black text-white mb-4">
-            🎯 Game Loading...
-          </h2>
-          <p className="text-xl text-gray-300">
-            Please select a game mode to start playing.
-          </p>
-        </div>
-      </div>
-    );
-  }
-  
-  const [currentNumber, setCurrentNumber] = useState<number | null>(null);
-  const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(gameMode.duration);
-  const [score, setScore] = useState<number>(0);
-  const [gameActive, setGameActive] = useState(false);
-  const [gamePaused, setGamePaused] = useState(false);
-  const [showCountdown, setShowCountdown] = useState(false);
-  const [countdownNumber, setCountdownNumber] = useState(3);
-  const [showPauseModal, setShowPauseModal] = useState(false);
-  const [showAudioSettings, setShowAudioSettings] = useState(false);
-  const [powerUps, setPowerUps] = useState({
-    magicBall: 3,
-    magicDauber: 2,
-    tripleTime: 1,
-  });
+  const bingoCardRef = useRef<any>(null);
+  const gameInterval = useRef<NodeJS.Timeout | null>(null);
+  const numberCallInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate a random bingo number (1-75)
-  const generateNumber = useCallback(() => {
-    const availableNumbers = Array.from({ length: 75 }, (_, i) => i + 1)
-      .filter(num => !calledNumbers.includes(num));
-    
-    if (availableNumbers.length === 0) return null;
-    
-    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-    return availableNumbers[randomIndex];
-  }, [calledNumbers]);
-
-  // Convert number to BINGO format (B4, I19, O64, etc.)
-  const getBingoCall = useCallback((number: number) => {
-    if (number >= 1 && number <= 15) return `B${number}`;
-    if (number >= 16 && number <= 30) return `I${number}`;
-    if (number >= 31 && number <= 45) return `N${number}`;
-    if (number >= 46 && number <= 60) return `G${number}`;
-    if (number >= 61 && number <= 75) return `O${number}`;
-    return `Number ${number}`;
-  }, []);
-
-  // Check for completed BINGO lines
-  const checkBingoLines = useCallback(() => {
-    // This is a simplified check - in a real implementation, you'd check the actual bingo card
-    // For now, we'll check if enough numbers have been called to potentially complete lines
-    if (calledNumbers.length < 5) return 0;
-    
-    // Simple heuristic: if 15+ numbers are called, there's a good chance of a line
-    if (calledNumbers.length >= 15) return 1;
-    if (calledNumbers.length >= 20) return 2;
-    if (calledNumbers.length >= 25) return 3;
-    
-    return 0;
-  }, [calledNumbers]);
-
-  // Handle countdown animation
-  const startCountdown = () => {
-    setShowCountdown(true);
-    setCountdownNumber(3);
-    
-    const countdownInterval = setInterval(() => {
-      setCountdownNumber(prev => {
-        if (prev > 1) {
-          playCountdown();
-          return prev - 1;
-        } else {
-          clearInterval(countdownInterval);
-          setTimeout(() => {
-            setShowCountdown(false);
-            startGameAfterCountdown();
-          }, 1000);
-          return 0;
-        }
-      });
-    }, 1000);
-  };
-
-  const startGameAfterCountdown = () => {
-    playGameStart();
-    playBackgroundMusic();
-    
-    // Switch to game music mode (louder)
+  // Set game music mode when component mounts
+  useEffect(() => {
     setGameMusicMode(true);
+    return () => setGameMusicMode(false);
+  }, [setGameMusicMode]);
+
+  // Generate BINGO numbers (B1-B15, I16-I30, N31-N45, G46-G60, O61-O75)
+  const generateBingoNumbers = () => {
+    const numbers: string[] = [];
+    const letters = ['B', 'I', 'N', 'G', 'O'];
+    const ranges = [
+      [1, 15], [16, 30], [31, 45], [46, 60], [61, 75]
+    ];
     
-    startGame(gameMode.id);
-    setGameActive(true);
-    setScore(0);
-    setCalledNumbers([]);
-    setTimeLeft(gameMode.duration);
-    setPowerUps({
-      magicBall: 3,
-      magicDauber: 2,
-      tripleTime: 1,
+    letters.forEach((letter, index) => {
+      const [start, end] = ranges[index];
+      for (let i = start; i <= end; i++) {
+        numbers.push(`${letter}${i}`);
+      }
     });
     
-    // Generate first number
-    const firstNumber = generateNumber();
-    if (firstNumber) {
-      setCurrentNumber(firstNumber);
-      setCalledNumbers([firstNumber]);
-      
-      // Use BINGO format for voice announcement
-      const bingoCall = getBingoCall(firstNumber);
-      playNumberCall(firstNumber);
-      
-      // Voice announcement with BINGO format
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(bingoCall);
-        utterance.rate = 0.8;
-        utterance.pitch = 1.2;
-        utterance.volume = 0.8;
-        speechSynthesis.speak(utterance);
-      }
-    }
+    return numbers.sort(() => Math.random() - 0.5);
   };
 
-  // Start the game
-  const handleStartGame = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Please Sign In",
-        description: "You need to be signed in to play.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    startCountdown();
-  };
-
-  // Handle pause/resume
-  const togglePause = () => {
-    if (gameActive && !gamePaused) {
-      setGamePaused(true);
-      setShowPauseModal(true);
-      // Switch to background music mode when paused
-      setGameMusicMode(false);
-    } else if (gameActive && gamePaused) {
-      setGamePaused(false);
-      setShowPauseModal(false);
-      // Switch back to game music mode when resumed
-      setGameMusicMode(true);
-    }
-  };
-
-  // Handle resume from pause modal
-  const handleResume = () => {
-    setGamePaused(false);
-    setShowPauseModal(false);
-    // Switch back to game music mode when resumed
-    setGameMusicMode(true);
-  };
-
-  // Handle quit game
-  const handleQuit = () => {
-    stopBackgroundMusic();
-    setGameActive(false);
-    setGamePaused(false);
-    setShowPauseModal(false);
-    // Switch back to background music mode when quitting
-    setGameMusicMode(false);
-    setCurrentNumber(null);
+  const startGame = () => {
+    setGameState('playing');
     setCalledNumbers([]);
-    setTimeLeft(gameMode.duration);
-    setScore(0);
+    setBallsRemaining(75);
+    setTripleDaubProgress(0);
+    
+    const allNumbers = generateBingoNumbers();
+    let currentIndex = 0;
+    
+    // Call numbers every 3 seconds
+    numberCallInterval.current = setInterval(() => {
+      if (currentIndex < allNumbers.length) {
+        const number = allNumbers[currentIndex];
+        setCurrentNumber(number);
+        setCalledNumbers(prev => [number, ...prev.slice(0, 2)]); // Keep only last 3
+        setBallsRemaining(75 - currentIndex - 1);
+        
+        // Play number call audio
+        playNumberCall(number);
+        
+        currentIndex++;
+      } else {
+        // Game finished
+        setGameState('finished');
+        if (numberCallInterval.current) {
+          clearInterval(numberCallInterval.current);
+        }
+      }
+    }, 3000);
   };
 
-  // Call next number
-  const callNextNumber = useCallback(() => {
-    if (!gameActive || gamePaused) return;
+  const pauseGame = () => {
+    setGameState('paused');
+    if (numberCallInterval.current) {
+      clearInterval(numberCallInterval.current);
+    }
+  };
 
-    const nextNumber = generateNumber();
-    if (nextNumber) {
-      setCurrentNumber(nextNumber);
-      setCalledNumbers(prev => [...prev, nextNumber]);
-      setScore(prev => prev + 10); // Base score for each number
+  const resumeGame = () => {
+    setGameState('playing');
+    startGame();
+  };
+
+  const handleCallBingo = () => {
+    if (!canCallBingo) return;
+    
+    // Check if player actually has BINGO
+    if (bingoCardRef.current && bingoCardRef.current.checkBingoLines()) {
+      playBingoCelebration();
+      setGameState('finished');
       
-      // Use BINGO format for voice announcement
-      const bingoCall = getBingoCall(nextNumber);
-      playNumberCall(nextNumber);
+      // Calculate winnings based on game mode
+      const winnings = calculateWinnings();
+      updateBalance(winnings);
       
-      // Voice announcement with BINGO format
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(bingoCall);
-        utterance.rate = 0.8;
-        utterance.pitch = 1.2;
-        utterance.volume = 0.8;
-        speechSynthesis.speak(utterance);
-      }
+      // Show celebration
+      alert(`🎉 BINGO! You won $${winnings.toFixed(2)}! 🎉`);
     } else {
-      // Game over - all numbers called
-      handleGameOver();
-    }
-  }, [gameActive, gamePaused, generateNumber, getBingoCall, playNumberCall]);
-
-  // Handle game over
-  const handleGameOver = () => {
-    setGameActive(false);
-    stopBackgroundMusic();
-    
-    // Switch back to background music mode (softer)
-    setGameMusicMode(false);
-    
-    // Calculate final score with time bonus
-    const timeBonus = Math.floor(timeLeft * 2); // 2 points per second remaining
-    const finalScore = score + timeBonus;
-    
-    // Calculate prize based on game mode and performance
-    let prizeAmount = 0;
-    let prizeMessage = '';
-    let gemsEarned = 0;
-    
-    if (gameMode.id === 'speed-bingo') {
-      // Winner takes 80%, Runner-up 20%
-      if (finalScore >= 500) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.8;
-        prizeMessage = `🏆 WINNER! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 100; // Bonus gems for winning
-      } else if (finalScore >= 300) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.2;
-        prizeMessage = `🥈 Runner-up! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 50; // Gems for runner-up
-      } else if (finalScore >= 200) {
-        gemsEarned = 25; // Participation gems
-      }
-    } else if (gameMode.id === 'classic-75') {
-      // 1st: 60%, 2nd: 25%, 3rd: 15%
-      if (finalScore >= 800) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.6;
-        prizeMessage = `🥇 1st Place! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 150; // Bonus gems for 1st place
-      } else if (finalScore >= 600) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.25;
-        prizeMessage = `🥈 2nd Place! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 75; // Gems for 2nd place
-      } else if (finalScore >= 400) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.15;
-        prizeMessage = `🥉 3rd Place! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 50; // Gems for 3rd place
-      } else if (finalScore >= 200) {
-        gemsEarned = 30; // Participation gems
-      }
-    } else if (gameMode.id === 'pattern-bingo') {
-      // Winner takes 70%, Pattern bonus 30%
-      if (finalScore >= 600) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', '')) * 0.7;
-        prizeMessage = `🎯 Pattern Master! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 120; // Bonus gems for pattern mastery
-      } else if (finalScore >= 400) {
-        gemsEarned = 60; // Gems for good pattern performance
-      } else if (finalScore >= 200) {
-        gemsEarned = 25; // Participation gems
-      }
-    } else if (gameMode.id === 'jackpot-room') {
-      // Progressive jackpot - simplified calculation
-      if (finalScore >= 1000) {
-        prizeAmount = parseFloat(gameMode.prize.replace('$', '').replace(',', ''));
-        prizeMessage = `💎 JACKPOT! You won $${prizeAmount.toFixed(2)}!`;
-        gemsEarned = 500; // Massive gem bonus for jackpot
-      } else if (finalScore >= 700) {
-        gemsEarned = 200; // High performance gems
-      } else if (finalScore >= 400) {
-        gemsEarned = 100; // Good performance gems
-      } else if (finalScore >= 200) {
-        gemsEarned = 50; // Participation gems
-      }
-    }
-    
-    // Award gems based on performance
-    if (gemsEarned > 0) {
-      updateGems(gemsEarned);
-      toast({
-        title: "💎 Gems Earned!",
-        description: `+${gemsEarned} gems for your performance!`,
-      });
-    }
-    
-    // Award prize if won
-    if (prizeAmount > 0) {
-      updateBalance(prizeAmount);
-      toast({
-        title: "🎉 PRIZE WON!",
-        description: prizeMessage,
-      });
-    }
-    
-    endGame(finalScore);
-    
-    // Show game results
-    toast({
-      title: "Game Complete! 🎯",
-      description: `Final Score: ${finalScore.toLocaleString()} (Base: ${score.toLocaleString()} + Time Bonus: ${timeBonus.toLocaleString()})${prizeAmount > 0 ? ` | Prize: $${prizeAmount.toFixed(2)}` : ''}${gemsEarned > 0 ? ` | Gems: +${gemsEarned}` : ''}`,
-    });
-    
-    // Reset game state
-    setCurrentNumber(null);
-    setCalledNumbers([]);
-    setTimeLeft(gameMode.duration);
-    setScore(0);
-  };
-
-  // Use power-up
-  const usePowerUp = (type: keyof typeof powerUps) => {
-    if (powerUps[type] <= 0 || gamePaused) return;
-    
-    setPowerUps(prev => ({ ...prev, [type]: prev[type] - 1 }));
-    
-    switch (type) {
-      case 'magicBall':
-        // Call 3 numbers at once
-        for (let i = 0; i < 3; i++) {
-          setTimeout(() => callNextNumber(), i * 500);
-        }
-        break;
-      case 'magicDauber':
-        // Auto-mark numbers on card (handled in BingoCard)
-        toast({
-          title: "Magic Dauber Activated!",
-          description: "Numbers will be auto-marked for 10 seconds!",
-        });
-        break;
-      case 'tripleTime':
-        // Triple the time remaining
-        setTimeLeft(prev => Math.min(prev * 3, 300));
-        toast({
-          title: "Triple Time!",
-          description: "Time extended!",
-        });
-        break;
+      alert('❌ No BINGO yet! Keep playing!');
     }
   };
 
-  // Timer effect
-  useEffect(() => {
-    if (!gameActive || timeLeft <= 0 || gamePaused) return;
+  const calculateWinnings = () => {
+    // Base winnings based on game mode
+    const baseWinnings = {
+      'bingo-room-1': 1.50,
+      'bingo-room-2': 5.00,
+      'bingo-room-3': 13.50,
+      'bingo-room-4': 9.00,
+      'bingo-room-5': 13.00,
+      'bingo-room-6': 18.90,
+      'bingo-room-7': 35.00
+    };
     
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleGameOver();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [gameActive, timeLeft, gamePaused]);
+    return baseWinnings[gameMode as keyof typeof baseWinnings] || 10.00;
+  };
 
-  // Auto-call numbers effect
-  useEffect(() => {
-    if (!gameActive || gamePaused) return;
-    
-    const interval = setInterval(() => {
-      callNextNumber();
-    }, 3000); // Call number every 3 seconds
-    
-    return () => clearInterval(interval);
-  }, [gameActive, gamePaused, callNextNumber]);
+  const getBingoCall = (number: string) => {
+    return number; // Format: B1, I16, N31, G46, O61
+  };
+
+  // Expose checkBingoLines method to parent
+  useImperativeHandle(ref, () => ({
+    checkBingoLines: () => {
+      return bingoCardRef.current?.checkBingoLines() || false;
+    }
+  }));
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && gameActive) {
-        togglePause();
+      if (e.key === 'Escape') {
+        if (gameState === 'playing') {
+          pauseGame();
+        } else if (gameState === 'paused') {
+          resumeGame();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameActive, gamePaused]);
+  }, [gameState]);
 
-  // Format time
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Countdown overlay
-  if (showCountdown) {
-    return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div className="text-center">
-          <div className="text-9xl font-black text-white mb-4 animate-pulse">
-            {countdownNumber > 0 ? countdownNumber : 'GO!'}
-          </div>
-          <div className="text-2xl text-white/80">
-            {countdownNumber > 0 ? 'Get Ready!' : 'Game Starting!'}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Check for BINGO lines periodically
+  useEffect(() => {
+    if (gameState === 'playing') {
+      const checkInterval = setInterval(() => {
+        if (bingoCardRef.current) {
+          const hasBingo = bingoCardRef.current.checkBingoLines();
+          setCanCallBingo(hasBingo);
+        }
+      }, 1000);
+      
+      return () => clearInterval(checkInterval);
+    }
+  }, [gameState]);
 
   return (
-    <div className="py-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-black text-white mb-4">
-            🎯 {gameMode.title}
-          </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
-            {gameMode.description}
-          </p>
-          
-          {/* Game Stats */}
-          <div className="flex justify-center items-center gap-8 text-white mb-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">💰 {gameMode.prize}</div>
-              <div className="text-sm text-white/80">Prize Pool</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">⏱️ {Math.floor(gameMode.duration / 60)}m {gameMode.duration % 60}s</div>
-              <div className="text-sm text-white/80">Game Duration</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">🎫 ${gameMode.entryFee}</div>
-              <div className="text-sm text-white/80">Entry Fee</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">🎯 {gameMode.id.includes('jackpot') ? 'Progressive' : 'Fixed'}</div>
-              <div className="text-sm text-white/80">Prize Type</div>
-            </div>
-          </div>
-          
-          {/* Game Controls */}
-          <div className="flex justify-center items-center gap-4 mb-6">
-            {!gameActive ? (
-              <button
-                onClick={handleStartGame}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black py-4 px-12 rounded-full text-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                🚀 START GAME
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={togglePause}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  <Pause className="w-5 h-5 mr-2 inline" />
-                  {gamePaused ? 'Resume' : 'Pause'}
-                </button>
-                
-                <button
-                  onClick={() => setShowAudioSettings(true)}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  <Settings className="w-5 h-5 mr-2 inline" />
-                  Audio
-                </button>
-              </>
-            )}
-          </div>
-          
-          {gameActive && (
-            <div className="flex justify-center items-center gap-8 text-white">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">⏰ {formatTime(timeLeft)}</div>
-                <div className="text-sm text-white/80">Time Left</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400">{score.toLocaleString()}</div>
-                <div className="text-sm text-white/80">Your Score</div>
-              </div>
-            </div>
-          )}
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-blue-900 to-purple-800 relative overflow-hidden">
+      {/* Futuristic City Skyline Background */}
+      <div className="absolute inset-0 z-0">
+        {/* Glowing buildings */}
+        <div className="absolute left-0 bottom-0 w-32 h-64 bg-gradient-to-t from-purple-600 to-blue-500 opacity-60">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-purple-400/20 to-transparent animate-pulse"></div>
+        </div>
+        <div className="absolute right-0 bottom-0 w-40 h-80 bg-gradient-to-t from-blue-600 to-purple-500 opacity-60">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Called Numbers */}
-          <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border-2 border-gray-600/30">
-              <h3 className="text-xl font-bold text-white mb-4 text-center">CALLED NUMBERS</h3>
+        {/* Central pyramid structure */}
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 w-48 h-96 bg-gradient-to-t from-yellow-400 via-orange-500 to-red-500 opacity-80">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-yellow-300/30 to-transparent animate-pulse"></div>
+        </div>
+        
+        {/* Glowing orbs */}
+        <div className="absolute left-1/4 top-1/2 w-4 h-4 bg-blue-400 rounded-full animate-ping opacity-60"></div>
+        <div className="absolute right-1/4 top-1/3 w-3 h-3 bg-purple-400 rounded-full animate-ping opacity-60" style={{animationDelay: '1s'}}></div>
+        <div className="absolute left-1/3 bottom-1/4 w-5 h-5 bg-pink-400 rounded-full animate-ping opacity-60" style={{animationDelay: '2s'}}></div>
+        
+        {/* Reflective water surface */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-400/20 to-transparent opacity-40"></div>
+      </div>
+
+      {/* Game Interface */}
+      <div className="relative z-10 p-4">
+        {/* Top Section - Currency and Controls */}
+        <div className="flex justify-between items-start mb-6">
+          {/* Left - Currency Display */}
+          <div className="flex gap-4">
+            <div className="flex items-center gap-2 bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-green-400/30">
+              <DollarSign className="w-5 h-5 text-green-400" />
+              <span className="text-green-400 font-bold text-lg">{(balance || 0).toFixed(0)}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-yellow-500/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-yellow-400/30">
+              <Coins className="w-5 h-5 text-yellow-400" />
+              <span className="text-yellow-400 font-bold text-lg">{(gems || 0).toFixed(0)}</span>
+            </div>
+          </div>
+          
+          {/* Right - Home Button */}
+          <Button
+            onClick={onExit}
+            variant="ghost"
+            className="bg-purple-600/20 hover:bg-purple-600/40 backdrop-blur-sm border border-purple-400/30 text-white p-3 rounded-full"
+          >
+            <Home className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Called Numbers Bar */}
+        <div className="flex items-center gap-4 mb-6 bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
+          <div className="flex gap-3">
+            {calledNumbers.map((number, index) => (
+              <div
+                key={index}
+                className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 ${
+                  index === 0 ? 'bg-orange-500 border-orange-400 animate-pulse' :
+                  index === 1 ? 'bg-green-500 border-green-400' :
+                  'bg-red-500 border-red-400'
+                }`}
+              >
+                {number}
+              </div>
+            ))}
+          </div>
+          
+          {/* Game Speed Control */}
+          <Button
+            onClick={() => setGameSpeed(prev => prev === 3 ? 1 : prev + 1)}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Zap className="w-4 h-4" />
+            <span className="text-sm">x{gameSpeed}</span>
+          </Button>
+          
+          {/* Balls Remaining */}
+          <div className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold">
+            {ballsRemaining} BALLS
+          </div>
+        </div>
+
+        {/* Main Game Area */}
+        <div className="flex gap-6">
+          {/* Left - BINGO Card */}
+          <div className="flex-1">
+            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-400/50">
+              {/* Rainbow BINGO Header */}
+              <div className="text-center mb-6">
+                <h1 className="text-4xl font-black">
+                  <span className="text-red-500">B</span>
+                  <span className="text-orange-500">I</span>
+                  <span className="text-green-500">N</span>
+                  <span className="text-blue-500">G</span>
+                  <span className="text-purple-500">O</span>
+                </h1>
+              </div>
               
-              {/* Current Number */}
-              {currentNumber && (
-                <div className="text-center mb-6">
-                  <div className="w-24 h-24 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-3xl font-black text-white shadow-lg animate-pulse">
-                    {currentNumber}
-                  </div>
-                  <div className="text-white/80 text-sm mt-2">Current Call</div>
-                </div>
-              )}
-              
-              {/* Recent Numbers */}
-              <div className="grid grid-cols-5 gap-2">
-                {calledNumbers.slice(-10).map((num, index) => (
-                  <div key={index} className="aspect-square bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                    {num}
+              <BingoCard
+                ref={bingoCardRef}
+                calledNumbers={calledNumbers}
+                onBingoLinesChange={setBingoLines}
+              />
+            </div>
+          </div>
+
+          {/* Right - Controls and Power-ups */}
+          <div className="w-80 space-y-4">
+            {/* Power-up Slots */}
+            <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
+              <h3 className="text-white font-bold mb-3 text-center">Power-ups</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((slot) => (
+                  <div
+                    key={slot}
+                    className="w-16 h-20 bg-purple-800/50 border border-purple-400/30 rounded-lg flex items-center justify-center"
+                  >
+                    {powerUpSlots[slot] ? (
+                      <div className="text-center">
+                        <div className="text-2xl">{powerUpSlots[slot].icon}</div>
+                        <div className="text-xs text-white">{powerUpSlots[slot].type}</div>
+                      </div>
+                    ) : (
+                      <div className="text-purple-400/50 text-xs">Empty</div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
-            
-            {/* Power-ups */}
-            <div className="mt-6 bg-gradient-to-br from-purple-800 to-indigo-900 rounded-2xl p-6 border-2 border-purple-400/30">
-              <h3 className="text-xl font-bold text-white mb-4 text-center">POWER-UPS</h3>
+
+            {/* Triple Daub Power-up */}
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl p-4 border border-pink-400/30">
+              <h3 className="text-white font-bold mb-3 text-center">TRIPLE DAUB</h3>
+              <div className="flex justify-center gap-2 mb-3">
+                {[0, 1, 2].map((chip) => (
+                  <div
+                    key={chip}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                      chip < tripleDaubProgress
+                        ? 'bg-red-500 border-red-400'
+                        : 'bg-gray-600 border-gray-500'
+                    }`}
+                  >
+                    {chip < tripleDaubProgress && <Star className="w-4 h-4 text-white" />}
+                  </div>
+                ))}
+              </div>
+              <div className="text-center text-white text-sm">
+                {tripleDaubProgress}/3
+              </div>
+            </div>
+
+            {/* Auto-daub Toggle */}
+            <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-bold">AUTO DAUB</span>
+                <Button
+                  onClick={() => setAutoDaub(!autoDaub)}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold ${
+                    autoDaub
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'bg-gray-600 hover:bg-gray-700 text-white'
+                  }`}
+                >
+                  {autoDaub ? 'ON' : 'OFF'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Game Controls */}
+            <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
               <div className="space-y-3">
-                <button 
-                  onClick={() => usePowerUp('magicBall')}
-                  disabled={powerUps.magicBall <= 0 || !gameActive || gamePaused}
-                  className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.magicBall > 0 && gameActive && !gamePaused
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'
+                {gameState === 'waiting' && (
+                  <Button
+                    onClick={startGame}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    START GAME
+                  </Button>
+                )}
+                
+                {gameState === 'playing' && (
+                  <Button
+                    onClick={pauseGame}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 rounded-xl"
+                  >
+                    <Pause className="w-4 h-4 mr-2" />
+                    PAUSE
+                  </Button>
+                )}
+                
+                {gameState === 'paused' && (
+                  <Button
+                    onClick={resumeGame}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-xl"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    RESUME
+                  </Button>
+                )}
+                
+                {/* CALL BINGO Button */}
+                <Button
+                  onClick={handleCallBingo}
+                  disabled={!canCallBingo}
+                  className={`w-full font-bold py-3 rounded-xl text-lg ${
+                    canCallBingo
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white animate-pulse'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  ⭐ Magic Ball <span className="ml-auto">{powerUps.magicBall}</span>
-                </button>
-                <button 
-                  onClick={() => usePowerUp('magicDauber')}
-                  disabled={powerUps.magicDauber <= 0 || !gameActive || gamePaused}
-                  className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.magicDauber > 0 && gameActive && !gamePaused
-                      ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white hover:from-blue-600 hover:to-cyan-700'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  👑 Magic Dauber <span className="ml-auto">{powerUps.magicDauber}</span>
-                </button>
-                <button 
-                  onClick={() => usePowerUp('tripleTime')}
-                  disabled={powerUps.tripleTime <= 0 || !gameActive || gamePaused}
-                  className={`w-full font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition-all ${
-                    powerUps.tripleTime > 0 && gameActive && !gamePaused
-                      ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  ⚡ Triple Time <span className="ml-auto">{powerUps.tripleTime}</span>
-                </button>
+                  🎯 CALL BINGO!
+                </Button>
               </div>
             </div>
           </div>
-          
-          {/* Bingo Card */}
-          <div className="flex-1 flex flex-col items-center justify-center">
-            {/* BINGO Button */}
-            <div className="mb-6 text-center">
-              <button
-                onClick={() => {
-                  // Check if player has actually completed a line
-                  const bingoLines = checkBingoLines();
-                  if (bingoLines > 0) {
-                    const bingoBonus = bingoLines * 100;
-                    setScore(prev => prev + bingoBonus);
-                    playBingo();
-                    toast({
-                      title: `BINGO! ${bingoLines} Line${bingoLines > 1 ? 's' : ''}!`,
-                      description: `+${bingoBonus} points!`,
-                    });
-                    // End the game with the current score
-                    handleGameOver();
-                  } else {
-                    toast({
-                      title: "Not Yet!",
-                      description: "You need to complete a line to call BINGO!",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-black text-3xl md:text-4xl py-4 px-8 rounded-full shadow-2xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-300 animate-pulse"
-              >
-                🎯 CALL BINGO! 🎯
-              </button>
-              <p className="text-white/70 text-sm mt-2">
-                Click when you complete a line to win!
-              </p>
+        </div>
+
+        {/* Game Status */}
+        <div className="mt-6 text-center">
+          <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 inline-block">
+            <div className="text-white font-bold text-lg">
+              {gameState === 'waiting' && '🎮 Ready to Start'}
+              {gameState === 'playing' && '🎯 Game in Progress'}
+              {gameState === 'paused' && '⏸️ Game Paused'}
+              {gameState === 'finished' && '🏆 Game Complete'}
             </div>
-            
-            <BingoCard
-              calledNumbers={calledNumbers}
-              gameActive={gameActive}
-              onBingo={(lines) => {
-                const bingoBonus = lines * 100;
-                setScore(prev => prev + bingoBonus);
-                playBingo();
-                toast({
-                  title: `BINGO! ${lines} Line${lines > 1 ? 's' : ''}!`,
-                  description: `+${bingoBonus} points!`,
-                });
-              }}
-            />
-            
-            {gameActive && (
-              <div className="mt-6 text-center">
-                <button 
-                  onClick={handleGameOver}
-                  className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-black py-4 px-12 rounded-full text-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  🛑 END GAME
-                </button>
+            {currentNumber && (
+              <div className="text-purple-300 text-sm mt-2">
+                Current Number: <span className="font-bold text-white">{getBingoCall(currentNumber)}</span>
               </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <GamePauseModal
-        isOpen={showPauseModal}
-        onClose={() => setShowPauseModal(false)}
-        onResume={handleResume}
-        onQuit={handleQuit}
-        onAudioSettings={() => setShowAudioSettings(true)}
-        isPaused={gamePaused}
-      />
-
-      <AudioSettingsModal
-        isOpen={showAudioSettings}
-        onClose={() => setShowAudioSettings(false)}
-      />
     </div>
   );
-};
+});
+
+GameInterface.displayName = 'GameInterface';
 
 export default GameInterface;
