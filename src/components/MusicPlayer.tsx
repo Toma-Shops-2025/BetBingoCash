@@ -16,13 +16,13 @@ const MusicPlayer: React.FC = () => {
   const { settings, updateSettings, playBackgroundMusic, stopBackgroundMusic } = useAudio();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentService, setCurrentService] = useState<string>('spotify');
-  const [showServices, setShowServices] = useState(false);
+  const [showServices, setShowServices] = useState(true); // Show services by default
   const [spotifyConnected, setSpotifyConnected] = useState(false);
 
   // Spotify Web Playback SDK integration
   useEffect(() => {
     // Check if Spotify is available
-    if (window.Spotify) {
+    if (typeof window !== 'undefined' && (window as any).Spotify) {
       setSpotifyConnected(true);
     }
   }, []);
@@ -124,57 +124,65 @@ const MusicPlayer: React.FC = () => {
   return (
     <div className="fixed bottom-4 left-4 z-50">
       {/* Main Music Player */}
-      <div className="bg-gradient-to-r from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-3 border border-purple-400/30 shadow-2xl">
-        <div className="flex items-center gap-3">
+      <div className="bg-gradient-to-r from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl">
+        <div className="flex items-center gap-4">
           {/* Service Icon */}
-          <div className={`w-12 h-12 bg-gradient-to-r ${currentServiceData?.color} rounded-lg flex items-center justify-center cursor-pointer hover:scale-105 transition-transform`} onClick={openStreamingService}>
-            <span className="text-2xl">{currentServiceData?.icon}</span>
+          <div className={`w-16 h-16 bg-gradient-to-r ${currentServiceData?.color} rounded-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-transform`} onClick={openStreamingService}>
+            <span className="text-3xl">{currentServiceData?.icon}</span>
           </div>
 
           {/* Service Info */}
           <div className="flex-1 min-w-0">
-            <div className="text-white font-bold text-sm truncate">
+            <div className="text-white font-bold text-lg truncate">
               {currentServiceData?.name}
             </div>
-            <div className="text-white/70 text-xs truncate">
+            <div className="text-white/70 text-sm truncate">
               {currentServiceData?.description}
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={togglePlayPause}
-              className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <Pause className="w-5 h-5 text-white" />
+                <Pause className="w-6 h-6 text-white" />
               ) : (
-                <Play className="w-5 h-5 text-white" />
+                <Play className="w-6 h-6 text-white" />
               )}
             </button>
 
             <button
               onClick={openStreamingService}
-              className="p-2 text-white/70 hover:text-white transition-colors"
+              className="p-3 text-white/70 hover:text-white transition-colors"
               title="Open in New Tab"
             >
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={() => setShowServices(!showServices)}
+              className="p-3 text-white/70 hover:text-white transition-colors"
+              title={showServices ? 'Hide Services' : 'Show Services'}
+            >
+              <Radio className="w-5 h-5" />
             </button>
           </div>
 
           {/* Volume Control */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={toggleMute}
-              className="p-2 text-white/70 hover:text-white transition-colors"
+              className="p-3 text-white/70 hover:text-white transition-colors"
               title={settings.musicEnabled ? 'Mute' : 'Unmute'}
             >
               {settings.musicEnabled ? (
-                <Volume2 className="w-4 h-4" />
+                <Volume2 className="w-5 h-5" />
               ) : (
-                <VolumeX className="w-4 h-4" />
+                <VolumeX className="w-5 h-5" />
               )}
             </button>
 
@@ -185,64 +193,64 @@ const MusicPlayer: React.FC = () => {
               step="0.1"
               value={settings.backgroundMusicVolume}
               onChange={handleVolumeChange}
-              className="w-16 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+              className="w-20 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
               title="Volume"
             />
           </div>
-
-          {/* Services Toggle */}
-          <button
-            onClick={() => setShowServices(!showServices)}
-            className="p-2 text-white/70 hover:text-white transition-colors"
-            title="Choose Music Service"
-          >
-            <Radio className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
       {/* Streaming Services Selection */}
       {showServices && (
-        <div className="mt-3 bg-gradient-to-r from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-3 border border-purple-400/30 shadow-2xl">
-          <div className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-            <Headphones className="w-4 h-4" />
-            Choose Your Music Service
+        <div className="mt-3 bg-gradient-to-r from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl">
+          <div className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+            🎵 Music Ready
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <p className="text-white/80 text-sm mb-4">
+            Connect your favorite music platform to enjoy music while playing BetBingo, just like Google Maps!
+          </p>
+          <div className="space-y-3">
             {streamingServices.map((service) => (
               <button
                 key={service.id}
                 onClick={() => {
                   setCurrentService(service.id);
-                  setShowServices(false);
+                  openStreamingService();
                 }}
-                className={`p-3 rounded-lg transition-all duration-200 text-left ${
+                className={`w-full p-4 rounded-xl transition-all duration-200 text-left border-2 ${
                   service.id === currentService
-                    ? 'bg-white/20 text-white border-2 border-white/30'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'bg-white/20 text-white border-purple-400'
+                    : 'text-white/70 hover:text-white hover:bg-white/10 border-transparent'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{service.icon}</span>
-                  <span className="font-medium text-sm">{service.name}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{service.icon}</span>
+                    <div>
+                      <div className="font-bold text-white">{service.name}</div>
+                      <div className="text-sm opacity-70">{service.description}</div>
+                    </div>
+                  </div>
+                  <div className="text-white/60">
+                    <ExternalLink className="w-4 h-4" />
+                  </div>
                 </div>
-                <div className="text-xs opacity-70 leading-tight">{service.description}</div>
               </button>
             ))}
           </div>
-          <div className="mt-3 text-center">
+          <div className="mt-4 text-center">
             <button
-              onClick={openStreamingService}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all duration-200"
+              onClick={() => setShowServices(false)}
+              className="text-white/70 hover:text-white text-sm transition-colors"
             >
-              🚀 Open {currentServiceData?.name}
+              Hide Services
             </button>
           </div>
         </div>
       )}
 
       {/* Custom Slider Styles */}
-      <style jsx>{`
+      <style>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
           height: 16px;
