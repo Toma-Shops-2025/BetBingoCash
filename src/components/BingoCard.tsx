@@ -1,175 +1,203 @@
-import React, { useState, useEffect } from 'react';
+import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
+import { Star, Coins, DollarSign, CreditCard } from 'lucide-react';
 
 interface BingoCardProps {
-  calledNumbers: number[];
-  gameActive: boolean;
-  onBingo: (lines: number) => void;
+  calledNumbers: string[];
+  onBingoLinesChange?: (lines: string[]) => void;
 }
 
-const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, gameActive, onBingo }) => {
-  const [markedNumbers, setMarkedNumbers] = useState<Set<number>>(new Set());
-  const [autoDaub, setAutoDaub] = useState(true);
-  
-  const bingoCard = [
-    [3, 20, 39, 48, 66],
-    [4, 25, 31, 53, 62],
-    [8, 19, 'FREE', 46, 72],
-    [11, 24, 44, 55, 69],
-    [7, 16, 43, 47, 63]
-  ];
+export interface BingoCardRef {
+  checkBingoLines: () => boolean;
+}
 
-  // Auto-mark numbers when they're called
-  useEffect(() => {
-    if (autoDaub && gameActive) {
-      const newMarked = new Set(markedNumbers);
-      calledNumbers.forEach(num => {
-        if (typeof num === 'number') {
-          newMarked.add(num);
-        }
-      });
-      setMarkedNumbers(newMarked);
-    }
-  }, [calledNumbers, autoDaub, gameActive, markedNumbers]);
+const BingoCard = forwardRef<BingoCardRef, BingoCardProps>(({ calledNumbers, onBingoLinesChange }, ref) => {
+  const [daubedNumbers, setDaubedNumbers] = useState<Set<string>>(new Set());
+  const [bingoLines, setBingoLines] = useState<string[]>([]);
 
-  // Check for bingo lines
-  useEffect(() => {
-    if (gameActive && markedNumbers.size >= 5) {
-      const lines = checkBingoLines();
-      if (lines > 0) {
-        onBingo(lines);
-      }
-    }
-  }, [markedNumbers, gameActive, onBingo]);
-
-  const checkBingoLines = (): number => {
-    let lines = 0;
+  // Generate BINGO card numbers
+  const generateCardNumbers = () => {
+    const card: string[][] = [];
+    const letters = ['B', 'I', 'N', 'G', 'O'];
+    const ranges = [
+      [1, 15], [16, 30], [31, 45], [46, 60], [61, 75]
+    ];
     
-    // Check rows
-    for (let row = 0; row < 5; row++) {
-      let rowComplete = true;
-      for (let col = 0; col < 5; col++) {
-        const cell = bingoCard[row][col];
-        if (cell !== 'FREE' && !markedNumbers.has(cell as number)) {
-          rowComplete = false;
-          break;
-        }
-      }
-      if (rowComplete) lines++;
-    }
-    
-    // Check columns
     for (let col = 0; col < 5; col++) {
-      let colComplete = true;
-      for (let row = 0; row < 5; row++) {
-        const cell = bingoCard[row][col];
-        if (cell !== 'FREE' && !markedNumbers.has(cell as number)) {
-          colComplete = false;
+      const [start, end] = ranges[col];
+      const columnNumbers: string[] = [];
+      
+      // Generate 5 unique numbers for this column
+      const numbers = [];
+      for (let i = start; i <= end; i++) {
+        numbers.push(i);
+      }
+      
+      // Shuffle and take first 5
+      for (let i = 0; i < 5; i++) {
+        const randomIndex = Math.floor(Math.random() * numbers.length);
+        columnNumbers.push(letters[col] + numbers[randomIndex]);
+        numbers.splice(randomIndex, 1);
+      }
+      
+      card.push(columnNumbers);
+    }
+    
+    return card;
+  };
+
+  const [cardNumbers] = useState(() => generateCardNumbers());
+
+  // Auto-daub numbers when they're called
+  useEffect(() => {
+    calledNumbers.forEach(number => {
+      setDaubedNumbers(prev => new Set([...prev, number]));
+    });
+  }, [calledNumbers]);
+
+  // Check for BINGO lines
+  const checkBingoLines = (): boolean => {
+    const lines: string[] = [];
+    
+    // Check horizontal lines
+    for (let row = 0; row < 5; row++) {
+      let isComplete = true;
+      for (let col = 0; col < 5; col++) {
+        if (col === 2 && row === 2) continue; // Skip free space
+        if (!daubedNumbers.has(cardNumbers[col][row])) {
+          isComplete = false;
           break;
         }
       }
-      if (colComplete) lines++;
+      if (isComplete) {
+        lines.push(`Row ${row + 1}`);
+      }
     }
     
-    // Check diagonals
+    // Check vertical lines
+    for (let col = 0; col < 5; col++) {
+      let isComplete = true;
+      for (let row = 0; row < 5; row++) {
+        if (col === 2 && row === 2) continue; // Skip free space
+        if (!daubedNumbers.has(cardNumbers[col][row])) {
+          isComplete = false;
+          break;
+        }
+      }
+      if (isComplete) {
+        lines.push(`Column ${String.fromCharCode(65 + col)}`);
+      }
+    }
+    
+    // Check diagonal lines
     let diagonal1Complete = true;
     let diagonal2Complete = true;
     
     for (let i = 0; i < 5; i++) {
-      const cell1 = bingoCard[i][i];
-      const cell2 = bingoCard[i][4 - i];
-      
-      if (cell1 !== 'FREE' && !markedNumbers.has(cell1 as number)) {
+      if (i === 2) continue; // Skip free space
+      if (!daubedNumbers.has(cardNumbers[i][i])) {
         diagonal1Complete = false;
       }
-      if (cell2 !== 'FREE' && !markedNumbers.has(cell2 as number)) {
+      if (!daubedNumbers.has(cardNumbers[i][4 - i])) {
         diagonal2Complete = false;
       }
     }
     
-    if (diagonal1Complete) lines++;
-    if (diagonal2Complete) lines++;
+    if (diagonal1Complete) lines.push('Diagonal \\');
+    if (diagonal2Complete) lines.push('Diagonal /');
     
-    return lines;
-  };
-
-  // Handle number click - DISABLED to prevent cheating
-  const handleNumberClick = (number: number) => {
-    // DISABLED: Users cannot manually daub numbers to prevent cheating
-    // Numbers are only marked automatically when called by the game
-    return;
+    setBingoLines(lines);
+    if (onBingoLinesChange) {
+      onBingoLinesChange(lines);
+    }
     
-    // OLD CODE (removed for security):
-    // if (gameActive && !markedNumbers.includes(number)) {
-    //   setMarkedNumbers(prev => [...prev, number]);
-    //   onBingo && onBingo(checkBingoLines());
-    // }
+    return lines.length > 0;
   };
 
-  const toggleAutoDaub = () => {
-    setAutoDaub(!autoDaub);
-  };
+  // Expose checkBingoLines method to parent
+  useImperativeHandle(ref, () => ({
+    checkBingoLines
+  }));
 
-  const getBingoLines = (): number => {
-    return checkBingoLines();
+  // Get icon for daubed numbers
+  const getDaubIcon = (number: string) => {
+    const num = parseInt(number.slice(1));
+    if (num % 3 === 0) return <Coins className="w-4 h-4 text-yellow-400" />;
+    if (num % 5 === 0) return <DollarSign className="w-4 h-4 text-green-400" />;
+    if (num % 7 === 0) return <CreditCard className="w-4 h-4 text-purple-400" />;
+    return <Star className="w-4 h-4 text-blue-400" />;
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-800 to-indigo-900 rounded-2xl p-6 border-2 border-purple-400/30">
-      <div className="text-center mb-4">
-        <h3 className="text-2xl font-bold text-white mb-2">YOUR BINGO CARD</h3>
-        <div className="flex justify-center space-x-2 mb-4">
-          {['B', 'I', 'N', 'G', 'O'].map((letter, index) => (
-            <div key={letter} className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white text-xl ${
-              ['bg-red-500', 'bg-yellow-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500'][index]
-            }`}>
-              {letter}
-            </div>
-          ))}
-        </div>
+    <div className="bg-white rounded-xl p-6 shadow-2xl">
+      {/* BINGO Header */}
+      <div className="grid grid-cols-5 gap-1 mb-4">
+        {['B', 'I', 'N', 'G', 'O'].map((letter, index) => (
+          <div
+            key={letter}
+            className={`text-center font-black text-lg py-2 rounded-lg ${
+              index === 0 ? 'bg-red-500 text-white' :
+              index === 1 ? 'bg-orange-500 text-white' :
+              index === 2 ? 'bg-green-500 text-white' :
+              index === 3 ? 'bg-blue-500 text-white' :
+              'bg-purple-500 text-white'
+            }`}
+          >
+            {letter}
+          </div>
+        ))}
       </div>
-      
-      <div className="grid grid-cols-5 gap-2 mb-6">
-        {bingoCard.map((row, rowIndex) =>
-          row.map((cell, colIndex) => (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className={`aspect-square flex items-center justify-center text-lg font-bold rounded-lg transition-all duration-200 ${
-                cell === 'FREE' 
-                  ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white'
-                  : typeof cell === 'number' && markedNumbers.has(cell)
-                  ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white scale-95'
-                  : 'bg-white/90 text-gray-800 hover:bg-yellow-200 disabled:opacity-50 disabled:cursor-not-allowed'
-              }`}
-            >
-              {cell}
-            </div>
-          ))
+
+      {/* BINGO Grid */}
+      <div className="grid grid-cols-5 gap-1">
+        {Array.from({ length: 5 }, (_, row) =>
+          Array.from({ length: 5 }, (_, col) => {
+            const number = cardNumbers[col][row];
+            const isFreeSpace = col === 2 && row === 2;
+            const isDaubed = daubedNumbers.has(number);
+            
+            return (
+              <div
+                key={`${col}-${row}`}
+                className={`
+                  aspect-square flex items-center justify-center rounded-lg border-2 font-bold text-sm relative
+                  ${isFreeSpace 
+                    ? 'bg-gradient-to-br from-red-400 to-red-600 border-red-500 text-white' 
+                    : isDaubed
+                    ? 'bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white'
+                    : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 transition-colors'
+                  }
+                `}
+              >
+                {isFreeSpace ? (
+                  <Star className="w-6 h-6 text-white" />
+                ) : (
+                  <>
+                    <span className="z-10">{number.slice(1)}</span>
+                    {isDaubed && (
+                      <div className="absolute inset-0 flex items-center justify-center opacity-80">
+                        {getDaubIcon(number)}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
-      
-      <div className="flex justify-between items-center">
-        <div className="text-white/80 text-sm">
-          Numbers marked: {markedNumbers.size} | Bingo lines: {getBingoLines()}
-        </div>
-        <button 
-          onClick={toggleAutoDaub}
-          className={`font-bold py-2 px-4 rounded-full text-sm transition-all ${
-            autoDaub 
-              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white'
-              : 'bg-gray-600 text-white hover:bg-gray-700'
-          }`}
-        >
-          AUTO-DAUB {autoDaub ? 'ON' : 'OFF'}
-        </button>
-      </div>
-      
-      {!gameActive && (
-        <div className="mt-4 text-center text-white/60 text-sm">
-          Start a game to begin playing!
+
+      {/* BINGO Lines Status */}
+      {bingoLines.length > 0 && (
+        <div className="mt-4 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg">
+          <div className="text-center text-white font-bold">
+            🎯 BINGO Lines Found: {bingoLines.join(', ')}
+          </div>
         </div>
       )}
     </div>
   );
-};
+});
+
+BingoCard.displayName = 'BingoCard';
 
 export default BingoCard;

@@ -3,7 +3,7 @@ import { useAppContext } from '@/contexts/AppContext';
 import { useAudio } from '@/contexts/AudioContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Home, Play, Pause, Volume2, VolumeX, Settings, Zap, Star, Coins, DollarSign, CreditCard } from 'lucide-react';
+import { Home, Play, Pause, Volume2, VolumeX, Settings, Zap, Star, Coins, DollarSign, CreditCard, Music, Mic } from 'lucide-react';
 import BingoCard from './BingoCard';
 
 interface GameInterfaceProps {
@@ -38,14 +38,111 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
   const [canCallBingo, setCanCallBingo] = useState(false);
   const [bingoLines, setBingoLines] = useState<string[]>([]);
   
+  // Audio states
+  const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState(false);
+  const [backgroundMusicVolume, setBackgroundMusicVolume] = useState(0.3);
+  const [isMuted, setIsMuted] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<string>('');
+  
   const bingoCardRef = useRef<any>(null);
   const gameInterval = useRef<NodeJS.Timeout | null>(null);
   const numberCallInterval = useRef<NodeJS.Timeout | null>(null);
+  const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+
+  // Initialize speech synthesis and find Adam-like voice
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      speechSynthesisRef.current = window.speechSynthesis;
+      
+      // Wait for voices to load
+      const loadVoices = () => {
+        const voices = speechSynthesisRef.current?.getVoices() || [];
+        // Find a male voice that sounds closest to Adam
+        const adamLikeVoice = voices.find(voice => 
+          voice.lang.includes('en') && 
+          (voice.name.includes('Male') || voice.name.includes('David') || voice.name.includes('Mark') || voice.name.includes('James'))
+        ) || voices.find(voice => voice.lang.includes('en')) || voices[0];
+        
+        if (adamLikeVoice) {
+          setSelectedVoice(adamLikeVoice.name);
+        }
+      };
+      
+      if (speechSynthesisRef.current.getVoices().length > 0) {
+        loadVoices();
+      } else {
+        speechSynthesisRef.current.addEventListener('voiceschanged', loadVoices);
+      }
+    }
+  }, []);
+
+  // Initialize background music
+  useEffect(() => {
+    backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
+    backgroundMusicRef.current.loop = true;
+    backgroundMusicRef.current.volume = backgroundMusicVolume;
+    
+    return () => {
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.pause();
+        backgroundMusicRef.current = null;
+      }
+    };
+  }, []);
+
+  // Play background music
+  const playBackgroundMusic = () => {
+    if (backgroundMusicRef.current && !isMuted) {
+      backgroundMusicRef.current.play().catch(console.error);
+      setIsBackgroundMusicPlaying(true);
+    }
+  };
+
+  // Stop background music
+  const stopBackgroundMusic = () => {
+    if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.pause();
+      setIsBackgroundMusicPlaying(false);
+    }
+  };
+
+  // Toggle mute
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.volume = !isMuted ? 0 : backgroundMusicVolume;
+    }
+  };
+
+  // Call BINGO number with Adam-like voice
+  const callBingoNumber = (number: string) => {
+    if (speechSynthesisRef.current && selectedVoice) {
+      // Cancel any ongoing speech
+      speechSynthesisRef.current.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.text = `Number ${number}`;
+      utterance.voice = speechSynthesisRef.current.getVoices().find(v => v.name === selectedVoice) || null;
+      utterance.rate = 0.9; // Slightly slower for Adam-like effect
+      utterance.pitch = 0.95; // Slightly lower pitch for male voice
+      utterance.volume = 0.8;
+      
+      // Add some natural pauses and emphasis
+      utterance.text = `Number ${number.slice(0, 1)} ${number.slice(1)}`;
+      
+      speechSynthesisRef.current.speak(utterance);
+    }
+  };
 
   // Set game music mode when component mounts
   useEffect(() => {
     setGameMusicMode(true);
-    return () => setGameMusicMode(false);
+    playBackgroundMusic();
+    return () => {
+      setGameMusicMode(false);
+      stopBackgroundMusic();
+    };
   }, [setGameMusicMode]);
 
   // Generate BINGO numbers (B1-B15, I16-I30, N31-N45, G46-G60, O61-O75)
@@ -83,8 +180,8 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
         setCalledNumbers(prev => [number, ...prev.slice(0, 2)]); // Keep only last 3
         setBallsRemaining(75 - currentIndex - 1);
         
-        // Play number call audio
-        playNumberCall(number);
+        // Call BINGO number with Adam-like voice
+        callBingoNumber(number);
         
         currentIndex++;
       } else {
@@ -236,6 +333,48 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
           </Button>
         </div>
 
+        {/* Audio Controls */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Music className="w-5 h-5 text-purple-400" />
+              <span className="text-white text-sm">Music</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={backgroundMusicVolume}
+                onChange={(e) => {
+                  const volume = parseFloat(e.target.value);
+                  setBackgroundMusicVolume(volume);
+                  if (backgroundMusicRef.current) {
+                    backgroundMusicRef.current.volume = volume;
+                  }
+                }}
+                className="w-20"
+              />
+            </div>
+            
+            <Button
+              onClick={toggleMute}
+              variant="ghost"
+              className={`p-2 rounded-lg ${
+                isMuted 
+                  ? 'bg-red-500/20 border border-red-400/30 text-red-400' 
+                  : 'bg-green-500/20 border border-green-400/30 text-green-400'
+              }`}
+            >
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              <Mic className="w-5 h-5 text-blue-400" />
+              <span className="text-white text-sm">Voice: {selectedVoice || 'Loading...'}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Called Numbers Bar */}
         <div className="flex items-center gap-4 mb-6 bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
           <div className="flex gap-3">
@@ -318,7 +457,7 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
 
             {/* Triple Daub Power-up */}
             <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl p-4 border border-pink-400/30">
-              <h3 className="text-white font-bold mb-3 text-center">TRIPLE DAUB</h3>
+              <h3 className="text-center text-white font-bold mb-3">TRIPLE DAUB</h3>
               <div className="flex justify-center gap-2 mb-3">
                 {[0, 1, 2].map((chip) => (
                   <div
