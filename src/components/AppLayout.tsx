@@ -266,6 +266,34 @@ const AppLayout: React.FC = () => {
             </button>
 
             <div className="pt-2 border-t border-white/20">
+              <div className="text-white/60 text-xs mb-2 text-center">🎵 Music</div>
+              
+              <button
+                onClick={() => window.open('https://open.spotify.com', '_blank')}
+                className="w-full p-3 bg-gradient-to-r from-green-600/80 to-green-700/80 hover:from-green-500 hover:to-green-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105 mb-2"
+              >
+                <span className="text-lg">🎵</span>
+                <span>Spotify</span>
+              </button>
+
+              <button
+                onClick={() => window.open('https://www.pandora.com', '_blank')}
+                className="w-full p-3 bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105 mb-2"
+              >
+                <span className="text-lg">🎵</span>
+                <span>Pandora</span>
+              </button>
+
+              <button
+                onClick={() => window.open('https://music.apple.com', '_blank')}
+                className="w-full p-3 bg-gradient-to-r from-pink-600/80 to-pink-700/80 hover:from-pink-500 hover:to-pink-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+              >
+                <span className="text-lg">🎵</span>
+                <span>Apple Music</span>
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-white/20">
               <button
                 onClick={scrollToTop}
                 className="w-full p-3 bg-gradient-to-r from-gray-600/80 to-gray-700/80 hover:from-gray-500 hover:to-gray-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
