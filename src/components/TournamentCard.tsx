@@ -1,4 +1,6 @@
 import React from 'react';
+import { useAppContext } from '@/contexts/AppContext';
+import { toast } from '@/components/ui/use-toast';
 
 interface TournamentCardProps {
   title: string;
@@ -9,11 +11,14 @@ interface TournamentCardProps {
   timeLeft: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   image: string;
+  onJoinTournament?: (tournament: any) => void;
 }
 
 const TournamentCard: React.FC<TournamentCardProps> = ({
-  title, prize, entry, players, maxPlayers, timeLeft, difficulty, image
+  title, prize, entry, players, maxPlayers, timeLeft, difficulty, image, onJoinTournament
 }) => {
+  const { isAuthenticated, balance, updateBalance } = useAppContext();
+
   const getDifficultyColor = (diff: string) => {
     switch(diff) {
       case 'Easy': return 'bg-green-500';
@@ -21,6 +26,67 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
       case 'Hard': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
+  };
+
+  const handleJoinTournament = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to be signed in to join tournaments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Parse entry fee
+    const entryFee = parseFloat(entry.replace('$', ''));
+    
+    if (balance < entryFee) {
+      toast({
+        title: "Insufficient Balance",
+        description: `You need $${entryFee.toFixed(2)} to join this tournament. Add funds to continue.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if tournament is full
+    if (players >= maxPlayers) {
+      toast({
+        title: "Tournament Full",
+        description: "This tournament is already full. Please try another one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Confirm entry fee payment
+    const confirmEntry = window.confirm(
+      `Join ${title} Tournament?\n\nEntry Fee: ${entry}\nPrize Pool: ${prize}\nPlayers: ${players}/${maxPlayers}\n\nYour balance: $${balance.toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+    );
+
+    if (!confirmEntry) return;
+
+    // Deduct entry fee
+    updateBalance(-entryFee);
+
+    // Call the tournament join handler
+    if (onJoinTournament) {
+      onJoinTournament({
+        title,
+        prize,
+        entry: entryFee,
+        players,
+        maxPlayers,
+        difficulty,
+        image
+      });
+    }
+
+    toast({
+      title: "Tournament Joined! 🏆",
+      description: `Welcome to ${title}! Entry fee of ${entry} has been deducted.`,
+    });
   };
 
   return (
@@ -60,8 +126,16 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
       
       <div className="flex justify-between items-center">
         <div className="text-orange-400 text-sm font-medium">⏰ {timeLeft}</div>
-        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2 px-6 rounded-full text-sm transition-all duration-200">
-          JOIN NOW
+        <button 
+          onClick={handleJoinTournament}
+          disabled={players >= maxPlayers}
+          className={`font-bold py-2 px-6 rounded-full text-sm transition-all duration-200 ${
+            players >= maxPlayers
+              ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+              : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:scale-105'
+          }`}
+        >
+          {players >= maxPlayers ? 'FULL' : 'JOIN NOW'}
         </button>
       </div>
     </div>
