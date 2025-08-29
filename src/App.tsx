@@ -17,14 +17,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <TooltipProvider>
-          <AudioProvider>
+          {/* <AudioProvider> */}
             <AppProvider>
               <BrowserRouter>
                 <Index />
                 <Toaster />
               </BrowserRouter>
             </AppProvider>
-          </AudioProvider>
+          {/* </AudioProvider> */}
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
