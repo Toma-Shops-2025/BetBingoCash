@@ -18,7 +18,6 @@ import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
 import UserProfileModal from './UserProfileModal';
 import GemShopModal from './GemShopModal';
-import MusicPlayer from './MusicPlayer';
 
 const AppLayout: React.FC = () => {
   const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout, currentGame } = useAppContext();
@@ -225,7 +224,7 @@ const AppLayout: React.FC = () => {
       {!isInGame && (
         <button
           onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
-          className="fixed top-4 right-4 z-40 p-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-200"
+          className="fixed top-4 right-4 z-50 p-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-200"
           title="Quick Navigation"
         >
           {showHamburgerMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -234,7 +233,7 @@ const AppLayout: React.FC = () => {
 
       {/* Hamburger Menu Dropdown */}
       {showHamburgerMenu && !isInGame && (
-        <div className="fixed top-20 right-4 z-40 bg-gradient-to-r from-purple-800/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl min-w-48">
+        <div className="fixed top-20 right-4 z-50 bg-gradient-to-r from-purple-800/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl min-w-48">
           <div className="text-white font-bold text-sm mb-3 text-center">
             🚀 Quick Navigation
           </div>
@@ -348,33 +347,10 @@ const AppLayout: React.FC = () => {
       <Footer />
 
       {/* Modals */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
-
-      <PaymentModal
-        isOpen={paymentModalOpen}
-        onClose={() => setPaymentModalOpen(false)}
-        amount={25}
-        onSuccess={(amount) => {
-          // Handle successful payment
-          console.log(`Payment successful: $${amount}`);
-        }}
-      />
-
-      <UserProfileModal
-        isOpen={profileModalOpen}
-        onClose={() => setProfileModalOpen(false)}
-      />
-
-      <GemShopModal
-        isOpen={gemShopModalOpen}
-        onClose={() => setGemShopModalOpen(false)}
-      />
-
-      {/* Music Player */}
-      <MusicPlayer />
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      <PaymentModal isOpen={paymentModalOpen} onClose={() => setPaymentModalOpen(false)} />
+      <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
+      <GemShopModal isOpen={gemShopModalOpen} onClose={() => setGemShopModalOpen(false)} />
     </div>
   );
 };
