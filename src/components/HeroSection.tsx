@@ -13,9 +13,11 @@ const HeroSection: React.FC = () => {
       
       {/* Floating Elements */}
       <div className="absolute inset-0">
-        <div className="animate-bounce absolute top-10 left-10 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-2xl">I</div>
-        <div className="animate-pulse absolute top-20 right-20 w-8 h-8 bg-green-400 rounded-full"></div>
-        <div className="animate-bounce absolute bottom-20 left-20 w-10 h-10 bg-orange-400 rounded-full delay-300"></div>
+        <div className="animate-bounce absolute top-10 left-10 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-2xl">$</div>
+        <div className="animate-pulse absolute top-20 right-20 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white font-bold text-lg">💰</div>
+        <div className="animate-bounce absolute bottom-20 left-20 w-10 h-10 bg-orange-400 rounded-full delay-300 flex items-center justify-center text-white font-bold text-lg">💎</div>
+        <div className="animate-bounce absolute top-32 left-32 w-8 h-8 bg-pink-400 rounded-full delay-500 flex items-center justify-center text-white font-bold text-sm">💵</div>
+        <div className="animate-pulse absolute bottom-32 right-32 w-12 h-12 bg-red-400 rounded-full delay-700 flex items-center justify-center text-white font-bold text-lg">🏦</div>
       </div>
       
       {/* Content */}
