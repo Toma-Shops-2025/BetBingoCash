@@ -17,15 +17,19 @@ import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
 import UserProfileModal from './UserProfileModal';
 import GemShopModal from './GemShopModal';
+import MusicPlayer from './MusicPlayer';
 
 const AppLayout: React.FC = () => {
-  const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout } = useAppContext();
+  const { sidebarOpen, toggleSidebar, user, balance, gems, isAuthenticated, logout, currentGame } = useAppContext();
   const { playBackgroundMusic, setGameMusicMode } = useAudio();
   const isMobile = useIsMobile();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [gemShopModalOpen, setGemShopModalOpen] = useState(false);
+
+  // Check if user is currently in a game
+  const isInGame = !!currentGame;
 
   // Debug authentication state
   console.log('AppLayout - isAuthenticated:', isAuthenticated, 'user:', user);
@@ -316,8 +320,12 @@ const AppLayout: React.FC = () => {
         isOpen={gemShopModalOpen}
         onClose={() => setGemShopModalOpen(false)}
       />
+
+      {/* Music Player */}
+      <MusicPlayer />
     </div>
   );
 };
 
-export default AppLayout;
+export default AppLayout;i m p o r t   M u s i c P l a y e r   f r o m   ' . / M u s i c P l a y e r ' ;  
+ 
