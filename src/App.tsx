@@ -6,7 +6,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/contexts/AppContext';
-import { AudioProvider } from '@/contexts/AudioContext';
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
 
@@ -17,14 +16,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <TooltipProvider>
-          {/* <AudioProvider> */}
-            <AppProvider>
-              <BrowserRouter>
-                <Index />
-                <Toaster />
-              </BrowserRouter>
-            </AppProvider>
-          {/* </AudioProvider> */}
+          <AppProvider>
+            <BrowserRouter>
+              <Index />
+              <Toaster />
+            </BrowserRouter>
+          </AppProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
