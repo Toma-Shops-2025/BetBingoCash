@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import { useAudio } from '@/contexts/AudioContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Menu, X, Gamepad2, Trophy, Gift, Coins, BarChart3, ChevronUp } from 'lucide-react';
 import HeroSection from './HeroSection';
 import PromoBanner from './PromoBanner';
 import GameModes from './GameModes';
@@ -27,6 +28,7 @@ const AppLayout: React.FC = () => {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [gemShopModalOpen, setGemShopModalOpen] = useState(false);
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   // Check if user is currently in a game
   const isInGame = !!currentGame;
@@ -44,6 +46,19 @@ const AppLayout: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setShowHamburgerMenu(false); // Close menu after navigation
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowHamburgerMenu(false); // Close menu after navigation
   };
 
   return (
