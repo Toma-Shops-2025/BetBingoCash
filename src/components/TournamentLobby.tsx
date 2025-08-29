@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import TournamentCard from './TournamentCard';
 import GameInterface from './GameInterface';
+import { toast } from '@/components/ui/use-toast';
 
 const TournamentLobby: React.FC = () => {
   const { startGame } = useAppContext();
@@ -78,40 +79,68 @@ const TournamentLobby: React.FC = () => {
   // Update countdown timers and player counts
   useEffect(() => {
     const interval = setInterval(() => {
-      setTournaments(prev => prev.map(tournament => {
-        // Update time left (simplified countdown)
-        const [mins, secs] = tournament.timeLeft.split(':').map(Number);
-        let newMins = mins;
-        let newSecs = secs - 1;
+      setTournaments(prev => {
+        console.log('Updating tournaments, current state:', prev);
         
-        if (newSecs < 0) {
-          newSecs = 59;
-          newMins -= 1;
-        }
+        const updated = prev.map(tournament => {
+          // Update time left (simplified countdown)
+          const [mins, secs] = tournament.timeLeft.split(':').map(Number);
+          let newMins = mins;
+          let newSecs = secs - 1;
+          
+          if (newSecs < 0) {
+            newSecs = 59;
+            newMins -= 1;
+          }
+          
+          if (newMins < 0) {
+            newMins = 15; // Reset to 15 minutes
+            newSecs = 0;
+          }
+          
+          const newTimeLeft = `${newMins}:${newSecs.toString().padStart(2, '0')}`;
+          
+          // Randomly update player count (simulate live activity)
+          const playerChange = Math.random() > 0.7 ? Math.floor(Math.random() * 3) - 1 : 0;
+          const newPlayers = Math.max(0, Math.min(tournament.maxPlayers, tournament.players + playerChange));
+          
+          const updatedTournament = {
+            ...tournament,
+            timeLeft: newTimeLeft,
+            players: newPlayers,
+            // Preserve the gameMode property
+            gameMode: tournament.gameMode
+          };
+          
+          console.log('Updated tournament:', updatedTournament.title, 'gameMode:', updatedTournament.gameMode);
+          
+          return updatedTournament;
+        });
         
-        if (newMins < 0) {
-          newMins = 15; // Reset to 15 minutes
-          newSecs = 0;
-        }
-        
-        const newTimeLeft = `${newMins}:${newSecs.toString().padStart(2, '0')}`;
-        
-        // Randomly update player count (simulate live activity)
-        const playerChange = Math.random() > 0.7 ? Math.floor(Math.random() * 3) - 1 : 0;
-        const newPlayers = Math.max(0, Math.min(tournament.maxPlayers, tournament.players + playerChange));
-        
-        return {
-          ...tournament,
-          timeLeft: newTimeLeft,
-          players: newPlayers
-        };
-      }));
+        console.log('Updated tournaments state:', updated);
+        return updated;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
   const handleJoinTournament = (tournament: any) => {
+    console.log('Joining tournament:', tournament);
+    console.log('Tournament gameMode:', tournament.gameMode);
+    console.log('Tournament keys:', Object.keys(tournament));
+    
+    // Validate tournament data
+    if (!tournament.gameMode) {
+      console.error('Tournament missing gameMode:', tournament);
+      toast({
+        title: "Tournament Error",
+        description: "This tournament is not properly configured. Please try another one.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Start the corresponding game mode
     startGame(tournament.gameMode);
     setSelectedTournament(tournament);
