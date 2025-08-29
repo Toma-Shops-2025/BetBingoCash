@@ -210,15 +210,15 @@ const AppLayout: React.FC = () => {
 
       {/* Quick Navigation Menu */}
       <div className="fixed top-20 right-4 z-40">
-        <div className="bg-gradient-to-br from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-2 border border-purple-400/30 shadow-2xl">
-          <div className="text-center mb-2">
+        <div className="bg-gradient-to-br from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-1 border border-purple-400/30 shadow-2xl">
+          <div className="text-center mb-1">
             <div className="text-white/80 text-xs font-bold hidden sm:block">🚀 QUICK NAV</div>
             <div className="text-white/80 text-xs font-bold sm:hidden">🚀</div>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-0.5">
             <button
               onClick={() => document.getElementById('games')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
               title="Jump to Games"
             >
               <span className="hidden sm:inline">🎮 Games</span>
@@ -226,7 +226,7 @@ const AppLayout: React.FC = () => {
             </button>
             <button
               onClick={() => document.getElementById('tournaments')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
               title="Jump to Tournaments"
             >
               <span className="hidden sm:inline">🏆 Tournaments</span>
@@ -234,7 +234,7 @@ const AppLayout: React.FC = () => {
             </button>
             <button
               onClick={() => document.getElementById('leaderboard')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
               title="Jump to Leaderboard"
             >
               <span className="hidden sm:inline">📊 Leaderboard</span>
@@ -242,7 +242,7 @@ const AppLayout: React.FC = () => {
             </button>
             <button
               onClick={() => document.getElementById('rewards')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
               title="Jump to Rewards"
             >
               <span className="hidden sm:inline">🎁 Rewards</span>
@@ -250,7 +250,7 @@ const AppLayout: React.FC = () => {
             </button>
             <button
               onClick={() => document.getElementById('cashout')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
               title="Jump to Cashout"
             >
               <span className="hidden sm:inline">💰 Cashout</span>
