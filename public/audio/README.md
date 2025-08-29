@@ -1,82 +1,59 @@
-# Audio Files for BetBingoCash
+# Audio Setup for BetBingoCash
 
-This folder should contain the following audio files for the game to work properly:
+## 🎵 New Music Player Features
 
-## Required Audio Files:
+### **Music Player Component:**
+- **Google Maps-style interface** with play/pause, skip, volume control
+- **Track selection** with playlist support
+- **Volume slider** for fine-tuned control
+- **Mute/unmute** functionality
+- **Responsive design** that works on all devices
 
-### Background Music
-- `background-music.mp3` - **SOFT ROCK/CLASSICAL ROCK** for ambient background music
-  - **Duration**: 3-5 minutes (will loop seamlessly)
-  - **Volume**: Designed for soft background ambiance
-  - **Style**: Soft rock, classic rock, or instrumental
-  - **Loop**: Should loop seamlessly without gaps
+### **Required Audio Files:**
 
-### Sound Effects
-- `countdown-beep.mp3` - Beep sound for countdown (3, 2, 1, GO!)
-- `game-start.mp3` - Sound when game starts
-- `bingo-celebration.mp3` - Celebration sound when BINGO is achieved
-- `number-call.mp3` - Sound when a new number is called
+#### **Background Music:**
+- **File**: `background-music.mp3`
+- **Location**: `/public/audio/background-music.mp3`
+- **Requirements**: 
+  - Soft rock/classical rock style
+  - 3-5 minutes long
+  - Seamless loop capability
+  - MP3 format, 128-320kbps
 
-## 🎵 Dynamic Music System:
+#### **Sound Effects:**
+- **File**: `countdown-beep.mp3` - Short beep for countdown
+- **File**: `game-start.mp3` - Exciting game start sound
+- **File**: `bingo-celebration.mp3` - Victory celebration
+- **File**: `number-call.mp3` - Number announcement sound
 
-### **Background Mode (Soft Volume):**
-- **Volume**: 30% (soft ambient music)
-- **When**: App loading, browsing, not playing games
-- **Purpose**: Create atmosphere without being distracting
+## 🚀 Quick Setup:
 
-### **Game Mode (Louder Volume):**
-- **Volume**: 60% (more prominent during gameplay)
-- **When**: Active games, countdown, gameplay
-- **Purpose**: Enhance gaming experience and excitement
+1. **Add audio files** to `/public/audio/` folder
+2. **Refresh the app** - music player will appear in bottom-left
+3. **Click play** to start background music
+4. **Adjust volume** with the slider
+5. **Use playlist** to switch between tracks
 
-### **Volume Balancing:**
-- **Background**: 30% - Soft, ambient, non-intrusive
-- **Game**: 60% - Louder, engaging, but not overwhelming
-- **Sound Effects**: 60% - Clear and audible
-- **Voice**: 80% - Crystal clear announcements
+## 🎯 Music Player Controls:
 
-## Audio Specifications:
-- **Format**: MP3 (recommended) or WAV
-- **Quality**: 128kbps or higher for MP3
-- **Duration**: 
-  - Background music: 3-5 minutes (will loop seamlessly)
-  - Sound effects: 0.5-2 seconds
-- **Volume**: Normalized to -14dB LUFS for consistent levels
-- **Loop**: Background music must loop seamlessly
+- **▶️ Play/Pause**: Start/stop background music
+- **⏮️ Previous**: Switch to previous track
+- **⏭️ Next**: Switch to next track
+- **🔊 Volume**: Adjust music volume
+- **🔇 Mute**: Quick mute/unmute
+- **📋 Playlist**: Show/hide track selection
 
-## Voice Announcements:
-The game uses the Web Speech API for voice announcements, so no audio files are needed for:
-- Number announcements ("Number 42")
-- Game instructions
-- BINGO celebrations
+## 💡 Tips:
 
-## Getting Audio Files:
-1. **Free Resources**: 
-   - Freesound.org
-   - Pixabay Music
-   - Zapsplat
-2. **Paid Resources**:
-   - AudioJungle
-   - Pond5
-   - PremiumBeat
+- **Music automatically starts** when app loads
+- **Volume persists** between sessions
+- **Quick navigation hidden** during gameplay
+- **Music player always visible** for easy access
 
-## 🎯 **Background Music Requirements:**
-- **Genre**: Soft rock, classic rock, or instrumental
-- **Mood**: Upbeat but not aggressive
-- **Tempo**: Medium (80-120 BPM)
-- **Loop**: Must loop seamlessly
-- **Volume**: Designed for background use
-- **Length**: 3-5 minutes for variety
+## 🔧 Troubleshooting:
 
-## File Naming:
-Make sure to use the exact filenames listed above, as the game code references these specific names.
-
-## Testing:
-After adding audio files, test them in the game's Audio Settings modal to ensure they work correctly.
-
-## 🎮 **How It Works:**
-1. **App loads** → Background music starts at 30% volume
-2. **Game starts** → Music increases to 60% volume
-3. **Game ends** → Music returns to 30% volume
-4. **Pause game** → Music returns to 30% volume
-5. **Resume game** → Music increases to 60% volume 
+If no sound:
+1. Check browser audio permissions
+2. Verify audio files exist in correct location
+3. Check volume settings in music player
+4. Ensure audio is not muted in browser/system 
