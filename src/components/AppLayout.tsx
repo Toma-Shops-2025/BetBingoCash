@@ -206,70 +206,75 @@ const AppLayout: React.FC = () => {
         </div>
       </nav>
 
-      {/* Quick Navigation Menu - Hidden during gameplay */}
+      {/* Hamburger Menu Button - Fixed Position */}
       {!isInGame && (
-        <div className="fixed top-20 right-4 z-40">
-          <div className="bg-gradient-to-br from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-1.5 border border-purple-400/30 shadow-2xl">
-            <div className="text-center mb-1.5">
-              <div className="text-white/80 text-xs font-bold hidden sm:block">🚀 QUICK NAV</div>
-              <div className="text-white/80 text-xs font-bold sm:hidden">🚀</div>
-            </div>
-            <div className="space-y-1">
+        <button
+          onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
+          className="fixed top-4 right-4 z-40 p-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-200"
+          title="Quick Navigation"
+        >
+          {showHamburgerMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      )}
+
+      {/* Hamburger Menu Dropdown */}
+      {showHamburgerMenu && !isInGame && (
+        <div className="fixed top-20 right-4 z-40 bg-gradient-to-r from-purple-800/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl min-w-48">
+          <div className="text-white font-bold text-sm mb-3 text-center">
+            🚀 Quick Navigation
+          </div>
+          
+          <div className="space-y-2">
+            <button
+              onClick={() => scrollToSection('games')}
+              className="w-full p-3 bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+            >
+              <Gamepad2 className="w-5 h-5" />
+              <span>Games</span>
+            </button>
+
+            <button
+              onClick={() => scrollToSection('tournaments')}
+              className="w-full p-3 bg-gradient-to-r from-purple-600/80 to-purple-700/80 hover:from-purple-500 hover:to-purple-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+            >
+              <Trophy className="w-5 h-5" />
+              <span>Tournaments</span>
+            </button>
+
+            <button
+              onClick={() => scrollToSection('leaderboard')}
+              className="w-full p-3 bg-gradient-to-r from-green-600/80 to-green-700/80 hover:from-green-500 hover:to-green-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+            >
+              <BarChart3 className="w-5 h-5" />
+              <span>Leaderboard</span>
+            </button>
+
+            <button
+              onClick={() => scrollToSection('rewards')}
+              className="w-full p-3 bg-gradient-to-r from-yellow-600/80 to-yellow-700/80 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+            >
+              <Gift className="w-5 h-5" />
+              <span>Rewards</span>
+            </button>
+
+            <button
+              onClick={() => scrollToSection('cashout')}
+              className="w-full p-3 bg-gradient-to-r from-red-600/80 to-red-700/80 hover:from-red-500 hover:to-red-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+            >
+              <Coins className="w-5 h-5" />
+              <span>Cashout</span>
+            </button>
+
+            <div className="pt-2 border-t border-white/20">
               <button
-                onClick={() => document.getElementById('games')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-                title="Jump to Games"
+                onClick={scrollToTop}
+                className="w-full p-3 bg-gradient-to-r from-gray-600/80 to-gray-700/80 hover:from-gray-500 hover:to-gray-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
               >
-                <span className="hidden sm:inline">🎮 Games</span>
-                <span className="sm:hidden">🎮</span>
-              </button>
-              <button
-                onClick={() => document.getElementById('tournaments')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-                title="Jump to Tournaments"
-              >
-                <span className="hidden sm:inline">🏆 Tournaments</span>
-                <span className="sm:hidden">🏆</span>
-              </button>
-              <button
-                onClick={() => document.getElementById('leaderboard')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-                title="Jump to Leaderboard"
-              >
-                <span className="hidden sm:inline">📊 Leaderboard</span>
-                <span className="sm:hidden">📊</span>
-              </button>
-              <button
-                onClick={() => document.getElementById('rewards')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-                title="Jump to Rewards"
-              >
-                <span className="hidden sm:inline">🎁 Rewards</span>
-                <span className="sm:hidden">🎁</span>
-              </button>
-              <button
-                onClick={() => document.getElementById('cashout')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-                title="Jump to Cashout"
-              >
-                <span className="hidden sm:inline">💰 Cashout</span>
-                <span className="sm:hidden">💰</span>
+                <ChevronUp className="w-5 h-5" />
+                <span>Back to Top</span>
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Back to Top Button - Hidden during gameplay */}
-      {!isInGame && (
-        <div className="fixed top-80 right-4 z-40">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="bg-gradient-to-br from-gray-700/90 to-gray-800/90 backdrop-blur-sm rounded-full p-3 border border-gray-500/30 shadow-2xl hover:scale-110 transition-all duration-200"
-            title="Back to Top"
-          >
-            <div className="text-white text-lg">⬆️</div>
-          </button>
         </div>
       )}
 
