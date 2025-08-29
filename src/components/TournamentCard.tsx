@@ -11,11 +11,12 @@ interface TournamentCardProps {
   timeLeft: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   image: string;
+  gameMode: string;
   onJoinTournament?: (tournament: any) => void;
 }
 
 const TournamentCard: React.FC<TournamentCardProps> = ({
-  title, prize, entry, players, maxPlayers, timeLeft, difficulty, image, onJoinTournament
+  title, prize, entry, players, maxPlayers, timeLeft, difficulty, image, gameMode, onJoinTournament
 }) => {
   const { isAuthenticated, balance, updateBalance } = useAppContext();
 
@@ -79,7 +80,9 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
         players,
         maxPlayers,
         difficulty,
-        image
+        image,
+        gameMode,
+        timeLeft
       });
     }
 

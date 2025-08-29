@@ -125,6 +125,11 @@ const TournamentLobby: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Monitor selectedTournament state changes
+  useEffect(() => {
+    console.log('selectedTournament state changed to:', selectedTournament);
+  }, [selectedTournament]);
+
   const handleJoinTournament = (tournament: any) => {
     console.log('Joining tournament:', tournament);
     console.log('Tournament gameMode:', tournament.gameMode);
@@ -141,9 +146,15 @@ const TournamentLobby: React.FC = () => {
       return;
     }
     
-    // Start the corresponding game mode
-    startGame(tournament.gameMode);
+    console.log('Setting selectedTournament to:', tournament);
+    
+    // Set the selected tournament FIRST
     setSelectedTournament(tournament);
+    
+    // Then start the game (this is just for logging)
+    startGame(tournament.gameMode);
+    
+    console.log('Tournament state should now be set. selectedTournament:', selectedTournament);
   };
 
   // If a tournament is selected, show the game interface
