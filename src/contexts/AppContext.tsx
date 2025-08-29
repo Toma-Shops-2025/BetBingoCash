@@ -159,12 +159,80 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const updateBalance = (amount: number) => {
-    setBalance(prev => prev + amount);
+  const updateBalance = async (amount: number) => {
+    const newBalance = balance + amount;
+    setBalance(newBalance);
+    
+    // Persist to database if user is authenticated
+    if (user?.id) {
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ 
+            balance: newBalance,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        
+        if (error) {
+          console.error('Error updating balance in database:', error);
+          // Revert local state if database update fails
+          setBalance(balance);
+          toast({
+            title: "Database Error",
+            description: "Balance update failed. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error updating balance:', error);
+        // Revert local state if database update fails
+        setBalance(balance);
+        toast({
+          title: "Database Error",
+          description: "Balance update failed. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
-  const updateGems = (amount: number) => {
-    setGems(prev => prev + amount);
+  const updateGems = async (amount: number) => {
+    const newGems = gems + amount;
+    setGems(newGems);
+    
+    // Persist to database if user is authenticated
+    if (user?.id) {
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ 
+            gems: newGems,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        
+        if (error) {
+          console.error('Error updating gems in database:', error);
+          // Revert local state if database update fails
+          setGems(gems);
+          toast({
+            title: "Database Error",
+            description: "Gems update failed. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error updating gems:', error);
+        // Revert local state if database update fails
+        setGems(gems);
+        toast({
+          title: "Database Error",
+          description: "Gems update failed. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const startGame = (gameType: string) => {
@@ -212,6 +280,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // Refresh user data from database
+  const refreshUserData = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile && !error) {
+        console.log('Refreshing user data from database:', profile);
+        setUser(profile);
+        setBalance(profile.balance || 0);
+        setGems(profile.gems || 0);
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+    }
+  };
+
   // Check authentication status on mount
   useEffect(() => {
     // Check for existing session first
@@ -219,7 +309,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         console.log('Existing session found on mount:', session.user.id);
-        
+
         // Create basic profile immediately
         const basicProfile = {
           id: session.user.id,
@@ -230,14 +320,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-        
+
         setUser(basicProfile);
         setBalance(basicProfile.balance);
         setGems(basicProfile.gems);
         console.log('Basic profile set from existing session');
+        
+        // Refresh from database in background
+        setTimeout(() => refreshUserData(), 1000);
       }
     };
-    
+
     checkExistingSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -295,6 +388,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Periodic refresh of user data (every 30 seconds)
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const refreshInterval = setInterval(() => {
+      refreshUserData();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [user?.id]);
 
   return (
     <AppContext.Provider

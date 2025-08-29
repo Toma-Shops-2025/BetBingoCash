@@ -75,6 +75,16 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     return availableNumbers[randomIndex];
   }, [calledNumbers]);
 
+  // Convert number to BINGO format (B4, I19, O64, etc.)
+  const getBingoCall = useCallback((number: number) => {
+    if (number >= 1 && number <= 15) return `B${number}`;
+    if (number >= 16 && number <= 30) return `I${number}`;
+    if (number >= 31 && number <= 45) return `N${number}`;
+    if (number >= 46 && number <= 60) return `G${number}`;
+    if (number >= 61 && number <= 75) return `O${number}`;
+    return `Number ${number}`;
+  }, []);
+
   // Handle countdown animation
   const startCountdown = () => {
     setShowCountdown(true);
@@ -120,7 +130,19 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     if (firstNumber) {
       setCurrentNumber(firstNumber);
       setCalledNumbers([firstNumber]);
+      
+      // Use BINGO format for voice announcement
+      const bingoCall = getBingoCall(firstNumber);
       playNumberCall(firstNumber);
+      
+      // Voice announcement with BINGO format
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(bingoCall);
+        utterance.rate = 0.8;
+        utterance.pitch = 1.2;
+        utterance.volume = 0.8;
+        speechSynthesis.speak(utterance);
+      }
     }
   };
 
@@ -178,18 +200,30 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
   // Call next number
   const callNextNumber = useCallback(() => {
     if (!gameActive || gamePaused) return;
-    
+
     const nextNumber = generateNumber();
     if (nextNumber) {
       setCurrentNumber(nextNumber);
       setCalledNumbers(prev => [...prev, nextNumber]);
       setScore(prev => prev + 10); // Base score for each number
+      
+      // Use BINGO format for voice announcement
+      const bingoCall = getBingoCall(nextNumber);
       playNumberCall(nextNumber);
+      
+      // Voice announcement with BINGO format
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(bingoCall);
+        utterance.rate = 0.8;
+        utterance.pitch = 1.2;
+        utterance.volume = 0.8;
+        speechSynthesis.speak(utterance);
+      }
     } else {
       // Game over - all numbers called
       handleGameOver();
     }
-  }, [gameActive, gamePaused, generateNumber]);
+  }, [gameActive, gamePaused, generateNumber, getBingoCall, playNumberCall]);
 
   // Handle game over
   const handleGameOver = () => {

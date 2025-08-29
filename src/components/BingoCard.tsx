@@ -92,18 +92,17 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, gameActive, onBing
     return lines;
   };
 
-  const toggleNumber = (num: number | string) => {
-    if (!gameActive) return;
+  // Handle number click - DISABLED to prevent cheating
+  const handleNumberClick = (number: number) => {
+    // DISABLED: Users cannot manually daub numbers to prevent cheating
+    // Numbers are only marked automatically when called by the game
+    return;
     
-    if (typeof num === 'number') {
-      const newMarked = new Set(markedNumbers);
-      if (newMarked.has(num)) {
-        newMarked.delete(num);
-      } else {
-        newMarked.add(num);
-      }
-      setMarkedNumbers(newMarked);
-    }
+    // OLD CODE (removed for security):
+    // if (gameActive && !markedNumbers.includes(number)) {
+    //   setMarkedNumbers(prev => [...prev, number]);
+    //   onBingo && onBingo(checkBingoLines());
+    // }
   };
 
   const toggleAutoDaub = () => {
@@ -132,11 +131,9 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, gameActive, onBing
       <div className="grid grid-cols-5 gap-2 mb-6">
         {bingoCard.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
-            <button
+            <div
               key={`${rowIndex}-${colIndex}`}
-              onClick={() => toggleNumber(cell)}
-              disabled={!gameActive}
-              className={`aspect-square rounded-lg flex items-center justify-center font-bold text-lg transition-all duration-200 ${
+              className={`aspect-square flex items-center justify-center text-lg font-bold rounded-lg transition-all duration-200 ${
                 cell === 'FREE' 
                   ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white'
                   : typeof cell === 'number' && markedNumbers.has(cell)
@@ -145,7 +142,7 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, gameActive, onBing
               }`}
             >
               {cell}
-            </button>
+            </div>
           ))
         )}
       </div>

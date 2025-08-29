@@ -69,20 +69,39 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const playBackgroundMusic = () => {
     if (!settings.musicEnabled) return;
     
-    if (!backgroundMusicRef.current) {
-      backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
-      backgroundMusicRef.current.loop = true;
-      backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
+    try {
+      if (!backgroundMusicRef.current) {
+        backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
+        backgroundMusicRef.current.loop = true;
+        backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
+        
+        // Handle missing audio file gracefully
+        backgroundMusicRef.current.onerror = () => {
+          console.warn('Background music file not found. Please add /audio/background-music.mp3');
+          // Fallback: use system beep or silent audio
+          backgroundMusicRef.current = null;
+        };
+      }
+      
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
+        backgroundMusicRef.current.play().catch(error => {
+          console.warn('Could not play background music:', error);
+        });
+      }
+    } catch (error) {
+      console.warn('Background music not available:', error);
     }
-    
-    backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
-    backgroundMusicRef.current.play().catch(console.error);
   };
 
   const stopBackgroundMusic = () => {
     if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.pause();
-      backgroundMusicRef.current.currentTime = 0;
+      try {
+        backgroundMusicRef.current.pause();
+        backgroundMusicRef.current.currentTime = 0;
+      } catch (error) {
+        console.warn('Error stopping background music:', error);
+      }
     }
   };
 
@@ -127,43 +146,31 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const playSoundEffect = (effect: string) => {
     if (!settings.soundEffectsEnabled) return;
     
-    const audio = new Audio(`/audio/${effect}.mp3`);
-    audio.volume = settings.soundEffectsVolume;
-    audio.play().catch(console.error);
+    try {
+      const audio = new Audio(`/audio/${effect}.mp3`);
+      audio.volume = settings.soundEffectsVolume;
+      audio.play().catch(error => {
+        console.warn(`Could not play sound effect ${effect}:`, error);
+      });
+    } catch (error) {
+      console.warn(`Sound effect ${effect} not available:`, error);
+    }
   };
 
   const playCountdown = () => {
-    if (!settings.soundEffectsEnabled) return;
-    
-    // Play countdown beep
     playSoundEffect('countdown-beep');
   };
 
   const playGameStart = () => {
-    if (!settings.soundEffectsEnabled) return;
-    
-    // Play game start sound
     playSoundEffect('game-start');
   };
 
   const playBingo = () => {
-    if (!settings.soundEffectsEnabled) return;
-    
-    // Play bingo celebration sound
     playSoundEffect('bingo-celebration');
   };
 
   const playNumberCall = (number: number) => {
-    if (!settings.voiceEnabled) return;
-    
-    // Announce the number
-    const numberText = number.toString();
-    playVoiceAnnouncement(`Number ${numberText}`);
-    
-    // Also play a sound effect
-    if (settings.soundEffectsEnabled) {
-      playSoundEffect('number-call');
-    }
+    playSoundEffect('number-call');
   };
 
   // Update audio volumes when settings change

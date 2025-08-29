@@ -158,22 +158,45 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
           
           <TabsContent value="balance" className="space-y-4">
             <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Account Balance</h3>
+                <button
+                  onClick={() => {
+                    // Trigger a refresh of user data
+                    window.location.reload();
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                >
+                  🔄 Refresh
+                </button>
+              </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-gradient-to-r from-green-800 to-emerald-800 rounded-lg">
                   <div className="text-2xl mb-2">💰</div>
                   <div className="text-white font-bold text-xl">${balance.toFixed(2)}</div>
                   <div className="text-white/60 text-sm">Available Balance</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-gradient-to-r from-yellow-800 to-orange-800 rounded-lg">
                   <div className="text-2xl mb-2">💎</div>
                   <div className="text-white font-bold text-xl">{gems}</div>
                   <div className="text-white/60 text-sm">Gems Earned</div>
                 </div>
               </div>
-              
+
               <div className="text-center text-white/60 text-sm">
                 💡 Play games to earn more gems and increase your balance!
+              </div>
+              
+              <div className="bg-gray-800 rounded-lg p-3">
+                <div className="text-white/80 text-sm font-semibold mb-2">💡 Cross-Device Sync:</div>
+                <div className="text-white/60 text-xs space-y-1">
+                  <div>• Your balance and gems sync automatically across devices</div>
+                  <div>• Changes are saved every 30 seconds</div>
+                  <div>• Use the Refresh button to force sync</div>
+                  <div>• All winnings are permanently saved to your account</div>
+                </div>
               </div>
             </div>
           </TabsContent>
