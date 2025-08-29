@@ -27,11 +27,11 @@ const HeroSection: React.FC = () => {
         />
         <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-lg">
           BET{' '}
-          <span className="inline-flex items-center">
-            <span>B</span>
-            <span>I</span>
-            <span>N</span>
-            <span>G</span>
+          <span className="inline-flex items-center gap-1">
+            <span className="text-white">B</span>
+            <span className="text-white">I</span>
+            <span className="text-white">N</span>
+            <span className="text-white">G</span>
             <span className="inline-block animate-bounce w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-2xl">$</span>
           </span>
           <span className="block text-yellow-400">
