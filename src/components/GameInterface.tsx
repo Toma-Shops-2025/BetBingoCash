@@ -194,6 +194,17 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     }, 3000);
   };
 
+  // Auto-start game after a short delay when entering a room
+  useEffect(() => {
+    if (gameState === 'waiting') {
+      const autoStartTimer = setTimeout(() => {
+        startGame();
+      }, 3000); // Start game automatically after 3 seconds
+      
+      return () => clearTimeout(autoStartTimer);
+    }
+  }, [gameState]);
+
   const pauseGame = () => {
     setGameState('paused');
     if (numberCallInterval.current) {
@@ -548,7 +559,7 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
         <div className="mt-6 text-center">
           <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 inline-block">
             <div className="text-white font-bold text-lg">
-              {gameState === 'waiting' && '🎮 Ready to Start'}
+              {gameState === 'waiting' && '🎮 Game Starting in 3 seconds...'}
               {gameState === 'playing' && '🎯 Game in Progress'}
               {gameState === 'paused' && '⏸️ Game Paused'}
               {gameState === 'finished' && '🏆 Game Complete'}
@@ -556,6 +567,11 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
             {currentNumber && (
               <div className="text-purple-300 text-sm mt-2">
                 Current Number: <span className="font-bold text-white">{getBingoCall(currentNumber)}</span>
+              </div>
+            )}
+            {gameState === 'waiting' && (
+              <div className="text-yellow-300 text-sm mt-2">
+                ⏰ Auto-starting soon...
               </div>
             )}
           </div>
