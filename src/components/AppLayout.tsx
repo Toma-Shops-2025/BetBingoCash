@@ -109,7 +109,7 @@ const AppLayout: React.FC = () => {
                       <span className="hidden xs:inline">{gems}</span>
                     </button>
                     <div className="text-green-400 text-xs font-bold">
-                      ${balance.toFixed(0)}
+                      ${(balance || 0).toFixed(0)}
                     </div>
                   </div>
 
@@ -120,11 +120,11 @@ const AppLayout: React.FC = () => {
                       className="flex items-center gap-2 hover:bg-white/20 rounded-full px-2 py-1 transition-colors"
                     >
                       <div className="text-yellow-400">💎</div>
-                      <span className="text-white font-bold">{gems}</span>
+                      <span className="text-white font-bold">{gems || 0}</span>
                     </button>
                     <div className="w-px h-4 bg-white/30"></div>
                     <div className="text-green-400">💰</div>
-                    <span className="text-white font-bold">${balance.toFixed(2)}</span>
+                    <span className="text-white font-bold">${(balance || 0).toFixed(2)}</span>
                   </div>
 
                   {/* Mobile: Compact Action Buttons */}
