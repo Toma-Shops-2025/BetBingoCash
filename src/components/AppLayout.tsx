@@ -206,68 +206,72 @@ const AppLayout: React.FC = () => {
         </div>
       </nav>
 
-      {/* Quick Navigation Menu */}
-      <div className="fixed top-20 right-4 z-40">
-        <div className="bg-gradient-to-br from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-1 border border-purple-400/30 shadow-2xl">
-          <div className="text-center mb-1">
-            <div className="text-white/80 text-xs font-bold hidden sm:block">🚀 QUICK NAV</div>
-            <div className="text-white/80 text-xs font-bold sm:hidden">🚀</div>
-          </div>
-          <div className="space-y-0.5">
-            <button
-              onClick={() => document.getElementById('games')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-              title="Jump to Games"
-            >
-              <span className="hidden sm:inline">🎮 Games</span>
-              <span className="sm:hidden">🎮</span>
-            </button>
-            <button
-              onClick={() => document.getElementById('tournaments')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-              title="Jump to Tournaments"
-            >
-              <span className="hidden sm:inline">🏆 Tournaments</span>
-              <span className="sm:hidden">🏆</span>
-            </button>
-            <button
-              onClick={() => document.getElementById('leaderboard')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-              title="Jump to Leaderboard"
-            >
-              <span className="hidden sm:inline">📊 Leaderboard</span>
-              <span className="sm:hidden">📊</span>
-            </button>
-            <button
-              onClick={() => document.getElementById('rewards')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-              title="Jump to Rewards"
-            >
-              <span className="hidden sm:inline">🎁 Rewards</span>
-              <span className="sm:hidden">🎁</span>
-            </button>
-            <button
-              onClick={() => document.getElementById('cashout')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-xs font-bold py-0.5 px-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
-              title="Jump to Cashout"
-            >
-              <span className="hidden sm:inline">💰 Cashout</span>
-              <span className="sm:hidden">💰</span>
-            </button>
+      {/* Quick Navigation Menu - Hidden during gameplay */}
+      {!isInGame && (
+        <div className="fixed top-20 right-4 z-40">
+          <div className="bg-gradient-to-br from-purple-800/90 to-indigo-900/90 backdrop-blur-sm rounded-2xl p-1.5 border border-purple-400/30 shadow-2xl">
+            <div className="text-center mb-1.5">
+              <div className="text-white/80 text-xs font-bold hidden sm:block">🚀 QUICK NAV</div>
+              <div className="text-white/80 text-xs font-bold sm:hidden">🚀</div>
+            </div>
+            <div className="space-y-1">
+              <button
+                onClick={() => document.getElementById('games')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Jump to Games"
+              >
+                <span className="hidden sm:inline">🎮 Games</span>
+                <span className="sm:hidden">🎮</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('tournaments')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Jump to Tournaments"
+              >
+                <span className="hidden sm:inline">🏆 Tournaments</span>
+                <span className="sm:hidden">🏆</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('leaderboard')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Jump to Leaderboard"
+              >
+                <span className="hidden sm:inline">📊 Leaderboard</span>
+                <span className="sm:hidden">📊</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('rewards')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Jump to Rewards"
+              >
+                <span className="hidden sm:inline">🎁 Rewards</span>
+                <span className="sm:hidden">🎁</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('cashout')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-xs font-bold py-1 px-1.5 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Jump to Cashout"
+              >
+                <span className="hidden sm:inline">💰 Cashout</span>
+                <span className="sm:hidden">💰</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Back to Top Button */}
-      <div className="fixed top-80 right-4 z-40">
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="bg-gradient-to-br from-gray-700/90 to-gray-800/90 backdrop-blur-sm rounded-full p-3 border border-gray-500/30 shadow-2xl hover:scale-110 transition-all duration-200"
-          title="Back to Top"
-        >
-          <div className="text-white text-lg">⬆️</div>
-        </button>
-      </div>
+      {/* Back to Top Button - Hidden during gameplay */}
+      {!isInGame && (
+        <div className="fixed top-80 right-4 z-40">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="bg-gradient-to-br from-gray-700/90 to-gray-800/90 backdrop-blur-sm rounded-full p-3 border border-gray-500/30 shadow-2xl hover:scale-110 transition-all duration-200"
+            title="Back to Top"
+          >
+            <div className="text-white text-lg">⬆️</div>
+          </button>
+        </div>
+      )}
 
       {/* Main Content */}
       <main>
@@ -327,5 +331,4 @@ const AppLayout: React.FC = () => {
   );
 };
 
-export default AppLayout;i m p o r t   M u s i c P l a y e r   f r o m   ' . / M u s i c P l a y e r ' ;  
- 
+export default AppLayout;
