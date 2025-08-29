@@ -1,109 +1,118 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/contexts/AppContext';
-import { toast } from '@/components/ui/use-toast';
-import GameInterface from './GameInterface';
+import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Crown, Users, DollarSign, Play } from 'lucide-react';
 
 const GameModes: React.FC = () => {
-  const { isAuthenticated, startGame, balance, updateBalance } = useAppContext();
+  const { isAuthenticated, balance, updateBalance, startGame } = useAppContext();
+  const { toast } = useToast();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
-  
-  const gameModes = [
+
+  // 7 different BINGO game rooms with varying stakes
+  const gameRooms = [
     {
-      id: 'speed-bingo',
-      title: "Speed Bingo",
-      description: "Fast-paced games with quick wins",
-      entryFee: 5.00,
-      prize: "$500",
-      minPlayers: 10,
-      maxPlayers: 100,
-      players: "125",
-      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342029898_22dadc29.webp",
-      color: "from-red-500 to-pink-600",
-      duration: 60, // 1 minute
-      prizeStructure: "Winner takes 80%, Runner-up 20%",
-      rules: [
-        "Complete 1 line (horizontal, vertical, or diagonal) to win",
-        "Numbers called every 3 seconds for fast-paced action",
-        "First player to complete a line wins instantly",
-        "Tie-breaker: Most numbers marked in shortest time",
-        "Auto-daub enabled - no manual marking needed"
-      ],
-      tips: "Stay focused! Speed is key in this fast-paced mode. Watch for patterns and be ready to call BINGO quickly.",
-      specialFeatures: "⚡ Speed Bonus: Complete in under 30 seconds for 10% extra prize"
+      id: 'bingo-room-1',
+      title: "BINGO Room 1",
+      entryFee: 0.10,
+      basePrize: 1.50,
+      minPlayers: 5,
+      maxPlayers: 50,
+      currentPlayers: 18,
+      color: "from-yellow-400 to-orange-500",
+      description: "Low stakes, high fun! Perfect for beginners.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
     },
     {
-      id: 'classic-75',
-      title: "Classic 75",
-      description: "Traditional bingo with big payouts",
+      id: 'bingo-room-2',
+      title: "BINGO Room 2", 
+      entryFee: 1.00,
+      basePrize: 2.00,
+      minPlayers: 3,
+      maxPlayers: 30,
+      currentPlayers: 3,
+      color: "from-blue-400 to-purple-500",
+      description: "Classic stakes with good odds.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+    },
+    {
+      id: 'bingo-room-3',
+      title: "BINGO Room 3",
+      entryFee: 4.00,
+      basePrize: 13.50,
+      minPlayers: 4,
+      maxPlayers: 40,
+      currentPlayers: 5,
+      color: "from-green-400 to-emerald-500",
+      description: "Medium stakes, competitive play.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+    },
+    {
+      id: 'bingo-room-4',
+      title: "BINGO Room 4",
+      entryFee: 1.50,
+      basePrize: 9.00,
+      minPlayers: 3,
+      maxPlayers: 35,
+      currentPlayers: 6,
+      color: "from-pink-400 to-rose-500",
+      description: "Balanced risk and reward.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+    },
+    {
+      id: 'bingo-room-5',
+      title: "BINGO Room 5",
+      entryFee: 2.20,
+      basePrize: 13.00,
+      minPlayers: 4,
+      maxPlayers: 45,
+      currentPlayers: 6,
+      color: "from-indigo-400 to-blue-500",
+      description: "Popular room with great odds.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+    },
+    {
+      id: 'bingo-room-6',
+      title: "BINGO Room 6",
+      entryFee: 4.50,
+      basePrize: 18.90,
+      minPlayers: 5,
+      maxPlayers: 50,
+      currentPlayers: 6,
+      color: "from-purple-400 to-pink-500",
+      description: "High stakes, high rewards.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+    },
+    {
+      id: 'bingo-room-7',
+      title: "BINGO Room 7",
       entryFee: 10.00,
-      prize: "$1,200",
-      minPlayers: 20,
-      maxPlayers: 150,
-      players: "89",
-      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342031659_b64c02ed.webp",
-      color: "from-blue-500 to-indigo-600",
-      duration: 120, // 2 minutes
-      prizeStructure: "1st: 60%, 2nd: 25%, 3rd: 15%",
-      rules: [
-        "Complete 1 line (horizontal, vertical, or diagonal) to win",
-        "Numbers called every 5 seconds for strategic play",
-        "Multiple winners share prize pool proportionally",
-        "Full card completion earns 2x prize multiplier",
-        "Traditional 5x5 grid with B-I-N-G-O columns"
-      ],
-      tips: "This is the most popular mode! Take your time and watch for multiple line opportunities.",
-      specialFeatures: "🏆 Full Card Bonus: Complete entire card for 2x prize multiplier"
-    },
-    {
-      id: 'pattern-bingo',
-      title: "Pattern Bingo",
-      description: "Special patterns for bonus wins",
-      entryFee: 7.50,
-      prize: "$800",
-      minPlayers: 15,
-      maxPlayers: 120,
-      players: "156",
-      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342033434_cde2517b.webp",
-      color: "from-green-500 to-emerald-600",
-      duration: 90, // 1.5 minutes
-      prizeStructure: "Winner takes 70%, Pattern bonus 30%",
-      rules: [
-        "Complete specific patterns shown at game start",
-        "Patterns include: X, L, T, U, Diamond, and more",
-        "Numbers called every 4 seconds",
-        "Pattern completion order determines prize share",
-        "Bonus prizes for completing multiple patterns"
-      ],
-      tips: "Study the pattern before the game starts! Some patterns are easier than others.",
-      specialFeatures: "✨ Pattern Master: Complete 3+ patterns for 50% bonus prize"
-    },
-    {
-      id: 'jackpot-room',
-      title: "Jackpot Room",
-      description: "Progressive jackpots up to $10K",
-      entryFee: 25.00,
-      prize: "$10,000",
-      minPlayers: 50,
-      maxPlayers: 200,
-      players: "234",
-      image: "", // Remove custom image to use bingo card background
-      color: "from-yellow-500 to-orange-600",
-      duration: 180, // 3 minutes
-      prizeStructure: "Progressive: 90% of entry fees + house contribution",
-      rules: [
-        "Complete 1 line to win progressive jackpot",
-        "Jackpot grows with each game until won",
-        "Numbers called every 6 seconds for maximum suspense",
-        "Minimum jackpot guarantee: $5,000",
-        "House contributes $1,000 to each jackpot"
-      ],
-      tips: "High stakes, high rewards! This is for serious players looking for life-changing wins.",
-      specialFeatures: "🎰 Progressive Jackpot: Grows with every game until someone wins!"
+      basePrize: 35.00,
+      minPlayers: 6,
+      maxPlayers: 60,
+      currentPlayers: 5,
+      color: "from-red-400 to-orange-500",
+      description: "Premium room for serious players.",
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
     }
   ];
 
-  const handlePlayGame = (gameMode: any) => {
+  // Calculate dynamic prize based on entry fee and player count
+  const calculatePrize = (entryFee: number, currentPlayers: number) => {
+    const baseMultiplier = 15; // Base 15x return
+    const playerBonus = Math.max(1, currentPlayers / 10); // Bonus for more players
+    return (entryFee * baseMultiplier * playerBonus).toFixed(2);
+  };
+
+  // Calculate crown points (VIP system)
+  const calculateCrownPoints = (entryFee: number, currentPlayers: number) => {
+    const basePoints = entryFee * 100;
+    const playerMultiplier = Math.max(1, currentPlayers / 5);
+    return Math.floor(basePoints * playerMultiplier);
+  };
+
+  const handlePlayGame = (gameRoom: any) => {
     if (!isAuthenticated) {
       toast({
         title: "Please Sign In",
@@ -114,10 +123,20 @@ const GameModes: React.FC = () => {
     }
 
     // Check if user has enough balance for entry fee
-    if (balance < gameMode.entryFee) {
+    if (balance < gameRoom.entryFee) {
       toast({
         title: "Insufficient Balance",
-        description: `You need $${gameMode.entryFee.toFixed(2)} to play ${gameMode.title}. Add funds to continue.`,
+        description: `You need $${gameRoom.entryFee.toFixed(2)} to join ${gameRoom.title}. Add funds to continue.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if room has minimum players
+    if (gameRoom.currentPlayers < gameRoom.minPlayers) {
+      toast({
+        title: "Room Not Ready",
+        description: `This room needs at least ${gameRoom.minPlayers} players to start. Currently: ${gameRoom.currentPlayers} players.`,
         variant: "destructive",
       });
       return;
@@ -125,187 +144,193 @@ const GameModes: React.FC = () => {
 
     // Confirm entry fee payment
     const confirmEntry = window.confirm(
-      `Join ${gameMode.title}?\n\nEntry Fee: $${gameMode.entryFee.toFixed(2)}\nPrize Pool: ${gameMode.prize}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+      `Join ${gameRoom.title}?\n\nEntry Fee: $${gameRoom.entryFee.toFixed(2)}\nPrize Pool: $${calculatePrize(gameRoom.entryFee, gameRoom.currentPlayers)}\nPlayers: ${gameRoom.currentPlayers}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
     );
 
     if (!confirmEntry) return;
 
     // Deduct entry fee and start game
-    updateBalance(-gameMode.entryFee);
+    updateBalance(-gameRoom.entryFee);
     
     // Start the selected game
-    startGame(gameMode.id);
-    setSelectedGame(gameMode.id);
+    startGame(gameRoom.id);
+    setSelectedGame(gameRoom.id);
     
     toast({
       title: `Entry Fee Paid! 🎯`,
-      description: `$${gameMode.entryFee.toFixed(2)} deducted. Starting ${gameMode.title}!`,
+      description: `$${gameRoom.entryFee.toFixed(2)} deducted. Starting ${gameRoom.title}!`,
     });
   };
 
-  const handleBackToModes = () => {
+  const handleBackToRooms = () => {
     setSelectedGame(null);
   };
 
   // If a game is selected, show the game interface
   if (selectedGame) {
-    const gameMode = gameModes.find(mode => mode.id === selectedGame);
+    const gameRoom = gameRooms.find(room => room.id === selectedGame);
     return (
-      <div className="py-16 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="py-8 bg-gray-800">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8">
             <button
-              onClick={handleBackToModes}
+              onClick={handleBackToRooms}
               className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-2 px-6 rounded-full text-sm mb-4 transition-all duration-200"
             >
-              ← Back to Game Modes
+              ← Back to Game Rooms
             </button>
             <h2 className="text-4xl font-black text-white mb-4">
-              🎯 {gameMode?.title}
+              🎯 {gameRoom?.title}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              {gameMode?.description}
+              {gameRoom?.description}
             </p>
           </div>
-          <GameInterface gameMode={gameMode} />
+          <div className="bg-gray-900 rounded-2xl p-8 text-center">
+            <h3 className="text-2xl font-bold text-white mb-4">BINGO Game Starting Soon!</h3>
+            <p className="text-gray-300 mb-6">This room will use the same BINGO rules as all other rooms.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-green-400">${gameRoom?.entryFee}</div>
+                <div className="text-sm text-gray-500">Entry Fee</div>
+              </div>
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-400">${calculatePrize(gameRoom?.entryFee || 0, gameRoom?.currentPlayers || 0)}</div>
+                <div className="text-sm text-gray-500">Prize Pool</div>
+              </div>
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-blue-400">{gameRoom?.currentPlayers}</div>
+                <div className="text-sm text-gray-500">Players</div>
+              </div>
+            </div>
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
+              <div className="text-sm font-bold text-blue-400 mb-2">🎯 BINGO Rules</div>
+              <p className="text-sm text-blue-300">{gameRoom?.bingoPattern}</p>
+            </div>
+            <p className="text-gray-400 text-sm">Game will start automatically when ready. Good luck! 🍀</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="py-16 bg-gray-800">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-black text-white mb-4">
-            Choose Your Game Mode
-          </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Multiple ways to win big! Pick your favorite bingo style and start earning cash prizes.
+    <div className="py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-black text-white mb-4">🎮 BINGO Game Rooms</h2>
+          <p className="text-gray-300 max-w-2xl mx-auto">
+            Multiple ways to win big! Pick your favorite BINGO room and start earning cash prizes. 
+            Same BINGO rules, different stakes and odds.
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {gameModes.map((mode, index) => (
-            <Card key={index} className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group">
-              <CardContent className="p-0">
-                <div className="relative overflow-hidden rounded-t-lg">
-                  {mode.image ? (
-                    <img 
-                      src={mode.image} 
-                      alt={mode.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
-                      {/* Bingo Card Background */}
-                      <div className="grid grid-cols-5 grid-rows-3 gap-2 p-4">
-                        {Array.from({ length: 15 }, (_, i) => (
-                          <div key={i} className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold text-sm shadow-lg">
+
+        {/* Game Rooms Grid */}
+        <div className="space-y-4">
+          {gameRooms.map((room, index) => {
+            const prizeAmount = calculatePrize(room.entryFee, room.currentPlayers);
+            const crownPoints = calculateCrownPoints(room.entryFee, room.currentPlayers);
+            
+            return (
+              <Card key={room.id} className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group">
+                <CardContent className="p-0">
+                  <div className="flex items-stretch">
+                    {/* Left Section - Prize Info (Yellow/Orange) */}
+                    <div className={`w-1/3 bg-gradient-to-br ${room.color} p-4 rounded-l-lg flex flex-col justify-center items-center text-center`}>
+                      <div className="text-3xl font-black text-white mb-2">${prizeAmount}</div>
+                      <div className="text-sm text-white/80 mb-4">PRIZE</div>
+                      
+                      <div className="flex items-center gap-2 mb-3">
+                        <Crown className="w-5 h-5 text-yellow-200" />
+                        <span className="text-white font-bold text-sm">
+                          {crownPoints >= 1000 ? `${(crownPoints / 1000).toFixed(1)}K` : crownPoints}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-white/80" />
+                        <span className="text-white text-sm">Players: {room.currentPlayers}</span>
+                      </div>
+                    </div>
+
+                    {/* Middle Section - Game Info (Blue/Purple) */}
+                    <div className="w-1/3 bg-gradient-to-br from-blue-500 to-purple-600 p-4 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                      {/* BINGO Card Background */}
+                      <div className="grid grid-cols-3 grid-rows-2 gap-1 mb-3">
+                        {Array.from({ length: 6 }, (_, i) => (
+                          <div key={i} className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xs">
                             {Math.floor(Math.random() * 75) + 1}
                           </div>
                         ))}
                       </div>
-                      {/* Jackpot Icon Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/20 to-orange-600/20 flex items-center justify-center">
-                        <div className="text-6xl">🎰</div>
+                      
+                      <div className="text-white font-bold text-lg mb-1">{room.title}</div>
+                      <div className="text-white/80 text-sm">{room.description}</div>
+                      
+                      {/* Room Status Badge */}
+                      <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
+                        <span className="text-white text-xs font-bold">
+                          {room.currentPlayers >= room.minPlayers ? 'Ready' : 'Waiting'}
+                        </span>
                       </div>
-                    </div>
-                  )}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${mode.color} opacity-80 group-hover:opacity-60 transition-opacity`}></div>
-                  <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
-                    <span className="text-white text-sm font-bold">👥 {mode.players}</span>
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{mode.title}</h3>
-                  <p className="text-gray-400 mb-4">{mode.description}</p>
-                  
-                  {/* Game Details */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="text-center p-3 bg-gray-800 rounded-lg">
-                      <div className="text-lg font-bold text-green-400">${mode.entryFee}</div>
-                      <div className="text-xs text-gray-500">Entry Fee</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-800 rounded-lg">
-                      <div className="text-lg font-bold text-yellow-400">{mode.players}</div>
-                      <div className="text-xs text-gray-500">Players</div>
-                    </div>
-                  </div>
-                  
-                  {/* Prize Structure */}
-                  <div className="mb-4 p-3 bg-gray-800 rounded-lg">
-                    <div className="text-center">
-                      <div className="text-2xl font-black text-green-400 mb-1">{mode.prize}</div>
-                      <div className="text-xs text-gray-500 mb-2">Prize Pool</div>
-                      <div className="text-xs text-blue-400">{mode.prizeStructure}</div>
-                    </div>
-                  </div>
-
-                  {/* Rules & Tips Section */}
-                  <div className="mb-4 space-y-3">
-                    {/* Rules */}
-                    <div className="bg-gray-800/50 rounded-lg p-3">
-                      <div className="text-xs font-bold text-blue-400 mb-2 flex items-center gap-1">
-                        📋 Rules
-                      </div>
-                      <ul className="text-xs text-gray-300 space-y-1">
-                        {mode.rules.slice(0, 3).map((rule, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-blue-400 text-xs">•</span>
-                            <span>{rule}</span>
-                          </li>
-                        ))}
-                        {mode.rules.length > 3 && (
-                          <li className="text-blue-400 text-xs cursor-pointer hover:underline">
-                            +{mode.rules.length - 3} more rules...
-                          </li>
-                        )}
-                      </ul>
                     </div>
 
-                    {/* Tips */}
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
-                      <div className="text-xs font-bold text-yellow-400 mb-2 flex items-center gap-1">
-                        💡 Pro Tip
-                      </div>
-                      <p className="text-xs text-yellow-300">{mode.tips}</p>
+                    {/* Right Section - Entry & Play (White/Gray) */}
+                    <div className="w-1/3 bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-r-lg flex flex-col justify-center items-center text-center">
+                      <div className="text-2xl font-bold text-gray-800 mb-2">Entry</div>
+                      <div className="text-3xl font-black text-green-600 mb-4">${room.entryFee}</div>
+                      
+                      <Button
+                        onClick={() => handlePlayGame(room)}
+                        disabled={room.currentPlayers < room.minPlayers}
+                        className={`w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                          room.currentPlayers < room.minPlayers ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Play
+                      </Button>
+                      
+                      {room.currentPlayers < room.minPlayers && (
+                        <div className="text-xs text-gray-500 mt-2">
+                          Needs {room.minPlayers} players
+                        </div>
+                      )}
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-                    {/* Special Features */}
-                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                      <div className="text-xs font-bold text-purple-400 mb-2 flex items-center gap-1">
-                        ⭐ Special Features
-                      </div>
-                      <p className="text-xs text-purple-300">{mode.specialFeatures}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Player Limits */}
-                  <div className="text-center text-xs text-gray-500 mb-4">
-                    Min: {mode.minPlayers} | Max: {mode.maxPlayers} players
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-center">
-                      <div className="text-sm text-white/80">Duration</div>
-                      <div className="text-xs text-gray-500">{Math.floor(mode.duration / 60)}m {mode.duration % 60}s</div>
-                    </div>
-                    <button 
-                      onClick={() => handlePlayGame(mode)}
-                      className={`bg-gradient-to-r ${mode.color} text-white font-bold py-2 px-4 rounded-full text-sm hover:shadow-lg transition-all transform hover:scale-105`}
-                    >
-                      Play Now
-                    </button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Info Section */}
+        <div className="mt-8 text-center">
+          <div className="bg-gray-800/50 rounded-lg p-6 max-w-2xl mx-auto">
+            <h3 className="text-xl font-bold text-white mb-4">🎯 How It Works</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+              <div>
+                <div className="font-bold text-blue-400 mb-2">Same BINGO Rules</div>
+                <p>All rooms use identical BINGO gameplay - complete 1 line to win!</p>
+              </div>
+              <div>
+                <div className="font-bold text-green-400 mb-2">Different Stakes</div>
+                <p>Choose your risk level - from $0.10 casual play to $10.00 high stakes!</p>
+              </div>
+              <div>
+                <div className="font-bold text-yellow-400 mb-2">Dynamic Prizes</div>
+                <p>Prize pools adjust based on entry fees and player counts.</p>
+              </div>
+              <div>
+                <div className="font-bold text-purple-400 mb-2">Crown Points</div>
+                <p>Earn VIP points based on your stakes and room popularity.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
