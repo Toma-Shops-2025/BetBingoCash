@@ -119,14 +119,44 @@ const TournamentLobby: React.FC = () => {
 
   // If a tournament is selected, show the game interface
   if (selectedTournament) {
+    // Ensure entry fee is a number
+    const entryFee = typeof selectedTournament.entry === 'string' 
+      ? parseFloat(selectedTournament.entry.replace('$', ''))
+      : selectedTournament.entry;
+    
+    // Validate game mode data
+    if (!selectedTournament.gameMode) {
+      console.error('Tournament missing gameMode:', selectedTournament);
+      return (
+        <div className="py-12 bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <button
+              onClick={() => setSelectedTournament(null)}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full text-sm transition-all duration-200 mb-4"
+            >
+              ← Back to Tournaments
+            </button>
+            <h2 className="text-4xl font-black text-white mb-4">
+              ⚠️ Tournament Error
+            </h2>
+            <p className="text-xl text-gray-300">
+              This tournament is not properly configured. Please try another one.
+            </p>
+          </div>
+        </div>
+      );
+    }
+    
     const gameMode = {
       id: selectedTournament.gameMode,
       title: selectedTournament.title,
       description: `Tournament: ${selectedTournament.title} - Prize Pool: ${selectedTournament.prize}`,
       duration: selectedTournament.difficulty === 'Easy' ? 60 : selectedTournament.difficulty === 'Medium' ? 120 : 180,
       prize: selectedTournament.prize,
-      entryFee: parseFloat(selectedTournament.entry.replace('$', ''))
+      entryFee: entryFee
     };
+
+    console.log('Starting tournament with gameMode:', gameMode);
 
     return (
       <div className="py-12 bg-gray-900">
@@ -142,7 +172,7 @@ const TournamentLobby: React.FC = () => {
               🏆 {selectedTournament.title} Tournament
             </h2>
             <p className="text-xl text-gray-300">
-              Prize Pool: {selectedTournament.prize} • Entry: {selectedTournament.entry}
+              Prize Pool: {selectedTournament.prize} • Entry: {typeof selectedTournament.entry === 'string' ? selectedTournament.entry : `$${selectedTournament.entry.toFixed(2)}`}
             </p>
           </div>
           
