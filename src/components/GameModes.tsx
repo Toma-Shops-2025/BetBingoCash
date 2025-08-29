@@ -21,7 +21,16 @@ const GameModes: React.FC = () => {
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342029898_22dadc29.webp",
       color: "from-red-500 to-pink-600",
       duration: 60, // 1 minute
-      prizeStructure: "Winner takes 80%, Runner-up 20%"
+      prizeStructure: "Winner takes 80%, Runner-up 20%",
+      rules: [
+        "Complete 1 line (horizontal, vertical, or diagonal) to win",
+        "Numbers called every 3 seconds for fast-paced action",
+        "First player to complete a line wins instantly",
+        "Tie-breaker: Most numbers marked in shortest time",
+        "Auto-daub enabled - no manual marking needed"
+      ],
+      tips: "Stay focused! Speed is key in this fast-paced mode. Watch for patterns and be ready to call BINGO quickly.",
+      specialFeatures: "⚡ Speed Bonus: Complete in under 30 seconds for 10% extra prize"
     },
     {
       id: 'classic-75',
@@ -35,7 +44,16 @@ const GameModes: React.FC = () => {
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342031659_b64c02ed.webp",
       color: "from-blue-500 to-indigo-600",
       duration: 120, // 2 minutes
-      prizeStructure: "1st: 60%, 2nd: 25%, 3rd: 15%"
+      prizeStructure: "1st: 60%, 2nd: 25%, 3rd: 15%",
+      rules: [
+        "Complete 1 line (horizontal, vertical, or diagonal) to win",
+        "Numbers called every 5 seconds for strategic play",
+        "Multiple winners share prize pool proportionally",
+        "Full card completion earns 2x prize multiplier",
+        "Traditional 5x5 grid with B-I-N-G-O columns"
+      ],
+      tips: "This is the most popular mode! Take your time and watch for multiple line opportunities.",
+      specialFeatures: "🏆 Full Card Bonus: Complete entire card for 2x prize multiplier"
     },
     {
       id: 'pattern-bingo',
@@ -49,7 +67,16 @@ const GameModes: React.FC = () => {
       image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342033434_cde2517b.webp",
       color: "from-green-500 to-emerald-600",
       duration: 90, // 1.5 minutes
-      prizeStructure: "Winner takes 70%, Pattern bonus 30%"
+      prizeStructure: "Winner takes 70%, Pattern bonus 30%",
+      rules: [
+        "Complete specific patterns shown at game start",
+        "Patterns include: X, L, T, U, Diamond, and more",
+        "Numbers called every 4 seconds",
+        "Pattern completion order determines prize share",
+        "Bonus prizes for completing multiple patterns"
+      ],
+      tips: "Study the pattern before the game starts! Some patterns are easier than others.",
+      specialFeatures: "✨ Pattern Master: Complete 3+ patterns for 50% bonus prize"
     },
     {
       id: 'jackpot-room',
@@ -60,10 +87,19 @@ const GameModes: React.FC = () => {
       minPlayers: 50,
       maxPlayers: 200,
       players: "234",
-      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342035247_cde2517b.webp",
+      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342025247_cde2517b.webp",
       color: "from-yellow-500 to-orange-600",
       duration: 180, // 3 minutes
-      prizeStructure: "Progressive: 90% of entry fees + house contribution"
+      prizeStructure: "Progressive: 90% of entry fees + house contribution",
+      rules: [
+        "Complete 1 line to win progressive jackpot",
+        "Jackpot grows with each game until won",
+        "Numbers called every 6 seconds for maximum suspense",
+        "Minimum jackpot guarantee: $5,000",
+        "House contributes $1,000 to each jackpot"
+      ],
+      tips: "High stakes, high rewards! This is for serious players looking for life-changing wins.",
+      specialFeatures: "🎰 Progressive Jackpot: Grows with every game until someone wins!"
     }
   ];
 
@@ -187,6 +223,45 @@ const GameModes: React.FC = () => {
                       <div className="text-2xl font-black text-green-400 mb-1">{mode.prize}</div>
                       <div className="text-xs text-gray-500 mb-2">Prize Pool</div>
                       <div className="text-xs text-blue-400">{mode.prizeStructure}</div>
+                    </div>
+                  </div>
+
+                  {/* Rules & Tips Section */}
+                  <div className="mb-4 space-y-3">
+                    {/* Rules */}
+                    <div className="bg-gray-800/50 rounded-lg p-3">
+                      <div className="text-xs font-bold text-blue-400 mb-2 flex items-center gap-1">
+                        📋 Rules
+                      </div>
+                      <ul className="text-xs text-gray-300 space-y-1">
+                        {mode.rules.slice(0, 3).map((rule, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-blue-400 text-xs">•</span>
+                            <span>{rule}</span>
+                          </li>
+                        ))}
+                        {mode.rules.length > 3 && (
+                          <li className="text-blue-400 text-xs cursor-pointer hover:underline">
+                            +{mode.rules.length - 3} more rules...
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* Tips */}
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                      <div className="text-xs font-bold text-yellow-400 mb-2 flex items-center gap-1">
+                        💡 Pro Tip
+                      </div>
+                      <p className="text-xs text-yellow-300">{mode.tips}</p>
+                    </div>
+
+                    {/* Special Features */}
+                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                      <div className="text-xs font-bold text-purple-400 mb-2 flex items-center gap-1">
+                        ⭐ Special Features
+                      </div>
+                      <p className="text-xs text-purple-300">{mode.specialFeatures}</p>
                     </div>
                   </div>
                   

@@ -20,6 +20,60 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
 }) => {
   const { isAuthenticated, balance, updateBalance } = useAppContext();
 
+  // Tournament details and rules
+  const getTournamentDetails = () => {
+    const details = {
+      'speed-bingo': {
+        description: "Lightning-fast tournament with rapid number calling and quick wins",
+        rules: [
+          "Complete 1 line to advance to next round",
+          "3-second number intervals for maximum speed",
+          "Elimination rounds until final winner",
+          "Sudden death format in final round"
+        ],
+        strategy: "Speed and focus are crucial. Watch for patterns and be ready to call BINGO instantly.",
+        specialRules: "⚡ Speed rounds: Numbers called faster in final stages"
+      },
+      'classic-75': {
+        description: "Traditional tournament with strategic gameplay and multiple winners",
+        rules: [
+          "Complete 1 line to advance to next round",
+          "5-second number intervals for strategy",
+          "Multiple winners can advance together",
+          "Final round: Best of 3 games"
+        ],
+        strategy: "Take your time and watch for multiple line opportunities. Quality over speed.",
+        specialRules: "🏆 Championship format: Best of 3 games in final round"
+      },
+      'pattern-bingo': {
+        description: "Pattern-based tournament with unique challenges and bonus prizes",
+        rules: [
+          "Complete specific patterns to advance",
+          "Patterns get more complex each round",
+          "Bonus points for creative pattern completion",
+          "Final round: Ultimate pattern challenge"
+        ],
+        strategy: "Study patterns carefully. Some are easier than others - choose wisely!",
+        specialRules: "✨ Pattern Master bonus: Complete 3+ patterns for extra points"
+      },
+      'jackpot-room': {
+        description: "High-stakes tournament with massive progressive jackpots",
+        rules: [
+          "Complete 1 line to advance to next round",
+          "6-second number intervals for suspense",
+          "Jackpot grows with each eliminated player",
+          "Final round: Winner takes all jackpot"
+        ],
+        strategy: "High risk, high reward. This is for serious players only!",
+        specialRules: "🎰 Progressive jackpot: Grows with every eliminated player"
+      }
+    };
+    
+    return details[gameMode as keyof typeof details] || details['classic-75'];
+  };
+
+  const tournamentDetails = getTournamentDetails();
+
   const getDifficultyColor = (diff: string) => {
     switch(diff) {
       case 'Easy': return 'bg-green-500';
