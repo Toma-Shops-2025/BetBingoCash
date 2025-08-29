@@ -112,12 +112,6 @@ const AppLayout: React.FC = () => {
                   {/* Mobile: Compact Action Buttons */}
                   <div className="lg:hidden flex items-center gap-1">
                     <button
-                      onClick={() => setGemShopModalOpen(true)}
-                      className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-1 px-2 rounded-full text-xs transition-all duration-200"
-                    >
-                      💎
-                    </button>
-                    <button
                       onClick={() => setPaymentModalOpen(true)}
                       className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-1 px-2 rounded-full text-xs transition-all duration-200"
                     >
