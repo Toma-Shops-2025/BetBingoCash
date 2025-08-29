@@ -299,27 +299,27 @@ const AppLayout: React.FC = () => {
 
       {/* Main Content */}
       <main>
-        <HeroSection />
-        <PromoBanner />
+        {/* <HeroSection /> */}
+        {/* <PromoBanner /> */}
         <div id="games">
           <GameModes />
         </div>
-        <FeaturesSection />
-        <GameStats />
+        {/* <FeaturesSection /> */}
+        {/* <GameStats /> */}
         <div id="tournaments">
           <TournamentLobby />
         </div>
-        <div id="leaderboard">
+        {/* <div id="leaderboard">
           <Leaderboard />
-        </div>
-        <TestimonialsSection />
-        <div id="rewards">
+        </div> */}
+        {/* <TestimonialsSection /> */}
+        {/* <div id="rewards">
           <DailyRewards />
-        </div>
-        <div id="cashout">
+        </div> */}
+        {/* <div id="cashout">
           <CashoutSection />
-        </div>
-        <Footer />
+        </div> */}
+        {/* <Footer /> */}
       </main>
 
       {/* Modals */}
