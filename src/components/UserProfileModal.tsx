@@ -174,7 +174,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-gradient-to-r from-green-800 to-emerald-800 rounded-lg">
                   <div className="text-2xl mb-2">💰</div>
-                  <div className="text-white font-bold text-xl">${balance.toFixed(2)}</div>
+                  <div className="text-white font-bold text-xl">${(balance || 0).toFixed(2)}</div>
                   <div className="text-white/60 text-sm">Available Balance</div>
                 </div>
 

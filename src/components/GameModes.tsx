@@ -125,7 +125,7 @@ const GameModes: React.FC = () => {
 
     // Confirm entry fee payment
     const confirmEntry = window.confirm(
-      `Join ${gameMode.title}?\n\nEntry Fee: $${gameMode.entryFee.toFixed(2)}\nPrize Pool: ${gameMode.prize}\n\nYour balance: $${balance.toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+      `Join ${gameMode.title}?\n\nEntry Fee: $${gameMode.entryFee.toFixed(2)}\nPrize Pool: ${gameMode.prize}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
     );
 
     if (!confirmEntry) return;

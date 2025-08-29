@@ -117,7 +117,7 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
 
     // Confirm entry fee payment
     const confirmEntry = window.confirm(
-      `Join ${title} Tournament?\n\nEntry Fee: ${entry}\nPrize Pool: ${prize}\nPlayers: ${players}/${maxPlayers}\n\nYour balance: $${balance.toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
+      `Join ${title} Tournament?\n\nEntry Fee: ${entry}\nPrize Pool: ${prize}\nPlayers: ${players}/${maxPlayers}\n\nYour balance: $${(balance || 0).toFixed(2)}\n\nClick OK to confirm and pay entry fee.`
     );
 
     if (!confirmEntry) return;
