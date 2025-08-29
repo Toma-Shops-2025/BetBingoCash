@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { getAudioFileForNumber, getDisplayTextForNumber } from '../lib/bingoAudioMap';
 
 interface AudioSettings {
   musicEnabled: boolean;
@@ -170,7 +171,66 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const playNumberCall = (number: number) => {
-    playSoundEffect('number-call');
+    if (!settings.voiceEnabled) return;
+    
+    try {
+      // Get Adam's voice audio file for this specific number
+      const audioFile = getAudioFileForNumber(number);
+      const displayText = getDisplayTextForNumber(number);
+      
+      if (audioFile) {
+        // Play Adam's voice calling the number
+        const audio = new Audio(audioFile);
+        audio.volume = settings.voiceVolume;
+        
+        // Handle successful play
+        audio.play().then(() => {
+          console.log(`Playing Adam's voice: ${displayText}`);
+        }).catch(error => {
+          console.warn(`Could not play Adam's voice for ${displayText}:`, error);
+          // Fallback to TTS if Adam's voice fails
+          fallbackToTTS(displayText || `Number ${number}`);
+        });
+        
+        // Handle audio errors gracefully
+        audio.onerror = () => {
+          console.warn(`Adam's voice file not found for ${displayText}:`, audioFile);
+          // Fallback to TTS
+          fallbackToTTS(displayText || `Number ${number}`);
+        };
+      } else {
+        // Fallback to TTS for invalid numbers
+        fallbackToTTS(`Number ${number}`);
+      }
+    } catch (error) {
+      console.warn('Error playing Adam\'s voice:', error);
+      // Fallback to TTS
+      fallbackToTTS(`Number ${number}`);
+    }
+  };
+
+  // Fallback to TTS if Adam's voice is not available
+  const fallbackToTTS = (text: string) => {
+    if (!settings.voiceEnabled) return;
+    
+    // Use Web Speech API for voice synthesis as fallback
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.volume = settings.voiceVolume;
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      
+      // Try to use a good voice
+      const voices = speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex')
+      );
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      speechSynthesis.speak(utterance);
+    }
   };
 
   // Update audio volumes when settings change
