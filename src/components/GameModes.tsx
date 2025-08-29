@@ -87,7 +87,7 @@ const GameModes: React.FC = () => {
       minPlayers: 50,
       maxPlayers: 200,
       players: "234",
-      image: "https://d64gsuwffb70l.cloudfront.net/68afa3c8dc48a02afdc596ca_1756342025247_cde2517b.webp",
+      image: "", // Remove custom image to use bingo card background
       color: "from-yellow-500 to-orange-600",
       duration: 180, // 3 minutes
       prizeStructure: "Progressive: 90% of entry fees + house contribution",
@@ -190,11 +190,28 @@ const GameModes: React.FC = () => {
             <Card key={index} className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <img 
-                    src={mode.image} 
-                    alt={mode.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
+                  {mode.image ? (
+                    <img 
+                      src={mode.image} 
+                      alt={mode.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
+                      {/* Bingo Card Background */}
+                      <div className="grid grid-cols-5 grid-rows-3 gap-2 p-4">
+                        {Array.from({ length: 15 }, (_, i) => (
+                          <div key={i} className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold text-sm shadow-lg">
+                            {Math.floor(Math.random() * 75) + 1}
+                          </div>
+                        ))}
+                      </div>
+                      {/* Jackpot Icon Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/20 to-orange-600/20 flex items-center justify-center">
+                        <div className="text-6xl">🎰</div>
+                      </div>
+                    </div>
+                  )}
                   <div className={`absolute inset-0 bg-gradient-to-t ${mode.color} opacity-80 group-hover:opacity-60 transition-opacity`}></div>
                   <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
                     <span className="text-white text-sm font-bold">👥 {mode.players}</span>
