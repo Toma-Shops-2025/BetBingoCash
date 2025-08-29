@@ -233,15 +233,23 @@ const AppLayout: React.FC = () => {
           <GameModes />
         </div>
         
-        <div id="tournaments" className="px-4 mt-16">
+        {/* Temporarily disabled TournamentLobby due to crash */}
+        {/* <div id="tournaments" className="px-4 mt-16">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">🏆 Tournaments</h2>
           <TournamentLobby />
-        </div>
+        </div> */}
       </main>
 
       {/* User Profile Modals */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
-      <PaymentModal isOpen={paymentModalOpen} onClose={() => setPaymentModalOpen(false)} />
+      <PaymentModal 
+        isOpen={paymentModalOpen} 
+        onClose={() => setPaymentModalOpen(false)}
+        amount={25}
+        onSuccess={(amount) => {
+          console.log(`Payment successful: $${amount}`);
+        }}
+      />
       <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
       <GemShopModal isOpen={gemShopModalOpen} onClose={() => setGemShopModalOpen(false)} />
     </div>
