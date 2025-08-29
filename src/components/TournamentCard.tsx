@@ -160,11 +160,53 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
       
       <h3 className="text-white font-bold text-xl mb-3">{title}</h3>
       
+      {/* Tournament Description */}
+      <p className="text-white/70 text-sm mb-4">{tournamentDetails.description}</p>
+      
       <div className="flex items-center gap-3 mb-4">
         <img src={image} alt="Game" className="w-12 h-12 rounded-full border-2 border-yellow-400/50" />
         <div>
           <div className="text-white/80 text-sm">Entry Fee</div>
           <div className="text-green-400 font-bold">{entry}</div>
+        </div>
+      </div>
+      
+      {/* Tournament Rules & Strategy */}
+      <div className="mb-4 space-y-3">
+        {/* Rules */}
+        <div className="bg-purple-800/30 rounded-lg p-3">
+          <div className="text-xs font-bold text-blue-400 mb-2 flex items-center gap-1">
+            📋 Tournament Rules
+          </div>
+          <ul className="text-xs text-white/80 space-y-1">
+            {tournamentDetails.rules.slice(0, 2).map((rule, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="text-blue-400 text-xs">•</span>
+                <span>{rule}</span>
+              </li>
+            ))}
+            {tournamentDetails.rules.length > 2 && (
+              <li className="text-blue-400 text-xs cursor-pointer hover:underline">
+                +{tournamentDetails.rules.length - 2} more rules...
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {/* Strategy */}
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+          <div className="text-xs font-bold text-yellow-400 mb-2 flex items-center gap-1">
+            🎯 Strategy
+          </div>
+          <p className="text-xs text-yellow-300">{tournamentDetails.strategy}</p>
+        </div>
+
+        {/* Special Rules */}
+        <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+          <div className="text-xs font-bold text-purple-400 mb-2 flex items-center gap-1">
+            ⭐ Special Rules
+          </div>
+          <p className="text-xs text-purple-300">{tournamentDetails.specialRules}</p>
         </div>
       </div>
       

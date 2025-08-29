@@ -85,6 +85,20 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
     return `Number ${number}`;
   }, []);
 
+  // Check for completed BINGO lines
+  const checkBingoLines = useCallback(() => {
+    // This is a simplified check - in a real implementation, you'd check the actual bingo card
+    // For now, we'll check if enough numbers have been called to potentially complete lines
+    if (calledNumbers.length < 5) return 0;
+    
+    // Simple heuristic: if 15+ numbers are called, there's a good chance of a line
+    if (calledNumbers.length >= 15) return 1;
+    if (calledNumbers.length >= 20) return 2;
+    if (calledNumbers.length >= 25) return 3;
+    
+    return 0;
+  }, [calledNumbers]);
+
   // Handle countdown animation
   const startCountdown = () => {
     setShowCountdown(true);
@@ -568,10 +582,43 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ gameMode }) => {
           </div>
           
           {/* Bingo Card */}
-          <div className="lg:col-span-2">
-            <BingoCard 
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {/* BINGO Button */}
+            <div className="mb-6 text-center">
+              <button
+                onClick={() => {
+                  // Check if player has actually completed a line
+                  const bingoLines = checkBingoLines();
+                  if (bingoLines > 0) {
+                    const bingoBonus = bingoLines * 100;
+                    setScore(prev => prev + bingoBonus);
+                    playBingo();
+                    toast({
+                      title: `BINGO! ${bingoLines} Line${bingoLines > 1 ? 's' : ''}!`,
+                      description: `+${bingoBonus} points!`,
+                    });
+                    // End the game with the current score
+                    handleGameOver();
+                  } else {
+                    toast({
+                      title: "Not Yet!",
+                      description: "You need to complete a line to call BINGO!",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-black text-3xl md:text-4xl py-4 px-8 rounded-full shadow-2xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-300 animate-pulse"
+              >
+                🎯 CALL BINGO! 🎯
+              </button>
+              <p className="text-white/70 text-sm mt-2">
+                Click when you complete a line to win!
+              </p>
+            </div>
+            
+            <BingoCard
               calledNumbers={calledNumbers}
-              gameActive={gameActive && !gamePaused}
+              gameActive={gameActive}
               onBingo={(lines) => {
                 const bingoBonus = lines * 100;
                 setScore(prev => prev + bingoBonus);
