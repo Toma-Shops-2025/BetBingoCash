@@ -28,7 +28,7 @@ const GameModes: React.FC = () => {
       id: 'bingo-room-2',
       title: "BINGO Room 2", 
       entryFee: 1.00,
-      basePrize: 2.00,
+      basePrize: 5.00,
       minPlayers: 3,
       maxPlayers: 30,
       currentPlayers: 3,
