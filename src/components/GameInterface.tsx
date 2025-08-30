@@ -463,6 +463,31 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
 
           {/* Right - Controls and Power-ups */}
           <div className="w-80 space-y-4">
+            {/* Debug Info - Always Visible */}
+            <div className="bg-red-500/20 backdrop-blur-sm rounded-xl p-4 border border-red-400/30">
+              <div className="text-white font-bold text-center mb-2">🐛 DEBUG INFO</div>
+              <div className="text-white text-sm space-y-1">
+                <div>Game State: <span className="text-yellow-400">{gameState}</span></div>
+                <div>Game Mode: <span className="text-yellow-400">{gameMode}</span></div>
+                <div>Called Numbers: <span className="text-yellow-400">{calledNumbers.length}</span></div>
+                <div>Balls Remaining: <span className="text-yellow-400">{ballsRemaining}</span></div>
+              </div>
+            </div>
+
+            {/* ALWAYS VISIBLE START BUTTON */}
+            <div className="bg-green-500/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
+              <Button
+                onClick={startGame}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                🚀 START BINGO GAME NOW! 🚀
+              </Button>
+              <div className="text-center text-green-300 text-sm mt-2">
+                Click to start the game immediately!
+              </div>
+            </div>
+
             {/* Power-up Slots */}
             <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
               <h3 className="text-white font-bold mb-3 text-center">Power-ups</h3>
@@ -527,20 +552,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
             {/* Game Controls */}
             <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
               <div className="space-y-3">
-                {gameState === 'waiting' && (
-                  <>
-                    <Button
-                      onClick={startGame}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg"
-                    >
-                      <Play className="w-5 h-5 mr-2" />
-                      🚀 START BINGO GAME NOW! 🚀
-                    </Button>
-                    <div className="text-center text-yellow-300 text-sm bg-yellow-500/20 p-2 rounded-lg border border-yellow-400/30">
-                      ⏰ Auto-starting in 3 seconds... (or click above to start immediately!)
-                    </div>
-                  </>
-                )}
                 
                 {gameState === 'playing' && (
                   <Button
