@@ -198,18 +198,16 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
   useEffect(() => {
     console.log('GameInterface mounted, gameState:', gameState, 'gameMode:', gameMode);
     
-    if (gameState === 'waiting') {
-      console.log('Setting up auto-start timer...');
-      const autoStartTimer = setTimeout(() => {
-        console.log('Auto-start timer triggered, starting game...');
-        startGame();
-      }, 3000); // Start game automatically after 3 seconds
-      
-      return () => {
-        console.log('Clearing auto-start timer');
-        clearTimeout(autoStartTimer);
-      };
-    }
+    // Start game automatically after 3 seconds
+    const autoStartTimer = setTimeout(() => {
+      console.log('Auto-start timer triggered, starting game...');
+      startGame();
+    }, 3000);
+    
+    return () => {
+      console.log('Clearing auto-start timer');
+      clearTimeout(autoStartTimer);
+    };
   }, []); // Run only once when component mounts
 
   // Force start game after a delay if still waiting
@@ -220,7 +218,7 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
           console.log('Force starting game...');
           startGame();
         }
-      }, 5000); // Force start after 5 seconds
+      }, 8000); // Force start after 8 seconds
       
       return () => clearTimeout(forceStartTimer);
     }
@@ -533,13 +531,13 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
                   <>
                     <Button
                       onClick={startGame}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl"
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg"
                     >
-                      <Play className="w-4 h-4 mr-2" />
-                      START GAME NOW
+                      <Play className="w-5 h-5 mr-2" />
+                      🚀 START BINGO GAME NOW! 🚀
                     </Button>
-                    <div className="text-center text-yellow-300 text-sm">
-                      ⏰ Auto-starting in a few seconds...
+                    <div className="text-center text-yellow-300 text-sm bg-yellow-500/20 p-2 rounded-lg border border-yellow-400/30">
+                      ⏰ Auto-starting in 3 seconds... (or click above to start immediately!)
                     </div>
                   </>
                 )}
