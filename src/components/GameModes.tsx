@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Crown, Users, DollarSign, Play } from 'lucide-react';
+import GameInterface from './GameInterface';
 
 const GameModes: React.FC = () => {
   const { isAuthenticated, balance, updateBalance, startGame } = useAppContext();
@@ -161,8 +162,7 @@ const GameModes: React.FC = () => {
     // Deduct entry fee and start game
     updateBalance(-gameRoom.entryFee);
     
-    // Start the selected game
-    startGame(gameRoom.id);
+    // Set the selected game to render the GameInterface
     setSelectedGame(gameRoom.id);
     
     toast({
@@ -179,47 +179,10 @@ const GameModes: React.FC = () => {
   if (selectedGame) {
     const gameRoom = gameRooms.find(room => room.id === selectedGame);
     return (
-      <div className="py-8 bg-gray-800">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <button
-              onClick={handleBackToRooms}
-              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-2 px-6 rounded-full text-sm mb-4 transition-all duration-200"
-            >
-              ← Back to Game Rooms
-            </button>
-            <h2 className="text-4xl font-black text-white mb-4">
-              🎯 {gameRoom?.title}
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              {gameRoom?.description}
-            </p>
-          </div>
-          <div className="bg-gray-900 rounded-2xl p-8 text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">BINGO Game Starting Soon!</h3>
-            <p className="text-gray-300 mb-6">This room will use the same BINGO rules as all other rooms.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-400">${gameRoom?.entryFee}</div>
-                <div className="text-sm text-gray-500">Entry Fee</div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-400">${calculatePrize(gameRoom?.entryFee || 0, gameRoom?.currentPlayers || 0, gameRoom?.id || '')}</div>
-                <div className="text-sm text-gray-500">Prize Pool</div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-blue-400">{gameRoom?.currentPlayers}</div>
-                <div className="text-sm text-gray-500">Players</div>
-              </div>
-            </div>
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
-              <div className="text-sm font-bold text-blue-400 mb-2">🎯 BINGO Rules</div>
-              <p className="text-sm text-blue-300">{gameRoom?.bingoPattern}</p>
-            </div>
-            <p className="text-gray-400 text-sm">Game will start automatically when ready. Good luck! 🍀</p>
-          </div>
-        </div>
-      </div>
+      <GameInterface 
+        gameMode={selectedGame}
+        onExit={() => setSelectedGame(null)}
+      />
     );
   }
 
