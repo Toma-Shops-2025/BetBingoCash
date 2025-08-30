@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
-import { useAudio } from '@/contexts/AudioContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Home, Play, Pause, Volume2, VolumeX, Settings, Zap, Star, Coins, DollarSign, CreditCard, Music, Mic } from 'lucide-react';
+import { Play, Pause, Home, Star, Coins, DollarSign, CreditCard } from 'lucide-react';
 import BingoCard from './BingoCard';
 
 interface GameInterfaceProps {
@@ -16,136 +14,18 @@ export interface GameInterfaceRef {
 }
 
 const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMode, onExit }, ref) => {
-  const { balance, gems, updateBalance, updateGems } = useAppContext();
-  const { 
-    isPlaying, 
-    togglePlay, 
-    backgroundMusicVolume, 
-    gameMusicVolume,
-    setGameMusicMode,
-    playNumberCall,
-    playBingoCelebration 
-  } = useAudio();
-
+  const { balance, gems, updateBalance } = useAppContext();
+  
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'paused' | 'finished'>('waiting');
   const [calledNumbers, setCalledNumbers] = useState<string[]>([]);
   const [currentNumber, setCurrentNumber] = useState<string>('');
   const [ballsRemaining, setBallsRemaining] = useState(75);
-  const [gameSpeed, setGameSpeed] = useState(1);
-  const [autoDaub, setAutoDaub] = useState(true);
-  const [tripleDaubProgress, setTripleDaubProgress] = useState(0);
-  const [powerUpSlots, setPowerUpSlots] = useState<Array<{ id: string; type: string; icon: string }>>([]);
   const [canCallBingo, setCanCallBingo] = useState(false);
-  const [bingoLines, setBingoLines] = useState<string[]>([]);
-  
-  // Audio states
-  const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState(false);
-  const [backgroundMusicVolume, setBackgroundMusicVolume] = useState(0.3);
-  const [isMuted, setIsMuted] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<string>('');
   
   const bingoCardRef = useRef<any>(null);
-  const gameInterval = useRef<NodeJS.Timeout | null>(null);
   const numberCallInterval = useRef<NodeJS.Timeout | null>(null);
-  const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
-  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
 
-  // Initialize speech synthesis and find Adam-like voice
-  useEffect(() => {
-    if ('speechSynthesis' in window) {
-      speechSynthesisRef.current = window.speechSynthesis;
-      
-      // Wait for voices to load
-      const loadVoices = () => {
-        const voices = speechSynthesisRef.current?.getVoices() || [];
-        // Find a male voice that sounds closest to Adam
-        const adamLikeVoice = voices.find(voice => 
-          voice.lang.includes('en') && 
-          (voice.name.includes('Male') || voice.name.includes('David') || voice.name.includes('Mark') || voice.name.includes('James'))
-        ) || voices.find(voice => voice.lang.includes('en')) || voices[0];
-        
-        if (adamLikeVoice) {
-          setSelectedVoice(adamLikeVoice.name);
-        }
-      };
-      
-      if (speechSynthesisRef.current.getVoices().length > 0) {
-        loadVoices();
-      } else {
-        speechSynthesisRef.current.addEventListener('voiceschanged', loadVoices);
-      }
-    }
-  }, []);
-
-  // Initialize background music
-  useEffect(() => {
-    backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
-    backgroundMusicRef.current.loop = true;
-    backgroundMusicRef.current.volume = backgroundMusicVolume;
-    
-    return () => {
-      if (backgroundMusicRef.current) {
-        backgroundMusicRef.current.pause();
-        backgroundMusicRef.current = null;
-      }
-    };
-  }, []);
-
-  // Play background music
-  const playBackgroundMusic = () => {
-    if (backgroundMusicRef.current && !isMuted) {
-      backgroundMusicRef.current.play().catch(console.error);
-      setIsBackgroundMusicPlaying(true);
-    }
-  };
-
-  // Stop background music
-  const stopBackgroundMusic = () => {
-    if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.pause();
-      setIsBackgroundMusicPlaying(false);
-    }
-  };
-
-  // Toggle mute
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.volume = !isMuted ? 0 : backgroundMusicVolume;
-    }
-  };
-
-  // Call BINGO number with Adam-like voice
-  const callBingoNumber = (number: string) => {
-    if (speechSynthesisRef.current && selectedVoice) {
-      // Cancel any ongoing speech
-      speechSynthesisRef.current.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance();
-      utterance.text = `Number ${number}`;
-      utterance.voice = speechSynthesisRef.current.getVoices().find(v => v.name === selectedVoice) || null;
-      utterance.rate = 0.9; // Slightly slower for Adam-like effect
-      utterance.pitch = 0.95; // Slightly lower pitch for male voice
-      utterance.volume = 0.8;
-      
-      // Add some natural pauses and emphasis
-      utterance.text = `Number ${number.slice(0, 1)} ${number.slice(1)}`;
-      
-      speechSynthesisRef.current.speak(utterance);
-    }
-  };
-
-  // Set game music mode when component mounts
-  useEffect(() => {
-    setGameMusicMode(true);
-    playBackgroundMusic();
-    return () => {
-      setGameMusicMode(false);
-      stopBackgroundMusic();
-    };
-  }, [setGameMusicMode]);
-
-  // Generate BINGO numbers (B1-B15, I16-I30, N31-N45, G46-G60, O61-O75)
+  // Generate BINGO numbers
   const generateBingoNumbers = () => {
     const numbers: string[] = [];
     const letters = ['B', 'I', 'N', 'G', 'O'];
@@ -164,65 +44,39 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
   };
 
   const startGame = () => {
+    console.log('Starting BINGO game...');
     setGameState('playing');
     setCalledNumbers([]);
     setBallsRemaining(75);
-    setTripleDaubProgress(0);
     
     const allNumbers = generateBingoNumbers();
     let currentIndex = 0;
     
-    // Call numbers every 3 seconds
+    // Call numbers every 2 seconds
     numberCallInterval.current = setInterval(() => {
       if (currentIndex < allNumbers.length) {
         const number = allNumbers[currentIndex];
         setCurrentNumber(number);
-        setCalledNumbers(prev => [number, ...prev.slice(0, 2)]); // Keep only last 3
+        setCalledNumbers(prev => [number, ...prev.slice(0, 2)]);
         setBallsRemaining(75 - currentIndex - 1);
         
-        // Call BINGO number with Adam-like voice
-        callBingoNumber(number);
+        // Use speech synthesis to call numbers
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(`Number ${number}`);
+          utterance.rate = 0.9;
+          utterance.pitch = 0.95;
+          window.speechSynthesis.speak(utterance);
+        }
         
         currentIndex++;
       } else {
-        // Game finished
         setGameState('finished');
         if (numberCallInterval.current) {
           clearInterval(numberCallInterval.current);
         }
       }
-    }, 3000);
+    }, 2000);
   };
-
-  // Auto-start game after a short delay when entering a room
-  useEffect(() => {
-    console.log('GameInterface mounted, gameState:', gameState, 'gameMode:', gameMode);
-    
-    // Start game automatically after 3 seconds
-    const autoStartTimer = setTimeout(() => {
-      console.log('Auto-start timer triggered, starting game...');
-      startGame();
-    }, 3000);
-    
-    return () => {
-      console.log('Clearing auto-start timer');
-      clearTimeout(autoStartTimer);
-    };
-  }, []); // Run only once when component mounts
-
-  // Force start game after a delay if still waiting
-  useEffect(() => {
-    if (gameState === 'waiting') {
-      const forceStartTimer = setTimeout(() => {
-        if (gameState === 'waiting') {
-          console.log('Force starting game...');
-          startGame();
-        }
-      }, 8000); // Force start after 8 seconds
-      
-      return () => clearTimeout(forceStartTimer);
-    }
-  }, [gameState]);
 
   const pauseGame = () => {
     setGameState('paused');
@@ -239,16 +93,13 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
   const handleCallBingo = () => {
     if (!canCallBingo) return;
     
-    // Check if player actually has BINGO
     if (bingoCardRef.current && bingoCardRef.current.checkBingoLines()) {
-      playBingoCelebration();
       setGameState('finished');
       
-      // Calculate winnings based on game mode
+      // Calculate winnings
       const winnings = calculateWinnings();
       updateBalance(winnings);
       
-      // Show celebration
       alert(`🎉 BINGO! You won $${winnings.toFixed(2)}! 🎉`);
     } else {
       alert('❌ No BINGO yet! Keep playing!');
@@ -256,7 +107,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
   };
 
   const calculateWinnings = () => {
-    // Base winnings based on game mode
     const baseWinnings = {
       'bingo-room-1': 1.50,
       'bingo-room-2': 5.00,
@@ -270,32 +120,12 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     return baseWinnings[gameMode as keyof typeof baseWinnings] || 10.00;
   };
 
-  const getBingoCall = (number: string) => {
-    return number; // Format: B1, I16, N31, G46, O61
-  };
-
-  // Expose checkBingoLines method to parent
+  // Expose checkBingoLines method
   useImperativeHandle(ref, () => ({
     checkBingoLines: () => {
       return bingoCardRef.current?.checkBingoLines() || false;
     }
   }));
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (gameState === 'playing') {
-          pauseGame();
-        } else if (gameState === 'paused') {
-          resumeGame();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameState]);
 
   // Check for BINGO lines periodically
   useEffect(() => {
@@ -315,33 +145,21 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-blue-900 to-purple-800 relative overflow-hidden">
       {/* Futuristic City Skyline Background */}
       <div className="absolute inset-0 z-0">
-        {/* Glowing buildings */}
         <div className="absolute left-0 bottom-0 w-32 h-64 bg-gradient-to-t from-purple-600 to-blue-500 opacity-60">
           <div className="w-full h-full bg-gradient-to-b from-transparent via-purple-400/20 to-transparent animate-pulse"></div>
         </div>
         <div className="absolute right-0 bottom-0 w-40 h-80 bg-gradient-to-t from-blue-600 to-purple-500 opacity-60">
           <div className="w-full h-full bg-gradient-to-b from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
         </div>
-        
-        {/* Central pyramid structure */}
         <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 w-48 h-96 bg-gradient-to-t from-yellow-400 via-orange-500 to-red-500 opacity-80">
           <div className="w-full h-full bg-gradient-to-b from-transparent via-yellow-300/30 to-transparent animate-pulse"></div>
         </div>
-        
-        {/* Glowing orbs */}
-        <div className="absolute left-1/4 top-1/2 w-4 h-4 bg-blue-400 rounded-full animate-ping opacity-60"></div>
-        <div className="absolute right-1/4 top-1/3 w-3 h-3 bg-purple-400 rounded-full animate-ping opacity-60" style={{animationDelay: '1s'}}></div>
-        <div className="absolute left-1/3 bottom-1/4 w-5 h-5 bg-pink-400 rounded-full animate-ping opacity-60" style={{animationDelay: '2s'}}></div>
-        
-        {/* Reflective water surface */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-400/20 to-transparent opacity-40"></div>
       </div>
 
       {/* Game Interface */}
       <div className="relative z-10 p-4">
-        {/* Top Section - Currency and Controls */}
+        {/* Top Section */}
         <div className="flex justify-between items-start mb-6">
-          {/* Left - Currency Display */}
           <div className="flex gap-4">
             <div className="flex items-center gap-2 bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-green-400/30">
               <DollarSign className="w-5 h-5 text-green-400" />
@@ -353,7 +171,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
             </div>
           </div>
           
-          {/* Right - Home Button */}
           <Button
             onClick={onExit}
             variant="ghost"
@@ -361,48 +178,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
           >
             <Home className="w-5 h-5" />
           </Button>
-        </div>
-
-        {/* Audio Controls */}
-        <div className="flex justify-center mb-6">
-          <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Music className="w-5 h-5 text-purple-400" />
-              <span className="text-white text-sm">Music</span>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={backgroundMusicVolume}
-                onChange={(e) => {
-                  const volume = parseFloat(e.target.value);
-                  setBackgroundMusicVolume(volume);
-                  if (backgroundMusicRef.current) {
-                    backgroundMusicRef.current.volume = volume;
-                  }
-                }}
-                className="w-20"
-              />
-            </div>
-            
-            <Button
-              onClick={toggleMute}
-              variant="ghost"
-              className={`p-2 rounded-lg ${
-                isMuted 
-                  ? 'bg-red-500/20 border border-red-400/30 text-red-400' 
-                  : 'bg-green-500/20 border border-green-400/30 text-green-400'
-              }`}
-            >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </Button>
-            
-            <div className="flex items-center gap-2">
-              <Mic className="w-5 h-5 text-blue-400" />
-              <span className="text-white text-sm">Voice: {selectedVoice || 'Loading...'}</span>
-            </div>
-          </div>
         </div>
 
         {/* Called Numbers Bar */}
@@ -422,16 +197,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
             ))}
           </div>
           
-          {/* Game Speed Control */}
-          <Button
-            onClick={() => setGameSpeed(prev => prev === 3 ? 1 : prev + 1)}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <Zap className="w-4 h-4" />
-            <span className="text-sm">x{gameSpeed}</span>
-          </Button>
-          
-          {/* Balls Remaining */}
           <div className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold">
             {ballsRemaining} BALLS
           </div>
@@ -442,7 +207,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
           {/* Left - BINGO Card */}
           <div className="flex-1">
             <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-400/50">
-              {/* Rainbow BINGO Header */}
               <div className="text-center mb-6">
                 <h1 className="text-4xl font-black">
                   <span className="text-red-500">B</span>
@@ -456,103 +220,45 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
               <BingoCard
                 ref={bingoCardRef}
                 calledNumbers={calledNumbers}
-                onBingoLinesChange={setBingoLines}
+                onBingoLinesChange={() => {}}
               />
             </div>
           </div>
 
-          {/* Right - Controls and Power-ups */}
+          {/* Right - Controls */}
           <div className="w-80 space-y-4">
-            {/* Debug Info - Always Visible */}
-            <div className="bg-red-500/20 backdrop-blur-sm rounded-xl p-4 border border-red-400/30">
-              <div className="text-white font-bold text-center mb-2">🐛 DEBUG INFO</div>
-              <div className="text-white text-sm space-y-1">
-                <div>Game State: <span className="text-yellow-400">{gameState}</span></div>
-                <div>Game Mode: <span className="text-yellow-400">{gameMode}</span></div>
-                <div>Called Numbers: <span className="text-yellow-400">{calledNumbers.length}</span></div>
-                <div>Balls Remaining: <span className="text-yellow-400">{ballsRemaining}</span></div>
-              </div>
-            </div>
-
-            {/* ALWAYS VISIBLE START BUTTON */}
-            <div className="bg-green-500/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
+            {/* GIGANTIC START BUTTON - ALWAYS VISIBLE */}
+            <div className="bg-green-500/20 backdrop-blur-sm rounded-xl p-6 border-4 border-green-400/50">
               <Button
                 onClick={startGame}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-6 rounded-xl text-xl shadow-2xl"
               >
-                <Play className="w-5 h-5 mr-2" />
-                🚀 START BINGO GAME NOW! 🚀
+                <Play className="w-8 h-8 mr-3" />
+                🚀 START BINGO GAME! 🚀
               </Button>
-              <div className="text-center text-green-300 text-sm mt-2">
-                Click to start the game immediately!
+              <div className="text-center text-green-300 text-lg mt-3 font-bold">
+                Click to start immediately!
               </div>
             </div>
 
-            {/* Power-up Slots */}
+            {/* Game Status */}
             <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
-              <h3 className="text-white font-bold mb-3 text-center">Power-ups</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {[0, 1, 2].map((slot) => (
-                  <div
-                    key={slot}
-                    className="w-16 h-20 bg-purple-800/50 border border-purple-400/30 rounded-lg flex items-center justify-center"
-                  >
-                    {powerUpSlots[slot] ? (
-                      <div className="text-center">
-                        <div className="text-2xl">{powerUpSlots[slot].icon}</div>
-                        <div className="text-xs text-white">{powerUpSlots[slot].type}</div>
-                      </div>
-                    ) : (
-                      <div className="text-purple-400/50 text-xs">Empty</div>
-                    )}
-                  </div>
-                ))}
+              <div className="text-white font-bold text-center text-lg mb-3">
+                {gameState === 'waiting' && '🎮 Ready to Start'}
+                {gameState === 'playing' && '🎯 Game in Progress'}
+                {gameState === 'paused' && '⏸️ Game Paused'}
+                {gameState === 'finished' && '🏆 Game Complete'}
               </div>
-            </div>
-
-            {/* Triple Daub Power-up */}
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl p-4 border border-pink-400/30">
-              <h3 className="text-center text-white font-bold mb-3">TRIPLE DAUB</h3>
-              <div className="flex justify-center gap-2 mb-3">
-                {[0, 1, 2].map((chip) => (
-                  <div
-                    key={chip}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
-                      chip < tripleDaubProgress
-                        ? 'bg-red-500 border-red-400'
-                        : 'bg-gray-600 border-gray-500'
-                    }`}
-                  >
-                    {chip < tripleDaubProgress && <Star className="w-4 h-4 text-white" />}
-                  </div>
-                ))}
-              </div>
-              <div className="text-center text-white text-sm">
-                {tripleDaubProgress}/3
-              </div>
-            </div>
-
-            {/* Auto-daub Toggle */}
-            <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-bold">AUTO DAUB</span>
-                <Button
-                  onClick={() => setAutoDaub(!autoDaub)}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold ${
-                    autoDaub
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-600 hover:bg-gray-700 text-white'
-                  }`}
-                >
-                  {autoDaub ? 'ON' : 'OFF'}
-                </Button>
-              </div>
+              {currentNumber && (
+                <div className="text-purple-300 text-center">
+                  Current: <span className="font-bold text-white">{currentNumber}</span>
+                </div>
+              )}
             </div>
 
             {/* Game Controls */}
             <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
               <div className="space-y-3">
-                
                 {gameState === 'playing' && (
                   <Button
                     onClick={pauseGame}
@@ -587,28 +293,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Game Status */}
-        <div className="mt-6 text-center">
-          <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 inline-block">
-            <div className="text-white font-bold text-lg">
-              {gameState === 'waiting' && '🎮 Game Starting in 3 seconds...'}
-              {gameState === 'playing' && '🎯 Game in Progress'}
-              {gameState === 'paused' && '⏸️ Game Paused'}
-              {gameState === 'finished' && '🏆 Game Complete'}
-            </div>
-            {currentNumber && (
-              <div className="text-purple-300 text-sm mt-2">
-                Current Number: <span className="font-bold text-white">{getBingoCall(currentNumber)}</span>
-              </div>
-            )}
-            {gameState === 'waiting' && (
-              <div className="text-yellow-300 text-sm mt-2">
-                ⏰ Auto-starting soon...
-              </div>
-            )}
           </div>
         </div>
       </div>
