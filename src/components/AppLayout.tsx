@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
-import { Menu, X, Gamepad2, Trophy, Gift, Coins, BarChart3, ChevronUp } from 'lucide-react';
+import { Menu, X, Gamepad2, Trophy, Gift, Coins, BarChart3, ChevronUp, Zap, Star, Target } from 'lucide-react';
 import GameModes from './GameModes';
 import TournamentLobby from './TournamentLobby';
+import BonusSystem from './BonusSystem';
+import MiniGames from './MiniGames';
 import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
 import UserProfileModal from './UserProfileModal';
@@ -198,46 +200,93 @@ const AppLayout: React.FC = () => {
           
           <div className="space-y-2">
             <button
-              onClick={() => scrollToSection('games')}
-              className="w-full p-3 bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+              onClick={() => scrollToSection('game-modes')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
             >
-              <Gamepad2 className="w-5 h-5" />
-              <span>Games</span>
+              <Gamepad2 className="w-4 h-4" />
+              🎯 BINGO Rooms
             </button>
-
+            
             <button
               onClick={() => scrollToSection('tournaments')}
-              className="w-full p-3 bg-gradient-to-r from-purple-600/80 to-purple-700/80 hover:from-purple-500 hover:to-purple-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
             >
-              <Trophy className="w-5 h-5" />
-              <span>Tournaments</span>
+              <Trophy className="w-4 h-4" />
+              🏆 Tournaments
             </button>
-
-            <div className="pt-2 border-t border-white/20">
-              <button
-                onClick={scrollToTop}
-                className="w-full p-3 bg-gradient-to-r from-gray-600/80 to-gray-700/80 hover:from-gray-500 hover:to-gray-600 text-white rounded-xl flex items-center gap-3 transition-all duration-200 hover:scale-105"
-              >
-                <ChevronUp className="w-5 h-5" />
-                <span>Back to Top</span>
-              </button>
-            </div>
+            
+            <button
+              onClick={() => scrollToSection('bonus')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <Zap className="w-4 h-4" />
+              ⚡ Bonus System
+            </button>
+            
+            <button
+              onClick={() => scrollToSection('mini-games')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <Star className="w-4 h-4" />
+              🎮 Mini Games
+            </button>
+            
+            <button
+              onClick={() => scrollToSection('leaderboard')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              📊 Leaderboard
+            </button>
+            
+            <button
+              onClick={() => scrollToSection('rewards')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <Gift className="w-4 h-4" />
+              🎁 Daily Rewards
+            </button>
+            
+            <button
+              onClick={() => scrollToSection('cashout')}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <Coins className="w-4 h-4" />
+              💰 Cashout
+            </button>
+            
+            <button
+              onClick={scrollToTop}
+              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
+            >
+              <ChevronUp className="w-4 h-4" />
+              🔝 Back to Top
+            </button>
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="pt-8">
-        <div id="games" className="px-4">
-          <h2 className="text-3xl font-bold text-white mb-6 text-center">🎮 Game Modes</h2>
+      <main className="flex-1">
+        <div id="game-modes" className="px-4 mt-16">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">🎮 BINGO Game Rooms</h2>
           <GameModes />
         </div>
         
-        {/* Temporarily disabled TournamentLobby due to crash */}
-        {/* <div id="tournaments" className="px-4 mt-16">
+        <div id="tournaments" className="px-4 mt-16">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">🏆 Tournaments</h2>
           <TournamentLobby />
-        </div> */}
+        </div>
+
+        <div id="bonus" className="px-4 mt-16">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">⚡ Bonus & Power-ups</h2>
+          <BonusSystem />
+        </div>
+
+        <div id="mini-games" className="px-4 mt-16">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">🎮 Mini-Games Arcade</h2>
+          <MiniGames />
+        </div>
       </main>
 
       {/* User Profile Modals */}
