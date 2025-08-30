@@ -196,12 +196,33 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
 
   // Auto-start game after a short delay when entering a room
   useEffect(() => {
+    console.log('GameInterface mounted, gameState:', gameState, 'gameMode:', gameMode);
+    
     if (gameState === 'waiting') {
+      console.log('Setting up auto-start timer...');
       const autoStartTimer = setTimeout(() => {
+        console.log('Auto-start timer triggered, starting game...');
         startGame();
       }, 3000); // Start game automatically after 3 seconds
       
-      return () => clearTimeout(autoStartTimer);
+      return () => {
+        console.log('Clearing auto-start timer');
+        clearTimeout(autoStartTimer);
+      };
+    }
+  }, []); // Run only once when component mounts
+
+  // Force start game after a delay if still waiting
+  useEffect(() => {
+    if (gameState === 'waiting') {
+      const forceStartTimer = setTimeout(() => {
+        if (gameState === 'waiting') {
+          console.log('Force starting game...');
+          startGame();
+        }
+      }, 5000); // Force start after 5 seconds
+      
+      return () => clearTimeout(forceStartTimer);
     }
   }, [gameState]);
 
@@ -509,13 +530,18 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
             <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
               <div className="space-y-3">
                 {gameState === 'waiting' && (
-                  <Button
-                    onClick={startGame}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    START GAME
-                  </Button>
+                  <>
+                    <Button
+                      onClick={startGame}
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      START GAME NOW
+                    </Button>
+                    <div className="text-center text-yellow-300 text-sm">
+                      ⏰ Auto-starting in a few seconds...
+                    </div>
+                  </>
                 )}
                 
                 {gameState === 'playing' && (
