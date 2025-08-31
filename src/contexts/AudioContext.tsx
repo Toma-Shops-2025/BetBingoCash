@@ -110,82 +110,90 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (typeof window !== 'undefined' && window.AudioContext) {
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         
-        // Create a pleasant ambient soundscape
-        const createAmbientLayer = (baseFreq: number, type: OscillatorType, volume: number, pan: number) => {
+        // Create a proper musical sequence
+        const createNote = (frequency: number, duration: number, startTime: number, volume: number) => {
           const oscillator = audioContext.createOscillator();
           const gainNode = audioContext.createGain();
-          const panNode = audioContext.createStereoPanner();
           const filter = audioContext.createBiquadFilter();
           
           oscillator.connect(filter);
           filter.connect(gainNode);
-          gainNode.connect(panNode);
-          panNode.connect(audioContext.destination);
+          gainNode.connect(audioContext.destination);
           
-          oscillator.type = type;
-          oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+          // Use different wave types for variety
+          const waveTypes: OscillatorType[] = ['sine', 'triangle', 'square'];
+          oscillator.type = waveTypes[Math.floor(Math.random() * waveTypes.length)];
           
-          // Gentle frequency modulation
-          oscillator.frequency.setValueAtTime(baseFreq * 1.002, audioContext.currentTime + 4);
-          oscillator.frequency.setValueAtTime(baseFreq * 0.998, audioContext.currentTime + 8);
+          oscillator.frequency.setValueAtTime(frequency, startTime);
+          
+          // Add slight pitch variation
+          oscillator.frequency.setValueAtTime(frequency * (0.98 + Math.random() * 0.04), startTime + duration * 0.5);
           
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(600, audioContext.currentTime);
-          filter.Q.setValueAtTime(0.3, audioContext.currentTime);
+          filter.frequency.setValueAtTime(800 + Math.random() * 400, startTime);
+          filter.Q.setValueAtTime(0.5 + Math.random() * 0.5, startTime);
           
-          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-          gainNode.gain.linearRampToValueAtTime(volume * 0.4, audioContext.currentTime + 2);
-          gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 6);
-          gainNode.gain.linearRampToValueAtTime(volume * 0.2, audioContext.currentTime + 10);
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
+          gainNode.gain.linearRampToValueAtTime(volume * 0.7, startTime + duration * 0.7);
+          gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
           
-          panNode.pan.setValueAtTime(pan, audioContext.currentTime);
-          
-          oscillator.start();
+          oscillator.start(startTime);
+          oscillator.stop(startTime + duration);
           
           return { oscillator, gainNode };
         };
         
-        // Create multiple ambient layers for a rich soundscape
-        const layers = [
-          { freq: 110, type: 'sine' as OscillatorType, vol: 0.08, pan: -0.3 },      // Low bass
-          { freq: 220, type: 'triangle' as OscillatorType, vol: 0.06, pan: 0.3 },   // Mid tone
-          { freq: 330, type: 'sine' as OscillatorType, vol: 0.04, pan: -0.1 },      // High tone
-          { freq: 440, type: 'triangle' as OscillatorType, vol: 0.03, pan: 0.1 },   // Very high
-        ];
+        // Create a pleasant melody using pentatonic scale (no harsh intervals)
+        const pentatonicScale = [220, 247, 277, 330, 370, 440, 494, 554, 659, 740]; // A pentatonic
+        const notes: any[] = [];
+        let currentTime = audioContext.currentTime;
         
-        const activeLayers: any[] = [];
-        
-        layers.forEach((layer, index) => {
-          const delay = index * 0.5;
-          setTimeout(() => {
-            if (settings.musicEnabled) {
-              const layerObj = createAmbientLayer(layer.freq, layer.type, layer.vol, layer.pan);
-              activeLayers.push(layerObj);
-            }
-          }, delay * 1000);
-        });
-        
-        // Gradually fade layers in and out for variation
-        setInterval(() => {
+        const playMelody = () => {
           if (!settings.musicEnabled) return;
           
-          activeLayers.forEach((layer, index) => {
-            const time = audioContext.currentTime;
-            const fadeIn = Math.sin(time * 0.1 + index) * 0.1 + 0.2;
-            layer.gainNode.gain.setValueAtTime(fadeIn, time);
+          // Clear old notes
+          notes.forEach(note => {
+            try {
+              note.oscillator.stop();
+            } catch (e) {}
           });
-        }, 2000);
+          notes.length = 0;
+          
+          // Play a sequence of 8-12 notes
+          const numNotes = 8 + Math.floor(Math.random() * 5);
+          
+          for (let i = 0; i < numNotes; i++) {
+            const freq = pentatonicScale[Math.floor(Math.random() * pentatonicScale.length)];
+            const duration = 0.5 + Math.random() * 1.5; // 0.5 to 2 seconds
+            const volume = (0.03 + Math.random() * 0.04) * settings.backgroundMusicVolume;
+            
+            const note = createNote(freq, duration, currentTime, volume);
+            notes.push(note);
+            
+            currentTime += duration + 0.1; // Small gap between notes
+          }
+          
+          // Schedule next melody
+          setTimeout(() => {
+            if (settings.musicEnabled) {
+              currentTime = audioContext.currentTime;
+              playMelody();
+            }
+          }, (currentTime - audioContext.currentTime) * 1000 + 1000);
+        };
         
-        console.log('Pleasant ambient background music created');
+        // Start playing
+        playMelody();
+        
+        console.log('Proper musical background music created');
         
         // Return cleanup function
         return () => {
-          activeLayers.forEach(layer => {
+          notes.forEach(note => {
             try {
-              layer.oscillator.stop();
-            } catch (e) {
-              // Ignore errors if already stopped
-            }
+              note.oscillator.stop();
+            } catch (e) {}
           });
         };
       }

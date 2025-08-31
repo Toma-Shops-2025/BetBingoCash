@@ -89,6 +89,72 @@ const AppLayout: React.FC = () => {
         <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-white rounded-full opacity-40 animate-pulse" style={{ animationDuration: '3s' }}></div>
         <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-yellow-300 rounded-full opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
         <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
+        
+        {/* MANY MORE ANIMATED ICONS - Creating a rich, lively background */}
+        {/* Gaming Icons */}
+        <div className="absolute top-1/6 left-1/6 text-purple-400 text-lg animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🎲</div>
+        <div className="absolute top-1/6 right-1/6 text-blue-400 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>🎯</div>
+        <div className="absolute top-1/6 left-1/2 text-green-400 text-lg animate-float" style={{ animationDuration: '4s', animationDelay: '1.5s' }}>🎮</div>
+        
+        {/* Prize Icons */}
+        <div className="absolute top-1/4 left-1/8 text-yellow-400 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>🏅</div>
+        <div className="absolute top-1/4 right-1/8 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1s' }}>🥇</div>
+        <div className="absolute top-1/4 left-3/4 text-red-400 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>🔥</div>
+        
+        {/* Lucky Icons */}
+        <div className="absolute top-1/3 left-1/4 text-pink-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.3s' }}>🍀</div>
+        <div className="absolute top-1/3 right-1/4 text-cyan-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.8s' }}>💫</div>
+        <div className="absolute top-1/3 left-1/2 text-yellow-300 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1.2s' }}>⭐</div>
+        
+        {/* More Floating Elements */}
+        <div className="absolute top-2/5 left-1/6 text-indigo-400 text-lg animate-spin-slow" style={{ animationDuration: '15s' }}>🌀</div>
+        <div className="absolute top-2/5 right-1/6 text-emerald-400 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.7s' }}>🌊</div>
+        <div className="absolute top-2/5 left-2/3 text-purple-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.1s' }}>🌈</div>
+        
+        {/* Achievement Icons */}
+        <div className="absolute top-1/2 left-1/8 text-gold-400 text-xl animate-pulse" style={{ animationDelay: '0.2s' }}>👑</div>
+        <div className="absolute top-1/2 right-1/8 text-silver-400 text-lg animate-pulse" style={{ animationDelay: '0.7s' }}>🥈</div>
+        <div className="absolute top-1/2 left-3/4 text-bronze-400 text-xl animate-pulse" style={{ animationDelay: '1.2s' }}>🥉</div>
+        
+        {/* More Gaming Elements */}
+        <div className="absolute top-3/5 left-1/4 text-red-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.4s' }}>⚡</div>
+        <div className="absolute top-3/5 right-1/4 text-blue-300 text-xl animate-float" style={{ animationDuration: '8s', animationDelay: '0.9s' }}>💎</div>
+        <div className="absolute top-3/5 left-1/2 text-green-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.3s' }}>🎪</div>
+        
+        {/* Floating Bubbles - More Variety */}
+        <div className="absolute top-2/3 left-1/6 w-8 h-8 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-30 animate-float" style={{ animationDuration: '4s', animationDelay: '0.6s' }}></div>
+        <div className="absolute top-2/3 right-1/6 w-12 h-12 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-25 animate-float" style={{ animationDuration: '5s', animationDelay: '1.1s' }}></div>
+        <div className="absolute top-2/3 left-2/3 w-6 h-6 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-35 animate-float" style={{ animationDuration: '6s', animationDelay: '0.8s' }}></div>
+        
+        {/* More Stars and Sparkles */}
+        <div className="absolute top-3/4 left-1/5 text-yellow-200 text-lg animate-pulse" style={{ animationDelay: '0.3s' }}>✨</div>
+        <div className="absolute top-3/4 right-1/5 text-blue-200 text-xl animate-pulse" style={{ animationDelay: '0.8s' }}>🌟</div>
+        <div className="absolute top-3/4 left-1/2 text-purple-200 text-lg animate-pulse" style={{ animationDelay: '1.3s' }}>💫</div>
+        
+        {/* Lucky Symbols */}
+        <div className="absolute top-4/5 left-1/4 text-green-300 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🍀</div>
+        <div className="absolute top-4/5 right-1/4 text-yellow-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>⭐</div>
+        <div className="absolute top-4/5 left-1/2 text-pink-300 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.7s' }}>💖</div>
+        
+        {/* Additional Glowing Elements */}
+        <div className="absolute top-1/6 left-3/4 w-1 h-24 bg-gradient-to-b from-transparent via-pink-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '5s' }}></div>
+        <div className="absolute top-1/3 right-3/4 w-1 h-20 bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/8 w-1 h-16 bg-gradient-to-b from-transparent via-green-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '6s', animationDelay: '0.5s' }}></div>
+        
+        {/* More Particles */}
+        <div className="absolute top-1/8 left-1/3 w-1.5 h-1.5 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '4s', animationDelay: '0.3s' }}></div>
+        <div className="absolute top-1/8 right-1/3 w-1 h-1 bg-yellow-300 rounded-full opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.8s' }}></div>
+        <div className="absolute top-1/8 left-2/3 w-2 h-2 bg-purple-300 rounded-full opacity-40 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1.2s' }}></div>
+        
+        {/* Bottom Layer Elements */}
+        <div className="absolute bottom-1/6 left-1/6 text-orange-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.4s' }}>🎨</div>
+        <div className="absolute bottom-1/6 right-1/6 text-indigo-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.9s' }}>🎭</div>
+        <div className="absolute bottom-1/6 left-1/2 text-emerald-400 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '1.1s' }}>🎪</div>
+        
+        {/* Final Floating Elements */}
+        <div className="absolute bottom-1/4 left-1/3 text-red-300 text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💥</div>
+        <div className="absolute bottom-1/4 right-1/3 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1.1s' }}>⚡</div>
+        <div className="absolute bottom-1/4 left-2/3 text-green-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>🎯</div>
       </div>
 
       {/* Full Navigation Bar */}

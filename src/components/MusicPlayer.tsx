@@ -132,6 +132,27 @@ const MusicPlayer: React.FC = () => {
             </div>
           </div>
 
+          {/* Test Audio Button */}
+          <div className="mb-4">
+            <div className="text-white text-sm mb-2 text-center">Test Audio</div>
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  // Force recreate the fallback music
+                  stopBackgroundMusic();
+                  setTimeout(() => {
+                    if (settings.musicEnabled) {
+                      playBackgroundMusic();
+                    }
+                  }, 100);
+                }}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
+              >
+                🔄 Restart Music
+              </button>
+            </div>
+          </div>
+
           {/* Music Status */}
           <div className="text-center">
             <div className={`text-sm font-medium ${
