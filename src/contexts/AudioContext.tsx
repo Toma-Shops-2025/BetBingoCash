@@ -57,6 +57,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const gameMusicRef = useRef<HTMLAudioElement | null>(null);
   const voiceRef = useRef<HTMLAudioElement | null>(null);
   const soundEffectsRef = useRef<HTMLAudioElement | null>(null);
+  const fallbackAudioRef = useRef<any>(null);
 
   // Save settings to localStorage when they change
   useEffect(() => {
@@ -195,14 +196,19 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         console.log('Proper musical background music created');
         
-        // Return cleanup function
-        return () => {
+        // Store cleanup function in ref so it can be stopped later
+        const cleanup = () => {
           notes.forEach(note => {
             try {
               note.oscillator.stop();
             } catch (e) {}
           });
         };
+        
+        fallbackAudioRef.current = { stop: cleanup };
+        
+        // Return cleanup function
+        return cleanup;
       }
     } catch (error) {
       console.warn('Could not create fallback audio:', error);
@@ -214,22 +220,35 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         backgroundMusicRef.current.pause();
         backgroundMusicRef.current.currentTime = 0;
+        backgroundMusicRef.current = null;
       } catch (error) {
         console.warn('Error stopping background music:', error);
+      }
+    }
+    
+    // Also stop any fallback audio that might be playing
+    if (fallbackAudioRef.current) {
+      try {
+        fallbackAudioRef.current.stop();
+        fallbackAudioRef.current = null;
+      } catch (error) {
+        console.warn('Error stopping fallback audio:', error);
       }
     }
   };
 
   // Dynamic music volume control
   const setGameMusicMode = (isGameActive: boolean) => {
-    if (!backgroundMusicRef.current || !settings.musicEnabled) return;
+    console.log('Setting game music mode:', isGameActive);
     
     if (isGameActive) {
       // Stop background music and start game music
+      console.log('Stopping background music, starting game music');
       stopBackgroundMusic();
       playGameMusic();
     } else {
       // Stop game music and resume background music
+      console.log('Stopping game music, resuming background music');
       stopGameMusic();
       playBackgroundMusic();
     }
@@ -282,15 +301,26 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       utterance.volume = settings.voiceVolume;
       utterance.rate = 0.9;
       utterance.pitch = 1.1;
+      utterance.lang = 'en-US'; // Force English language
       
-      // Try to use a good voice
+      // Try to use a good English voice
       const voices = speechSynthesis.getVoices();
+      console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+      
       const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex')
-      );
+        (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex')) && 
+        voice.lang.startsWith('en')
+      ) || voices.find(voice => voice.lang.startsWith('en'));
+      
       if (preferredVoice) {
         utterance.voice = preferredVoice;
+        console.log('Using voice:', preferredVoice.name, preferredVoice.lang);
+      } else {
+        console.log('No preferred English voice found, using default');
       }
+      
+      // Cancel any previous speech
+      speechSynthesis.cancel();
       
       speechSynthesis.speak(utterance);
     }
