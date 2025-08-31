@@ -109,31 +109,85 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       if (typeof window !== 'undefined' && window.AudioContext) {
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+        // Create a pleasant ambient soundscape
+        const createAmbientLayer = (baseFreq: number, type: OscillatorType, volume: number, pan: number) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          const panNode = audioContext.createStereoPanner();
+          const filter = audioContext.createBiquadFilter();
+          
+          oscillator.connect(filter);
+          filter.connect(gainNode);
+          gainNode.connect(panNode);
+          panNode.connect(audioContext.destination);
+          
+          oscillator.type = type;
+          oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+          
+          // Gentle frequency modulation
+          oscillator.frequency.setValueAtTime(baseFreq * 1.002, audioContext.currentTime + 4);
+          oscillator.frequency.setValueAtTime(baseFreq * 0.998, audioContext.currentTime + 8);
+          
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(600, audioContext.currentTime);
+          filter.Q.setValueAtTime(0.3, audioContext.currentTime);
+          
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(volume * 0.4, audioContext.currentTime + 2);
+          gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 6);
+          gainNode.gain.linearRampToValueAtTime(volume * 0.2, audioContext.currentTime + 10);
+          
+          panNode.pan.setValueAtTime(pan, audioContext.currentTime);
+          
+          oscillator.start();
+          
+          return { oscillator, gainNode };
+        };
         
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 2);
-        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 4);
+        // Create multiple ambient layers for a rich soundscape
+        const layers = [
+          { freq: 110, type: 'sine' as OscillatorType, vol: 0.08, pan: -0.3 },      // Low bass
+          { freq: 220, type: 'triangle' as OscillatorType, vol: 0.06, pan: 0.3 },   // Mid tone
+          { freq: 330, type: 'sine' as OscillatorType, vol: 0.04, pan: -0.1 },      // High tone
+          { freq: 440, type: 'triangle' as OscillatorType, vol: 0.03, pan: 0.1 },   // Very high
+        ];
         
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime + 2);
+        const activeLayers: any[] = [];
         
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 6);
+        layers.forEach((layer, index) => {
+          const delay = index * 0.5;
+          setTimeout(() => {
+            if (settings.musicEnabled) {
+              const layerObj = createAmbientLayer(layer.freq, layer.type, layer.vol, layer.pan);
+              activeLayers.push(layerObj);
+            }
+          }, delay * 1000);
+        });
         
-        // Loop the fallback music
+        // Gradually fade layers in and out for variation
         setInterval(() => {
-          if (settings.musicEnabled) {
-            createFallbackBackgroundMusic();
-          }
-        }, 6000);
+          if (!settings.musicEnabled) return;
+          
+          activeLayers.forEach((layer, index) => {
+            const time = audioContext.currentTime;
+            const fadeIn = Math.sin(time * 0.1 + index) * 0.1 + 0.2;
+            layer.gainNode.gain.setValueAtTime(fadeIn, time);
+          });
+        }, 2000);
         
-        console.log('Fallback background music created');
+        console.log('Pleasant ambient background music created');
+        
+        // Return cleanup function
+        return () => {
+          activeLayers.forEach(layer => {
+            try {
+              layer.oscillator.stop();
+            } catch (e) {
+              // Ignore errors if already stopped
+            }
+          });
+        };
       }
     } catch (error) {
       console.warn('Could not create fallback audio:', error);

@@ -107,6 +107,31 @@ const MusicPlayer: React.FC = () => {
             </div>
           </div>
 
+          {/* Music Options */}
+          <div className="mb-4">
+            <div className="text-white text-sm mb-2 text-center">Music Type</div>
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => updateSettings({ backgroundMusicVolume: 0.3 })}
+                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg transition-colors"
+              >
+                Ambient
+              </button>
+              <button
+                onClick={() => updateSettings({ backgroundMusicVolume: 0.1 })}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+              >
+                Soft
+              </button>
+              <button
+                onClick={() => updateSettings({ backgroundMusicVolume: 0 })}
+                className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded-lg transition-colors"
+              >
+                Off
+              </button>
+            </div>
+          </div>
+
           {/* Music Status */}
           <div className="text-center">
             <div className={`text-sm font-medium ${
