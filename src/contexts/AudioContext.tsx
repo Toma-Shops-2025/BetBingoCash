@@ -216,11 +216,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const stopBackgroundMusic = () => {
+    console.log('Stopping background music...');
+    
     if (backgroundMusicRef.current) {
       try {
         backgroundMusicRef.current.pause();
         backgroundMusicRef.current.currentTime = 0;
         backgroundMusicRef.current = null;
+        console.log('Background music stopped');
       } catch (error) {
         console.warn('Error stopping background music:', error);
       }
@@ -229,11 +232,91 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Also stop any fallback audio that might be playing
     if (fallbackAudioRef.current) {
       try {
+        console.log('Stopping fallback audio...');
         fallbackAudioRef.current.stop();
         fallbackAudioRef.current = null;
+        console.log('Fallback audio stopped');
       } catch (error) {
         console.warn('Error stopping fallback audio:', error);
       }
+    }
+    
+    // Force stop any ongoing speech synthesis
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      console.log('Speech synthesis cancelled');
+    }
+    
+    // Force stop any Web Audio API contexts
+    if ((window as any).audioContext) {
+      try {
+        (window as any).audioContext.close();
+        console.log('Audio context closed');
+      } catch (e) {}
+    }
+  };
+
+  // Comprehensive function to stop ALL audio
+  const stopAllAudio = () => {
+    console.log('Stopping ALL audio sources...');
+    
+    // Stop background music
+    if (backgroundMusicRef.current) {
+      try {
+        backgroundMusicRef.current.pause();
+        backgroundMusicRef.current.currentTime = 0;
+        backgroundMusicRef.current = null;
+        console.log('Background music stopped');
+      } catch (error) {
+        console.warn('Error stopping background music:', error);
+      }
+    }
+    
+    // Stop game music
+    if (gameMusicRef.current) {
+      try {
+        gameMusicRef.current.pause();
+        gameMusicRef.current.currentTime = 0;
+        gameMusicRef.current = null;
+        console.log('Game music stopped');
+      } catch (error) {
+        console.warn('Error stopping game music:', error);
+      }
+    }
+    
+    // Stop fallback audio
+    if (fallbackAudioRef.current) {
+      try {
+        fallbackAudioRef.current.stop();
+        fallbackAudioRef.current = null;
+        console.log('Fallback audio stopped');
+      } catch (error) {
+        console.warn('Error stopping fallback audio:', error);
+      }
+    }
+    
+    // Stop speech synthesis
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      console.log('Speech synthesis cancelled');
+    }
+    
+    // Stop all HTML audio elements
+    const allAudioElements = document.querySelectorAll('audio');
+    allAudioElements.forEach(audio => {
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+        console.log('HTML audio element stopped');
+      } catch (e) {}
+    });
+    
+    // Close any Web Audio contexts
+    if ((window as any).audioContext) {
+      try {
+        (window as any).audioContext.close();
+        console.log('Audio context closed');
+      } catch (e) {}
     }
   };
 
@@ -242,9 +325,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log('Setting game music mode:', isGameActive);
     
     if (isGameActive) {
-      // Stop background music and start game music
-      console.log('Stopping background music, starting game music');
-      stopBackgroundMusic();
+      // Stop ALL audio and start game music
+      console.log('Stopping ALL audio, starting game music');
+      stopAllAudio();
       playGameMusic();
     } else {
       // Stop game music and resume background music
@@ -295,34 +378,56 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const playVoiceAnnouncement = (text: string) => {
     if (!settings.voiceEnabled) return;
     
+    console.log('Playing voice announcement:', text);
+    
     // Use Web Speech API for voice synthesis
     if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.volume = settings.voiceVolume;
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      utterance.lang = 'en-US'; // Force English language
-      
-      // Try to use a good English voice
-      const voices = speechSynthesis.getVoices();
-      console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
-      
-      const preferredVoice = voices.find(voice => 
-        (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex')) && 
-        voice.lang.startsWith('en')
-      ) || voices.find(voice => voice.lang.startsWith('en'));
-      
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-        console.log('Using voice:', preferredVoice.name, preferredVoice.lang);
-      } else {
-        console.log('No preferred English voice found, using default');
-      }
-      
-      // Cancel any previous speech
+      // Cancel any previous speech first
       speechSynthesis.cancel();
       
-      speechSynthesis.speak(utterance);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.volume = settings.voiceVolume;
+      utterance.rate = 0.8; // Slightly slower for clarity
+      utterance.pitch = 1.0; // Normal pitch
+      utterance.lang = 'en-US'; // Force English language
+      
+      // Wait for voices to load if they haven't already
+      const getVoices = () => {
+        const voices = speechSynthesis.getVoices();
+        console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+        
+        // Try to find the best English voice
+        let preferredVoice = voices.find(voice => 
+          voice.lang.startsWith('en') && 
+          (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex'))
+        );
+        
+        if (!preferredVoice) {
+          preferredVoice = voices.find(voice => voice.lang.startsWith('en'));
+        }
+        
+        if (!preferredVoice) {
+          preferredVoice = voices.find(voice => voice.lang.includes('en'));
+        }
+        
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+          console.log('Using voice:', preferredVoice.name, preferredVoice.lang);
+        } else {
+          console.log('No English voice found, using default');
+        }
+        
+        // Start speaking
+        speechSynthesis.speak(utterance);
+      };
+      
+      // If voices are already loaded, use them immediately
+      if (speechSynthesis.getVoices().length > 0) {
+        getVoices();
+      } else {
+        // Wait for voices to load
+        speechSynthesis.onvoiceschanged = getVoices;
+      }
     }
   };
 
