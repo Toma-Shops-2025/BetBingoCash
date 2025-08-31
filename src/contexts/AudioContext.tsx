@@ -320,15 +320,59 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  // Nuclear option - completely reset audio system
+  const resetAudioSystem = () => {
+    console.log('Nuclear option: Resetting entire audio system...');
+    
+    try {
+      // Stop all audio elements
+      const allAudioElements = document.querySelectorAll('audio');
+      allAudioElements.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = '';
+        audio.load(); // Force reload
+      });
+      
+      // Cancel all speech
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+      
+      // Clear all refs
+      backgroundMusicRef.current = null;
+      gameMusicRef.current = null;
+      fallbackAudioRef.current = null;
+      
+      // Force page audio context to reset
+      if (window.AudioContext || (window as any).webkitAudioContext) {
+        try {
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          audioContext.close();
+        } catch (e) {}
+      }
+      
+      console.log('Audio system reset complete');
+    } catch (error) {
+      console.error('Error resetting audio system:', error);
+    }
+  };
+
   // Dynamic music volume control
   const setGameMusicMode = (isGameActive: boolean) => {
     console.log('Setting game music mode:', isGameActive);
     
     if (isGameActive) {
-      // Stop ALL audio and start game music
-      console.log('Stopping ALL audio, starting game music');
-      stopAllAudio();
-      playGameMusic();
+      // Nuclear option - reset everything
+      console.log('Using nuclear option to stop all audio');
+      resetAudioSystem();
+      
+      // Wait a moment then start game music
+      setTimeout(() => {
+        console.log('Starting game music after reset...');
+        playGameMusic();
+      }, 100);
+      
     } else {
       // Stop game music and resume background music
       console.log('Stopping game music, resuming background music');
@@ -372,6 +416,24 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.warn('Error stopping game music:', error);
       }
     }
+  };
+
+  // Simple number-to-text mapping for clear pronunciation
+  const numberToText = (num: number): string => {
+    if (num === 0) return 'Free Space';
+    
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy'];
+    
+    if (num < 10) return ones[num];
+    if (num < 20) return teens[num - 10];
+    if (num < 100) {
+      const ten = Math.floor(num / 10);
+      const one = num % 10;
+      return one === 0 ? tens[ten] : `${tens[ten]}-${ones[one]}`;
+    }
+    return num.toString();
   };
 
   // Voice announcement functions
@@ -431,6 +493,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  // Enhanced number call with clear text
+  const playNumberCall = (number: number) => {
+    const text = numberToText(number);
+    console.log(`Calling number: ${number} as "${text}"`);
+    playVoiceAnnouncement(text);
+  };
+
   // Sound effect functions
   const playSoundEffect = (effect: string) => {
     if (!settings.soundEffectsEnabled) return;
@@ -456,45 +525,6 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const playBingo = () => {
     playSoundEffect('bingo-celebration');
-  };
-
-  const playNumberCall = (number: number) => {
-    if (!settings.voiceEnabled) return;
-    
-    try {
-      // Get Adam's voice audio file for this specific number
-      const audioFile = getAudioFileForNumber(number);
-      const displayText = getDisplayTextForNumber(number);
-      
-      if (audioFile) {
-        // Play Adam's voice calling the number
-        const audio = new Audio(audioFile);
-        audio.volume = settings.voiceVolume;
-        
-        // Handle successful play
-        audio.play().then(() => {
-          console.log(`Playing Adam's voice: ${displayText}`);
-        }).catch(error => {
-          console.warn(`Could not play Adam's voice for ${displayText}:`, error);
-          // Fallback to TTS if Adam's voice fails
-          fallbackToTTS(displayText || `Number ${number}`);
-        });
-        
-        // Handle audio errors gracefully
-        audio.onerror = () => {
-          console.warn(`Adam's voice file not found for ${displayText}:`, audioFile);
-          // Fallback to TTS
-          fallbackToTTS(displayText || `Number ${number}`);
-        };
-      } else {
-        // Fallback to TTS for invalid numbers
-        fallbackToTTS(`Number ${number}`);
-      }
-    } catch (error) {
-      console.warn('Error playing Adam\'s voice:', error);
-      // Fallback to TTS
-      fallbackToTTS(`Number ${number}`);
-    }
   };
 
   // Fallback to TTS if Adam's voice is not available
