@@ -493,11 +493,57 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Enhanced number call with clear text
+  // Get Adam's voice file path for a BINGO number
+  const getAdamVoiceFile = (number: number): string => {
+    if (number === 0) return ''; // Free space has no voice
+    
+    // Determine which column (B, I, N, G, O) this number belongs to
+    let column: string;
+    if (number >= 1 && number <= 15) column = 'B';
+    else if (number >= 16 && number <= 30) column = 'I';
+    else if (number >= 31 && number <= 45) column = 'N';
+    else if (number >= 46 && number <= 60) column = 'G';
+    else if (number >= 61 && number <= 75) column = 'O';
+    else return ''; // Invalid number
+    
+    return `/audio/adam-voice/${column}-${number}.mp3`;
+  };
+
+  // Enhanced number call with Adam's voice
   const playNumberCall = (number: number) => {
-    const text = numberToText(number);
-    console.log(`Calling number: ${number} as "${text}"`);
-    playVoiceAnnouncement(text);
+    if (!settings.voiceEnabled) return;
+    
+    const voiceFile = getAdamVoiceFile(number);
+    if (!voiceFile) return; // Skip free space
+    
+    console.log(`Playing Adam's voice for number: ${number} from file: ${voiceFile}`);
+    
+    try {
+      // Create and play Adam's voice audio
+      const audio = new Audio(voiceFile);
+      audio.volume = settings.voiceVolume;
+      
+      // Handle successful play
+      audio.play().then(() => {
+        console.log(`Adam's voice playing: ${number}`);
+      }).catch(error => {
+        console.warn(`Could not play Adam's voice for ${number}:`, error);
+        // Fallback to TTS if Adam's voice fails
+        fallbackToTTS(numberToText(number));
+      });
+      
+      // Handle audio errors gracefully
+      audio.onerror = () => {
+        console.warn(`Adam's voice file not found for ${number}:`, voiceFile);
+        // Fallback to TTS
+        fallbackToTTS(numberToText(number));
+      };
+      
+    } catch (error) {
+      console.warn('Error playing Adam\'s voice:', error);
+      // Fallback to TTS
+      fallbackToTTS(numberToText(number));
+    }
   };
 
   // Sound effect functions
@@ -529,26 +575,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Fallback to TTS if Adam's voice is not available
   const fallbackToTTS = (text: string) => {
-    if (!settings.voiceEnabled) return;
-    
-    // Use Web Speech API for voice synthesis as fallback
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.volume = settings.voiceVolume;
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      
-      // Try to use a good voice
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex')
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
-      
-      speechSynthesis.speak(utterance);
-    }
+    console.log(`Falling back to TTS for: ${text}`);
+    playVoiceAnnouncement(text);
   };
 
   // Update audio volumes when settings change
