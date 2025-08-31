@@ -54,6 +54,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
+  const gameMusicRef = useRef<HTMLAudioElement | null>(null);
   const voiceRef = useRef<HTMLAudioElement | null>(null);
   const soundEffectsRef = useRef<HTMLAudioElement | null>(null);
 
@@ -68,38 +69,32 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Background music functions
   const playBackgroundMusic = () => {
-    if (!settings.musicEnabled) return;
-    
     try {
-      if (!backgroundMusicRef.current) {
-        // Try to load background music, but provide fallback
-        backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
-        backgroundMusicRef.current.loop = true;
-        backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
+      if (settings.musicEnabled && typeof window !== 'undefined') {
+        // Try to use the actual background music file first
+        const audio = new Audio('/audio/background-music.mp3');
+        audio.loop = true;
+        audio.volume = settings.backgroundMusicVolume;
         
-        // Handle missing audio file gracefully
-        backgroundMusicRef.current.onerror = () => {
-          console.warn('Background music file not found. Using fallback audio.');
-          // Create a simple fallback audio using Web Audio API
-          createFallbackBackgroundMusic();
-        };
+        audio.addEventListener('canplaythrough', () => {
+          audio.play().catch(error => {
+            console.warn('Could not play background music:', error);
+            // Fallback to generated music if file fails
+            createFallbackBackgroundMusic();
+          });
+        });
         
-        // Handle successful load
-        backgroundMusicRef.current.oncanplaythrough = () => {
-          console.log('Background music loaded successfully');
-        };
-      }
-      
-      if (backgroundMusicRef.current && backgroundMusicRef.current.readyState >= 2) {
-        backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
-        backgroundMusicRef.current.play().catch(error => {
-          console.warn('Could not play background music:', error);
-          // Try fallback if main audio fails
+        audio.addEventListener('error', () => {
+          console.warn('Background music file failed to load, using fallback');
           createFallbackBackgroundMusic();
         });
+        
+        // Store reference for controls
+        backgroundMusicRef.current = audio;
+        console.log('Background music started with MP3 file');
       }
     } catch (error) {
-      console.warn('Background music not available:', error);
+      console.warn('Could not play background music:', error);
       createFallbackBackgroundMusic();
     }
   };
@@ -218,11 +213,50 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!backgroundMusicRef.current || !settings.musicEnabled) return;
     
     if (isGameActive) {
-      // Increase volume for active gameplay
-      backgroundMusicRef.current.volume = settings.gameMusicVolume;
+      // Stop background music and start game music
+      stopBackgroundMusic();
+      playGameMusic();
     } else {
-      // Decrease volume for background ambiance
-      backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
+      // Stop game music and resume background music
+      stopGameMusic();
+      playBackgroundMusic();
+    }
+  };
+
+  // Game music functions
+  const playGameMusic = () => {
+    try {
+      if (settings.musicEnabled && typeof window !== 'undefined') {
+        // Play game music
+        const gameAudio = new Audio('/audio/bingo-game-music.mp3');
+        gameAudio.loop = true;
+        gameAudio.volume = settings.gameMusicVolume;
+        
+        gameAudio.addEventListener('canplaythrough', () => {
+          gameAudio.play().catch(error => {
+            console.warn('Could not play game music:', error);
+          });
+        });
+        
+        // Store reference for controls
+        gameMusicRef.current = gameAudio;
+        console.log('Game music started');
+      }
+    } catch (error) {
+      console.warn('Could not play game music:', error);
+    }
+  };
+
+  const stopGameMusic = () => {
+    if (gameMusicRef.current) {
+      try {
+        gameMusicRef.current.pause();
+        gameMusicRef.current.currentTime = 0;
+        gameMusicRef.current = null;
+        console.log('Game music stopped');
+      } catch (error) {
+        console.warn('Error stopping game music:', error);
+      }
     }
   };
 
