@@ -427,7 +427,81 @@ const AppLayout: React.FC = () => {
           BINGO Game Rooms
         </h1>
 
-        <GameModes />
+        <div id="game-modes">
+          <GameModes />
+        </div>
+        
+        {/* Tournaments Section */}
+        <div id="tournaments" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            🏆 Tournaments
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              Exciting BINGO tournaments coming soon! Compete against players worldwide for massive prizes.
+            </p>
+          </div>
+        </div>
+        
+        {/* Mini Games Section */}
+        <div id="mini-games" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            🎮 Mini Games
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              Fun mini-games and side activities to earn extra rewards while playing BINGO!
+            </p>
+          </div>
+        </div>
+        
+        {/* Leaderboard Section */}
+        <div id="leaderboard" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            📊 Leaderboard
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              See who's on top! Check the leaderboard for the highest earners and biggest winners.
+            </p>
+          </div>
+        </div>
+        
+        {/* Daily Rewards Section */}
+        <div id="rewards" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            🎁 Daily Rewards
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              Log in daily to collect rewards, bonuses, and special prizes!
+            </p>
+          </div>
+        </div>
+        
+        {/* Bonus System Section */}
+        <div id="bonus" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            ⚡ Bonus System
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              Unlock amazing bonuses, multipliers, and special features as you play!
+            </p>
+          </div>
+        </div>
+        
+        {/* Cashout Section */}
+        <div id="cashout" className="w-full max-w-6xl mx-auto mt-16 px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
+            💰 Cashout
+          </h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <p className="text-white/80 text-center text-lg">
+              Convert your winnings to real cash! Fast, secure, and reliable payment processing.
+            </p>
+          </div>
+        </div>
       </main>
 
       {/* User Profile Modals */}
