@@ -23,7 +23,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 18,
       color: "from-yellow-400 to-orange-500",
       description: "Low stakes, high fun! Perfect for beginners.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["🎯 Perfect for new players", "💰 Low risk, good rewards", "⚡ Quick games", "🏆 Build your confidence"],
+      specialInfo: "NEWCOMER FRIENDLY - Start your BINGO journey here!"
     },
     {
       id: 'bingo-room-2',
@@ -35,7 +37,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 3,
       color: "from-blue-400 to-purple-500",
       description: "Classic stakes with good odds.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["🎲 Balanced gameplay", "💎 Great value", "🚀 Steady progression", "⭐ Popular choice"],
+      specialInfo: "BEST VALUE - Most popular room for regular players!"
     },
     {
       id: 'bingo-room-3',
@@ -47,7 +51,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 5,
       color: "from-green-400 to-emerald-500",
       description: "Medium stakes, competitive play.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["🔥 Competitive action", "💪 Skill-based rewards", "🎮 Strategic play", "🏅 Pro player favorite"],
+      specialInfo: "COMPETITIVE - Test your skills against serious players!"
     },
     {
       id: 'bingo-room-4',
@@ -59,7 +65,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 6,
       color: "from-pink-400 to-rose-500",
       description: "Balanced risk and reward.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["⚖️ Perfect balance", "🎯 Sweet spot odds", "💫 Rising popularity", "🌟 Hidden gem"],
+      specialInfo: "BALANCED - The sweet spot between risk and reward!"
     },
     {
       id: 'bingo-room-5',
@@ -71,7 +79,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 6,
       color: "from-indigo-400 to-blue-500",
       description: "Popular room with great odds.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["🎯 High win rate", "💎 Excellent odds", "🚀 Fast action", "🏆 Player favorite"],
+      specialInfo: "HIGH WIN RATE - Players love the odds in this room!"
     },
     {
       id: 'bingo-room-6',
@@ -83,7 +93,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 6,
       color: "from-purple-400 to-pink-500",
       description: "High stakes, high rewards.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["💎 Premium stakes", "🔥 High intensity", "🎯 Big rewards", "⭐ Elite players"],
+      specialInfo: "PREMIUM - For players who want the big wins!"
     },
     {
       id: 'bingo-room-7',
@@ -95,7 +107,9 @@ const GameModes: React.FC = () => {
       currentPlayers: 5,
       color: "from-red-400 to-orange-500",
       description: "Premium room for serious players.",
-      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)"
+      bingoPattern: "Any 1 line (horizontal, vertical, or diagonal)",
+      features: ["👑 VIP experience", "💎 Maximum rewards", "🔥 Ultimate challenge", "🏆 Legendary status"],
+      specialInfo: "VIP ROOM - The ultimate BINGO experience for champions!"
     }
   ];
 
@@ -228,6 +242,20 @@ const GameModes: React.FC = () => {
 
                     {/* Middle Section - Game Info (Blue/Purple) */}
                     <div className="w-1/3 bg-gradient-to-br from-blue-500 to-purple-600 p-4 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                      {/* Special Info Badge */}
+                      <div className="absolute top-2 left-2 bg-yellow-500/90 backdrop-blur-sm rounded-full px-2 py-1 animate-pulse">
+                        <span className="text-black text-xs font-bold">
+                          {room.specialInfo}
+                        </span>
+                      </div>
+                      
+                      {/* Room Status Badge */}
+                      <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
+                        <span className="text-white text-xs font-bold">
+                          {room.currentPlayers >= room.minPlayers ? 'Ready' : 'Waiting'}
+                        </span>
+                      </div>
+                      
                       {/* BINGO Card Background */}
                       <div className="grid grid-cols-3 grid-rows-2 gap-1 mb-3">
                         {Array.from({ length: 6 }, (_, i) => (
@@ -238,13 +266,15 @@ const GameModes: React.FC = () => {
                       </div>
                       
                       <div className="text-white font-bold text-lg mb-1">{room.title}</div>
-                      <div className="text-white/80 text-sm">{room.description}</div>
+                      <div className="text-white/80 text-sm mb-2">{room.description}</div>
                       
-                      {/* Room Status Badge */}
-                      <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
-                        <span className="text-white text-xs font-bold">
-                          {room.currentPlayers >= room.minPlayers ? 'Ready' : 'Waiting'}
-                        </span>
+                      {/* Features List */}
+                      <div className="space-y-1">
+                        {room.features.slice(0, 2).map((feature, index) => (
+                          <div key={index} className="text-white/90 text-xs font-medium">
+                            {feature}
+                          </div>
+                        ))}
                       </div>
                     </div>
 

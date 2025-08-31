@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
+import { useAudio } from '@/contexts/AudioContext';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Home, Star, Coins, DollarSign, CreditCard } from 'lucide-react';
 import BingoCard from './BingoCard';
@@ -15,6 +16,7 @@ export interface GameInterfaceRef {
 
 const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMode, onExit }, ref) => {
   const { balance, gems, updateBalance } = useAppContext();
+  const { playGameStart, playBingo, playNumberCall, setGameMusicMode } = useAudio();
   
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'paused' | 'finished'>('waiting');
   const [calledNumbers, setCalledNumbers] = useState<string[]>([]);
@@ -49,6 +51,10 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     setCalledNumbers([]);
     setBallsRemaining(75);
     
+    // Play game start sound and switch to game music mode
+    playGameStart();
+    setGameMusicMode(true);
+    
     const allNumbers = generateBingoNumbers();
     let currentIndex = 0;
     
@@ -59,6 +65,10 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
         setCurrentNumber(number);
         setCalledNumbers(prev => [number, ...prev.slice(0, 2)]);
         setBallsRemaining(75 - currentIndex - 1);
+        
+        // Play number call sound
+        const numberValue = parseInt(number.slice(1));
+        playNumberCall(numberValue);
         
         // Use speech synthesis to call numbers
         if ('speechSynthesis' in window) {
@@ -71,6 +81,7 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
         currentIndex++;
       } else {
         setGameState('finished');
+        setGameMusicMode(false); // Switch back to background music
         if (numberCallInterval.current) {
           clearInterval(numberCallInterval.current);
         }
@@ -95,6 +106,10 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     
     if (bingoCardRef.current && bingoCardRef.current.checkBingoLines()) {
       setGameState('finished');
+      setGameMusicMode(false); // Switch back to background music
+      
+      // Play BINGO celebration sound
+      playBingo();
       
       // Calculate winnings
       const winnings = calculateWinnings();
@@ -140,6 +155,13 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
       return () => clearInterval(checkInterval);
     }
   }, [gameState]);
+
+  // Cleanup effect to reset music mode when component unmounts
+  useEffect(() => {
+    return () => {
+      setGameMusicMode(false);
+    };
+  }, [setGameMusicMode]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-blue-900 to-purple-800 relative overflow-hidden">
@@ -203,25 +225,30 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
         </div>
 
         {/* Main Game Area */}
-        <div className="flex gap-6">
+        <div className="flex gap-8">
           {/* Left - BINGO Card */}
           <div className="flex-1">
-            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-400/50">
-              <div className="text-center mb-6">
-                <h1 className="text-4xl font-black">
-                  <span className="text-red-500">B</span>
-                  <span className="text-orange-500">I</span>
-                  <span className="text-green-500">N</span>
-                  <span className="text-blue-500">G</span>
-                  <span className="text-purple-500">O</span>
+            <div className="bg-gradient-to-br from-black/30 to-purple-900/30 backdrop-blur-sm rounded-3xl p-8 border-4 border-yellow-400/50 shadow-2xl">
+              <div className="text-center mb-8">
+                <h1 className="text-6xl font-black drop-shadow-2xl">
+                  <span className="text-red-500 drop-shadow-lg">B</span>
+                  <span className="text-orange-500 drop-shadow-lg">I</span>
+                  <span className="text-green-500 drop-shadow-lg">N</span>
+                  <span className="text-blue-500 drop-shadow-lg">G</span>
+                  <span className="text-purple-500 drop-shadow-lg">O</span>
                 </h1>
+                <div className="text-yellow-300 text-lg font-medium mt-2">
+                  Complete a line to win!
+                </div>
               </div>
               
-              <BingoCard
-                ref={bingoCardRef}
-                calledNumbers={calledNumbers}
-                onBingoLinesChange={() => {}}
-              />
+              <div className="transform hover:scale-105 transition-all duration-500">
+                <BingoCard
+                  ref={bingoCardRef}
+                  calledNumbers={calledNumbers}
+                  onBingoLinesChange={() => {}}
+                />
+              </div>
             </div>
           </div>
 

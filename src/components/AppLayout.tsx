@@ -9,6 +9,7 @@ import AuthModal from './AuthModal';
 import PaymentModal from './PaymentModal';
 import UserProfileModal from './UserProfileModal';
 import GemShopModal from './GemShopModal';
+import MusicPlayer from './MusicPlayer';
 
 const AppLayout: React.FC = () => {
   const { user, balance, gems, isAuthenticated, logout } = useAppContext();
@@ -301,6 +302,9 @@ const AppLayout: React.FC = () => {
       />
       <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
       <GemShopModal isOpen={gemShopModalOpen} onClose={() => setGemShopModalOpen(false)} />
+
+      {/* Background Music Player */}
+      <MusicPlayer />
     </div>
   );
 };

@@ -5,6 +5,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom slider styles */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+}
+
+.slider::-webkit-slider-track {
+  background: linear-gradient(90deg, #6b7280, #9ca3af);
+  border-radius: 10px;
+  height: 8px;
+}
+
+.slider::-moz-range-track {
+  background: linear-gradient(90deg, #6b7280, #9ca3af);
+  border-radius: 10px;
+  height: 8px;
+}
+
 /* Screen reader only utility */
 .sr-only {
   position: absolute;

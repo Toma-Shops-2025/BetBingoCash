@@ -3,13 +3,15 @@ import { useAppContext } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Users, DollarSign, Play, Star, Zap, Crown, Gift, Target, Flame, Lightning, Shield } from 'lucide-react';
+import { Trophy, Users, DollarSign, Play, Star, Zap, Crown, Gift, Target, Flame, Shield } from 'lucide-react';
 
 const TournamentLobby: React.FC = () => {
   const { isAuthenticated, balance, updateBalance, startGame } = useAppContext();
   const { toast } = useToast();
   const [selectedTournament, setSelectedTournament] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'featured' | 'daily' | 'weekly' | 'special'>('featured');
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [tournamentToShow, setTournamentToShow] = useState<any>(null);
 
   // Amazing tournament collection
   const tournaments = [
@@ -18,6 +20,7 @@ const TournamentLobby: React.FC = () => {
       id: 'mega-bingo-championship',
       title: "🏆 MEGA BINGO CHAMPIONSHIP",
       description: "The ultimate BINGO showdown! Compete against the best players worldwide.",
+      longDescription: "Join the most prestigious BINGO tournament of the year! This championship brings together elite players from around the world for an epic battle of skill, strategy, and luck. With massive prize pools, exclusive VIP rewards, and legendary status on the line, this is your chance to become a BINGO legend!",
       entryFee: 25.00,
       prizePool: 2500.00,
       maxPlayers: 100,
@@ -28,12 +31,14 @@ const TournamentLobby: React.FC = () => {
       color: "from-yellow-400 via-orange-500 to-red-500",
       icon: "👑",
       minPlayers: 20,
-      gameMode: 'bingo-room-7'
+      gameMode: 'bingo-room-7',
+      highlights: ["🌟 Legendary Status", "💰 Massive Prizes", "👑 VIP Perks", "🏆 Exclusive Badges"]
     },
     {
       id: 'lightning-speed-bingo',
       title: "⚡ LIGHTNING SPEED BINGO",
       description: "Ultra-fast BINGO action! Numbers called every 1 second.",
+      longDescription: "Experience the thrill of lightning-fast BINGO! Numbers are called every second, creating an intense, adrenaline-pumping gaming experience. Perfect for players who love fast-paced action and quick rewards. Can you keep up with the speed and claim your lightning-fast victory?",
       entryFee: 15.00,
       prizePool: 1200.00,
       maxPlayers: 50,
@@ -44,7 +49,8 @@ const TournamentLobby: React.FC = () => {
       color: "from-blue-400 via-purple-500 to-pink-500",
       icon: "⚡",
       minPlayers: 15,
-      gameMode: 'bingo-room-6'
+      gameMode: 'bingo-room-6',
+      highlights: ["⚡ Lightning Speed", "🎯 Quick Rewards", "🔥 Adrenaline Rush", "💎 Speed Bonuses"]
     },
     
     // Daily Tournaments
@@ -150,6 +156,11 @@ const TournamentLobby: React.FC = () => {
     }
   ];
 
+  const showTournamentDescription = (tournament: any) => {
+    setTournamentToShow(tournament);
+    setShowDescriptionModal(true);
+  };
+
   const handleJoinTournament = (tournament: any) => {
     if (!isAuthenticated) {
       toast({
@@ -245,7 +256,11 @@ const TournamentLobby: React.FC = () => {
         {/* Tournament Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {getFilteredTournaments().map((tournament) => (
-            <Card key={tournament.id} className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group overflow-hidden">
+            <Card 
+              key={tournament.id} 
+              className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group overflow-hidden"
+              onClick={() => showTournamentDescription(tournament)}
+            >
               <CardContent className="p-0">
                 {/* Tournament Header */}
                 <div className={`bg-gradient-to-r ${tournament.color} p-6 text-center relative overflow-hidden`}>
@@ -360,6 +375,115 @@ const TournamentLobby: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Tournament Description Modal */}
+      {showDescriptionModal && tournamentToShow && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-purple-500 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center gap-3">
+                <div className="text-4xl">{tournamentToShow.icon}</div>
+                <div>
+                  <h3 className="text-2xl font-black text-white">{tournamentToShow.title}</h3>
+                  <p className="text-purple-300 text-sm">{tournamentToShow.type.toUpperCase()} TOURNAMENT</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDescriptionModal(false)}
+                className="text-gray-400 hover:text-white text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Tournament Description */}
+            <div className="mb-6">
+              <h4 className="text-lg font-bold text-white mb-3">📖 Tournament Overview</h4>
+              <p className="text-gray-300 leading-relaxed">
+                {tournamentToShow.longDescription || tournamentToShow.description}
+              </p>
+            </div>
+
+            {/* Tournament Highlights */}
+            {tournamentToShow.highlights && (
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-white mb-3">✨ Key Highlights</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {tournamentToShow.highlights.map((highlight, index) => (
+                    <div key={index} className="bg-purple-500/20 border border-purple-400/30 rounded-lg p-3 text-center">
+                      <span className="text-purple-300 text-sm font-medium">{highlight}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tournament Stats */}
+            <div className="mb-6">
+              <h4 className="text-lg font-bold text-white mb-3">📊 Tournament Details</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-blue-300">${tournamentToShow.prizePool.toFixed(0)}</div>
+                  <div className="text-blue-200 text-sm">Prize Pool</div>
+                </div>
+                <div className="bg-green-500/20 border border-green-400/30 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-green-300">${tournamentToShow.entryFee}</div>
+                  <div className="text-green-200 text-sm">Entry Fee</div>
+                </div>
+                <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-yellow-300">{tournamentToShow.currentPlayers}/{tournamentToShow.maxPlayers}</div>
+                  <div className="text-yellow-200 text-sm">Players</div>
+                </div>
+                <div className="bg-purple-500/20 border border-purple-400/30 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-purple-300">{tournamentToShow.timeLeft.split(' ')[0]}</div>
+                  <div className="text-purple-200 text-sm">Time Left</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Special Features */}
+            <div className="mb-6">
+              <h4 className="text-lg font-bold text-white mb-3">🎁 Special Features</h4>
+              <div className="flex flex-wrap gap-2">
+                {tournamentToShow.specialFeatures.map((feature, index) => (
+                  <span
+                    key={index}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-3 py-1 rounded-full font-medium"
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDescriptionModal(false)}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowDescriptionModal(false);
+                  handleJoinTournament(tournamentToShow);
+                }}
+                disabled={tournamentToShow.currentPlayers < tournamentToShow.minPlayers}
+                className={`flex-1 font-bold py-3 px-6 rounded-xl transition-all duration-200 ${
+                  tournamentToShow.currentPlayers >= tournamentToShow.minPlayers
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white transform hover:scale-105'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <Trophy className="w-5 h-5 mr-2 inline" />
+                {tournamentToShow.currentPlayers >= tournamentToShow.minPlayers ? 'JOIN NOW' : 'WAITING FOR PLAYERS'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
