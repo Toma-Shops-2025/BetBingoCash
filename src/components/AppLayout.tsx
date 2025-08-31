@@ -418,6 +418,7 @@ const AppLayout: React.FC = () => {
             src="/hero logo.png" 
             alt="BetBingoCash Logo" 
             className="h-32 w-auto object-contain"
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
         </div>
         
