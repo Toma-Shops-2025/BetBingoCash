@@ -134,8 +134,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           filter.Q.setValueAtTime(0.5 + Math.random() * 0.5, startTime);
           
           gainNode.gain.setValueAtTime(0, startTime);
-          gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
-          gainNode.gain.linearRampToValueAtTime(volume * 0.7, startTime + duration * 0.7);
+          gainNode.gain.linearRampToValueAtTime(volume * 3, startTime + 0.1); // MUCH LOUDER
+          gainNode.gain.linearRampToValueAtTime(volume * 2.5, startTime + duration * 0.7);
           gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
           
           oscillator.start(startTime);
@@ -166,7 +166,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           for (let i = 0; i < numNotes; i++) {
             const freq = pentatonicScale[Math.floor(Math.random() * pentatonicScale.length)];
             const duration = 0.5 + Math.random() * 1.5; // 0.5 to 2 seconds
-            const volume = (0.03 + Math.random() * 0.04) * settings.backgroundMusicVolume;
+            const volume = (0.1 + Math.random() * 0.15) * settings.backgroundMusicVolume; // MUCH LOUDER
             
             const note = createNote(freq, duration, currentTime, volume);
             notes.push(note);

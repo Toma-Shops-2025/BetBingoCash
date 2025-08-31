@@ -135,20 +135,52 @@ const MusicPlayer: React.FC = () => {
           {/* Test Audio Button */}
           <div className="mb-4">
             <div className="text-white text-sm mb-2 text-center">Test Audio</div>
-            <div className="flex justify-center">
+            <div className="flex gap-2 justify-center">
               <button
                 onClick={() => {
                   // Force recreate the fallback music
                   stopBackgroundMusic();
+                  setIsPlaying(false);
                   setTimeout(() => {
                     if (settings.musicEnabled) {
                       playBackgroundMusic();
+                      setIsPlaying(true);
                     }
-                  }, 100);
+                  }, 200);
                 }}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
               >
                 🔄 Restart Music
+              </button>
+              <button
+                onClick={() => {
+                  // Play a test tone
+                  try {
+                    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A note
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 1);
+                    
+                    console.log('Test tone played');
+                  } catch (error) {
+                    console.warn('Could not play test tone:', error);
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+              >
+                🔊 Test Tone
               </button>
             </div>
           </div>
