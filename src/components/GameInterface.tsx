@@ -150,15 +150,45 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
 
   // Auto-start the game when component mounts
   useEffect(() => {
+    console.log('GameInterface mounted, gameStarted:', gameStarted);
     if (!gameStarted) {
       // Small delay to ensure everything is loaded
       const timer = setTimeout(() => {
-        ref.current?.startGame();
-      }, 500);
+        console.log('Auto-starting game...');
+        // Start the game directly since we have access to the methods
+        startGame();
+      }, 1000);
       
       return () => clearTimeout(timer);
     }
   }, [gameStarted]);
+
+  const startGame = () => {
+    setGameStarted(true);
+    setIsPlaying(true);
+    setIsPaused(false);
+    setTimeLeft(60);
+    setScore(0);
+    setCalledNumbers([]);
+    setCurrentNumber(null);
+    setBingoAchieved(false);
+    setGameMusicMode(true);
+    playGameStart();
+    
+    // Start timer
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          endGame();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    // Start calling numbers
+    startCallingNumbers();
+  };
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 z-50 overflow-y-auto">

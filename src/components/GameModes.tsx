@@ -258,6 +258,17 @@ const GameModes: React.FC = () => {
                         </span>
                       </div>
                       
+                      {/* Prominent START GAME Button */}
+                      <Button
+                        onClick={() => handlePlayGame(room)}
+                        disabled={room.currentPlayers < room.minPlayers}
+                        className={`mb-3 w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                          room.currentPlayers < room.minPlayers ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        🚀 START GAME
+                      </Button>
+                      
                       {/* BINGO Card Background */}
                       <div className="grid grid-cols-3 grid-rows-2 gap-1 mb-3">
                         {Array.from({ length: 6 }, (_, i) => (
@@ -293,7 +304,7 @@ const GameModes: React.FC = () => {
                         }`}
                       >
                         <Play className="w-4 h-4 mr-2" />
-                        Play
+                        Start Game
                       </Button>
                       
                       {room.currentPlayers < room.minPlayers && (
@@ -301,6 +312,37 @@ const GameModes: React.FC = () => {
                           Needs {room.minPlayers} players
                         </div>
                       )}
+                    </div>
+                  </div>
+                  
+                  {/* Rules & Gameplay Section */}
+                  <div className="bg-gray-800 p-4 rounded-b-lg border-t border-gray-700">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Game Rules */}
+                      <div>
+                        <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
+                          📋 Game Rules
+                        </h4>
+                        <div className="text-gray-300 text-xs space-y-1">
+                          <div>• {room.bingoPattern}</div>
+                          <div>• Numbers called every 3 seconds</div>
+                          <div>• 60-second game timer</div>
+                          <div>• Auto-daubing enabled</div>
+                        </div>
+                      </div>
+                      
+                      {/* How to Play */}
+                      <div>
+                        <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
+                          🎮 How to Play
+                        </h4>
+                        <div className="text-gray-300 text-xs space-y-1">
+                          <div>• Click "Start Game" to begin</div>
+                          <div>• Watch for called numbers</div>
+                          <div>• Get 5 in a row to win</div>
+                          <div>• Click BINGO when you win!</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
