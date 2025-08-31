@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Zap, Star, Shield, Target, Flame, Lightning, Crown, Gift, Coins, DollarSign, Sparkles, Rocket } from 'lucide-react';
+import { Zap, Star, Shield, Target, Flame, Crown, Gift, Coins, DollarSign, Sparkles, Rocket } from 'lucide-react';
 
 interface BonusSystemProps {
   onBonusActivated?: (bonusType: string) => void;
@@ -29,7 +29,7 @@ const BonusSystem: React.FC<BonusSystemProps> = ({ onBonusActivated }) => {
       id: 'lightning-speed',
       name: 'Lightning Speed',
       description: 'Numbers called 2x faster',
-      icon: <Lightning className="w-6 h-6" />,
+      icon: <Zap className="w-6 h-6" />,
       cost: 75,
       duration: 45,
       color: 'from-yellow-400 to-orange-500',
