@@ -63,6 +63,18 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('audioSettings', JSON.stringify(settings));
   }, [settings]);
 
+  // Start background music automatically when component mounts
+  useEffect(() => {
+    if (settings.musicEnabled) {
+      // Small delay to ensure everything is loaded
+      const timer = setTimeout(() => {
+        playBackgroundMusic();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []); // Only run once on mount
+
   const updateSettings = (newSettings: Partial<AudioSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
