@@ -176,13 +176,16 @@ const GameModes: React.FC = () => {
     // Deduct entry fee and start game
     updateBalance(-gameRoom.entryFee);
     
-    // Set the selected game to render the GameInterface
-    setSelectedGame(gameRoom.id);
-    
+    // Show success message
     toast({
       title: `Entry Fee Paid! 🎯`,
       description: `$${gameRoom.entryFee.toFixed(2)} deducted. Starting ${gameRoom.title}!`,
     });
+
+    // Small delay to show the toast, then start the game
+    setTimeout(() => {
+      setSelectedGame(gameRoom.id);
+    }, 1000);
   };
 
   const handleBackToRooms = () => {

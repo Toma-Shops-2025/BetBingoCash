@@ -148,6 +148,18 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     };
   }, [setGameMusicMode]);
 
+  // Auto-start the game when component mounts
+  useEffect(() => {
+    if (!gameStarted) {
+      // Small delay to ensure everything is loaded
+      const timer = setTimeout(() => {
+        ref.current?.startGame();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [gameStarted]);
+
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 z-50 overflow-y-auto">
       {/* Top Section */}
