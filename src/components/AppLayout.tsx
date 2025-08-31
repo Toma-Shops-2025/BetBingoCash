@@ -41,22 +41,22 @@ const AppLayout: React.FC = () => {
       {/* Animated Background Elements */}
       <div className="fixed inset-0 z-0">
         {/* Floating Bubbles - Spread across entire screen with much better spacing */}
-        <div className="absolute top-8 left-8 w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
-        <div className="absolute top-16 right-16 w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
-        <div className="absolute top-32 left-1/3 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
-        <div className="absolute top-48 right-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
+        <div className="absolute top-8 right-8 w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
+        <div className="absolute top-16 left-16 w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
+        <div className="absolute top-32 right-1/3 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+        <div className="absolute top-48 left-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
         <div className="absolute top-64 right-1/6 w-18 h-18 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1.5s', animationDuration: '4.5s' }}></div>
         <div className="absolute top-80 left-1/6 w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2.5s', animationDuration: '3.8s' }}></div>
         <div className="absolute top-96 right-2/3 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.8s', animationDuration: '4.2s' }}></div>
         <div className="absolute top-40 left-2/3 w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1.8s', animationDuration: '5.2s' }}></div>
         
         {/* Floating Stars - Distributed across screen with much better spacing */}
-        <div className="absolute top-24 right-1/4 text-yellow-300 text-2xl animate-pulse" style={{ animationDelay: '0s' }}>⭐</div>
-        <div className="absolute top-56 left-1/3 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
-        <div className="absolute top-88 right-1/2 text-purple-300 text-3xl animate-pulse" style={{ animationDelay: '2s' }}>🌟</div>
-        <div className="absolute top-40 left-1/2 text-green-300 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>💫</div>
+        <div className="absolute top-24 left-1/4 text-yellow-300 text-2xl animate-pulse" style={{ animationDelay: '0s' }}>⭐</div>
+        <div className="absolute top-56 right-1/3 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
+        <div className="absolute top-88 left-1/2 text-purple-300 text-3xl animate-pulse" style={{ animationDelay: '2s' }}>🌟</div>
+        <div className="absolute top-40 right-1/2 text-green-300 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>💫</div>
         <div className="absolute top-72 right-1/8 text-pink-300 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>⭐</div>
-        <div className="absolute top-32 right-3/4 text-cyan-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>✨</div>
+        <div className="absolute top-32 left-3/4 text-cyan-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>✨</div>
         
         {/* Floating Coins - Spread out with much better distribution */}
         <div className="absolute top-48 right-1/5 text-yellow-400 text-2xl animate-float" style={{ animationDelay: '0.5s', animationDuration: '4s' }}>💰</div>
@@ -88,14 +88,14 @@ const AppLayout: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '1s' }}></div>
         
         {/* Gaming Icons - Top Left Quadrant - Much better spaced */}
-        <div className="absolute top-1/6 right-1/6 text-purple-400 text-lg animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🎲</div>
-        <div className="absolute top-1/8 right-1/8 text-blue-400 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>🎯</div>
-        <div className="absolute top-1/4 right-1/8 text-yellow-400 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>🏅</div>
+        <div className="absolute top-1/6 left-1/6 text-purple-400 text-lg animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🎲</div>
+        <div className="absolute top-1/8 left-1/8 text-blue-400 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>🎯</div>
+        <div className="absolute top-1/4 left-1/8 text-yellow-400 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>🏅</div>
         
         {/* Gaming Icons - Top Right Quadrant - Much better spaced */}
-        <div className="absolute top-1/6 left-1/6 text-green-400 text-lg animate-float" style={{ animationDuration: '4s', animationDelay: '1.5s' }}>🎮</div>
-        <div className="absolute top-1/8 left-1/8 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1s' }}>🥇</div>
-        <div className="absolute top-1/4 left-1/8 text-red-400 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>🔥</div>
+        <div className="absolute top-1/6 right-1/6 text-green-400 text-lg animate-float" style={{ animationDuration: '4s', animationDelay: '1.5s' }}>🎮</div>
+        <div className="absolute top-1/8 right-1/8 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1s' }}>🥇</div>
+        <div className="absolute top-1/4 right-1/8 text-red-400 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>🔥</div>
         
         {/* Gaming Icons - Top Center - Much better spaced */}
         <div className="absolute top-1/6 left-1/2 text-pink-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.3s' }}>🍀</div>
@@ -103,39 +103,39 @@ const AppLayout: React.FC = () => {
         <div className="absolute top-1/4 left-3/4 text-yellow-300 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1.2s' }}>⭐</div>
         
         {/* Middle Left Area - Much better distributed */}
-        <div className="absolute top-2/5 right-1/6 text-indigo-400 text-lg animate-spin-slow" style={{ animationDuration: '15s' }}>🌀</div>
-        <div className="absolute top-1/3 right-1/4 text-emerald-400 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.7s' }}>🌊</div>
-        <div className="absolute top-2/5 right-1/8 text-purple-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.1s' }}>🌈</div>
-        <div className="absolute top-3/5 right-1/5 text-blue-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.8s' }}>💎</div>
-        <div className="absolute top-4/5 right-1/4 text-green-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.3s' }}>🎪</div>
+        <div className="absolute top-2/5 left-1/6 text-indigo-400 text-lg animate-spin-slow" style={{ animationDuration: '15s' }}>🌀</div>
+        <div className="absolute top-1/3 left-1/4 text-emerald-400 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.7s' }}>🌊</div>
+        <div className="absolute top-2/5 left-1/8 text-purple-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.1s' }}>🌈</div>
+        <div className="absolute top-3/5 left-1/5 text-blue-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.8s' }}>💎</div>
+        <div className="absolute top-4/5 left-1/4 text-green-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.3s' }}>🎪</div>
         
         {/* Middle Right Area - Much better distributed */}
-        <div className="absolute top-2/5 left-1/6 text-red-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.4s' }}>⚡</div>
-        <div className="absolute top-1/3 left-1/4 text-blue-300 text-xl animate-float" style={{ animationDuration: '8s', animationDelay: '0.9s' }}>💎</div>
-        <div className="absolute top-2/5 left-1/8 text-green-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.3s' }}>🎪</div>
-        <div className="absolute top-3/5 left-1/5 text-purple-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.2s' }}>🎭</div>
-        <div className="absolute top-4/5 left-1/4 text-orange-300 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '0.6s' }}>🎨</div>
+        <div className="absolute top-2/5 right-1/6 text-red-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.4s' }}>⚡</div>
+        <div className="absolute top-1/3 right-1/4 text-blue-300 text-xl animate-float" style={{ animationDuration: '8s', animationDelay: '0.9s' }}>💎</div>
+        <div className="absolute top-2/5 right-1/8 text-green-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.3s' }}>🎪</div>
+        <div className="absolute top-3/5 right-1/5 text-purple-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.2s' }}>🎭</div>
+        <div className="absolute top-4/5 right-1/4 text-orange-300 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '0.6s' }}>🎨</div>
         
         {/* Center Area - Much better distributed */}
-        <div className="absolute top-1/2 right-1/8 text-yellow-400 text-xl animate-pulse" style={{ animationDelay: '0.2s' }}>👑</div>
-        <div className="absolute top-1/2 left-1/8 text-gray-400 text-lg animate-pulse" style={{ animationDelay: '0.7s' }}>🥈</div>
-        <div className="absolute top-1/2 right-3/4 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1.2s' }}>🥉</div>
+        <div className="absolute top-1/2 left-1/8 text-yellow-400 text-xl animate-pulse" style={{ animationDelay: '0.2s' }}>👑</div>
+        <div className="absolute top-1/2 right-1/8 text-gray-400 text-lg animate-pulse" style={{ animationDelay: '0.7s' }}>🥈</div>
+        <div className="absolute top-1/2 left-3/4 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1.2s' }}>🥉</div>
         <div className="absolute top-1/2 left-1/2 text-pink-400 text-lg animate-pulse" style={{ animationDelay: '0.9s' }}>💖</div>
         <div className="absolute top-1/2 right-2/3 text-cyan-400 text-lg animate-pulse" style={{ animationDelay: '1.4s' }}>💫</div>
         
         {/* Bottom Left Quadrant - Much better distributed */}
-        <div className="absolute bottom-1/6 right-1/6 text-orange-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.4s' }}>🎨</div>
-        <div className="absolute bottom-1/4 right-1/6 text-indigo-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.9s' }}>🎭</div>
-        <div className="absolute bottom-1/3 right-1/8 text-emerald-400 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '1.1s' }}>🎪</div>
-        <div className="absolute bottom-2/5 right-1/4 text-blue-400 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '0.6s' }}>🌊</div>
-        <div className="absolute bottom-1/8 right-1/3 text-yellow-400 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '1.5s' }}>⭐</div>
+        <div className="absolute bottom-1/6 left-1/6 text-orange-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.4s' }}>🎨</div>
+        <div className="absolute bottom-1/4 left-1/6 text-indigo-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.9s' }}>🎭</div>
+        <div className="absolute bottom-1/3 left-1/8 text-emerald-400 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '1.1s' }}>🎪</div>
+        <div className="absolute bottom-2/5 left-1/4 text-blue-400 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '0.6s' }}>🌊</div>
+        <div className="absolute bottom-1/8 left-1/3 text-yellow-400 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '1.5s' }}>⭐</div>
         
         {/* Bottom Right Quadrant - Much better distributed */}
-        <div className="absolute bottom-1/6 left-1/6 text-red-300 text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💥</div>
-        <div className="absolute bottom-1/4 left-1/6 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1.1s' }}>⚡</div>
-        <div className="absolute bottom-1/3 left-1/8 text-green-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>🎯</div>
-        <div className="absolute bottom-2/5 left-1/4 text-purple-400 text-lg animate-pulse" style={{ animationDelay: '1.3s' }}>🌈</div>
-        <div className="absolute bottom-1/8 left-1/3 text-pink-400 text-lg animate-pulse" style={{ animationDelay: '0.4s' }}>💖</div>
+        <div className="absolute bottom-1/6 right-1/6 text-red-300 text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💥</div>
+        <div className="absolute bottom-1/4 right-1/6 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1.1s' }}>⚡</div>
+        <div className="absolute bottom-1/3 right-1/8 text-green-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>🎯</div>
+        <div className="absolute bottom-2/5 right-1/4 text-purple-400 text-lg animate-pulse" style={{ animationDelay: '1.3s' }}>🌈</div>
+        <div className="absolute bottom-1/8 right-1/3 text-pink-400 text-lg animate-pulse" style={{ animationDelay: '0.4s' }}>💖</div>
         
         {/* Bottom Center - Much better distributed */}
         <div className="absolute bottom-1/6 left-1/2 text-green-300 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🍀</div>
@@ -417,8 +417,8 @@ const AppLayout: React.FC = () => {
           <img 
             src="/hero logo.png" 
             alt="BetBingoCash Logo" 
-            className="h-32 w-auto object-contain"
-            style={{ filter: 'brightness(0) invert(1)' }}
+            className="h-32 w-auto object-contain mix-blend-multiply"
+            style={{ filter: 'contrast(1.2) brightness(1.1)' }}
           />
         </div>
         
