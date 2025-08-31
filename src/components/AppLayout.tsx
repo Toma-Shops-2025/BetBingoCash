@@ -37,9 +37,62 @@ const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 z-0">
+        {/* Floating Bubbles */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
+        <div className="absolute top-60 left-1/4 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+        <div className="absolute top-80 right-1/3 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
+        
+        {/* Floating Stars */}
+        <div className="absolute top-32 left-1/3 text-yellow-300 text-2xl animate-pulse" style={{ animationDelay: '0s' }}>⭐</div>
+        <div className="absolute top-64 right-1/4 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
+        <div className="absolute top-96 left-1/2 text-purple-300 text-3xl animate-pulse" style={{ animationDelay: '2s' }}>🌟</div>
+        
+        {/* Floating Coins */}
+        <div className="absolute top-48 left-1/5 text-yellow-400 text-2xl animate-float" style={{ animationDelay: '0.5s', animationDuration: '4s' }}>💰</div>
+        <div className="absolute top-72 right-1/5 text-green-400 text-xl animate-float" style={{ animationDelay: '1.5s', animationDuration: '3s' }}>💎</div>
+        
+        {/* Moving Clouds */}
+        <div className="absolute top-16 left-0 w-32 h-16 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '6s' }}></div>
+        <div className="absolute top-32 right-0 w-24 h-12 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '8s', animationDelay: '2s' }}></div>
+        
+        {/* Animated Grid Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            animation: 'gridMove 20s linear infinite'
+          }}></div>
+        </div>
+        
+        {/* Gradient Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '1s' }}></div>
+        
+        {/* Additional Floating Elements */}
+        <div className="absolute top-1/3 right-1/3 text-red-400 text-xl animate-spin-slow">🎯</div>
+        <div className="absolute bottom-1/3 left-1/3 text-indigo-400 text-2xl animate-float" style={{ animationDuration: '7s' }}>🎮</div>
+        <div className="absolute top-3/4 right-1/4 text-emerald-400 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>🏆</div>
+        
+        {/* Glowing Lines */}
+        <div className="absolute top-1/2 left-0 w-1 h-32 bg-gradient-to-b from-transparent via-purple-400 to-transparent opacity-30 animate-pulse" style={{ animationDuration: '4s' }}></div>
+        <div className="absolute top-1/2 right-0 w-1 h-32 bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-30 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
+        
+        {/* Floating Particles */}
+        <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-white rounded-full opacity-40 animate-pulse" style={{ animationDuration: '3s' }}></div>
+        <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-yellow-300 rounded-full opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
+      </div>
+
       {/* Full Navigation Bar */}
-      <nav className="bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 border-b border-purple-700/50 sticky top-0 z-50 backdrop-blur-sm">
+      <nav className="bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-blue-900/80 border-b border-purple-700/50 sticky top-0 z-50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Brand */}

@@ -18,10 +18,15 @@ const MusicPlayer: React.FC = () => {
   // Start background music when component mounts
   useEffect(() => {
     if (settings.musicEnabled) {
-      playBackgroundMusic();
-      setIsPlaying(true);
+      // Small delay to ensure audio context is ready
+      const timer = setTimeout(() => {
+        playBackgroundMusic();
+        setIsPlaying(true);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [settings.musicEnabled, playBackgroundMusic]);
 
   const toggleMusic = () => {
     if (isPlaying) {

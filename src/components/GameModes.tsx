@@ -205,8 +205,7 @@ const GameModes: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-black text-white mb-4">🎮 BINGO Game Rooms</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto">
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg">
             Multiple ways to win big! Pick your favorite BINGO room and start earning cash prizes. 
             Same BINGO rules, different stakes and odds.
           </p>

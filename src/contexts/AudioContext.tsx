@@ -72,26 +72,71 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     try {
       if (!backgroundMusicRef.current) {
+        // Try to load background music, but provide fallback
         backgroundMusicRef.current = new Audio('/audio/background-music.mp3');
         backgroundMusicRef.current.loop = true;
         backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
         
         // Handle missing audio file gracefully
         backgroundMusicRef.current.onerror = () => {
-          console.warn('Background music file not found. Please add /audio/background-music.mp3');
-          // Fallback: use system beep or silent audio
-          backgroundMusicRef.current = null;
+          console.warn('Background music file not found. Using fallback audio.');
+          // Create a simple fallback audio using Web Audio API
+          createFallbackBackgroundMusic();
+        };
+        
+        // Handle successful load
+        backgroundMusicRef.current.oncanplaythrough = () => {
+          console.log('Background music loaded successfully');
         };
       }
       
-      if (backgroundMusicRef.current) {
+      if (backgroundMusicRef.current && backgroundMusicRef.current.readyState >= 2) {
         backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
         backgroundMusicRef.current.play().catch(error => {
           console.warn('Could not play background music:', error);
+          // Try fallback if main audio fails
+          createFallbackBackgroundMusic();
         });
       }
     } catch (error) {
       console.warn('Background music not available:', error);
+      createFallbackBackgroundMusic();
+    }
+  };
+
+  // Create fallback background music using Web Audio API
+  const createFallbackBackgroundMusic = () => {
+    try {
+      if (typeof window !== 'undefined' && window.AudioContext) {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 2);
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 4);
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime + 2);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 6);
+        
+        // Loop the fallback music
+        setInterval(() => {
+          if (settings.musicEnabled) {
+            createFallbackBackgroundMusic();
+          }
+        }, 6000);
+        
+        console.log('Fallback background music created');
+      }
+    } catch (error) {
+      console.warn('Could not create fallback audio:', error);
     }
   };
 
