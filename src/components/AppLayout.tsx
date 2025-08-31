@@ -395,16 +395,16 @@ const AppLayout: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
         {/* Header Logo */}
-        <div className="mb-6 flex justify-center">
+        <div className="mb-3 flex justify-center">
           <img 
-            src="/betbingocash headerlogo.png" 
+            src="/hero logo.png" 
             alt="BetBingoCash Logo" 
-            className="h-24 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
         </div>
         
         {/* Main Title */}
-        <h1 className="text-5xl md:text-6xl font-bold text-white text-center mb-4 drop-shadow-2xl">
+        <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-4 drop-shadow-2xl">
           BINGO Game Rooms
         </h1>
 
