@@ -4,10 +4,12 @@ interface BingoCardProps {
   calledNumbers: number[];
   onBingo: () => void;
   bingoAchieved: boolean;
+  onDaub: (number: number) => void;
 }
 
-const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, onBingo, bingoAchieved }) => {
+const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, onBingo, bingoAchieved, onDaub }) => {
   const [hoveredCell, setHoveredCell] = useState<number | null>(null);
+  const [daubedNumbers, setDaubedNumbers] = useState<Set<number>>(new Set());
 
   // Generate a random BINGO card
   const generateBingoCard = () => {
@@ -47,6 +49,20 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, onBingo, bingoAchi
     return calledNumbers.includes(number);
   };
 
+  const isNumberDaubed = (number: number) => {
+    return daubedNumbers.has(number);
+  };
+
+  const handleCellClick = (number: number) => {
+    if (number === 0) return; // Free space can't be daubed
+    
+    if (isNumberCalled(number) && !isNumberDaubed(number)) {
+      // Mark as daubed
+      setDaubedNumbers(prev => new Set([...prev, number]));
+      onDaub(number);
+    }
+  };
+
   const getBingoLetter = (colIndex: number) => {
     const letters = ['B', 'I', 'N', 'G', 'O'];
     return letters[colIndex];
@@ -60,36 +76,47 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, onBingo, bingoAchi
   const checkBingo = () => {
     // Check rows
     for (let row = 0; row < 5; row++) {
-      if (bingoCard.every((col, colIndex) => col[row] === 0 || isNumberCalled(col[row]))) {
+      if (bingoCard.every((col, colIndex) => {
+        const num = col[row];
+        return num === 0 || (isNumberCalled(num) && isNumberDaubed(num));
+      })) {
         return true;
       }
     }
     
     // Check columns
     for (let col = 0; col < 5; col++) {
-      if (bingoCard[col].every(num => num === 0 || isNumberCalled(num))) {
+      if (bingoCard[col].every(num => {
+        return num === 0 || (isNumberCalled(num) && isNumberDaubed(num));
+      })) {
         return true;
       }
     }
     
     // Check diagonals
-    if (bingoCard.every((col, colIndex) => col[colIndex] === 0 || isNumberCalled(col[colIndex]))) {
+    if (bingoCard.every((col, colIndex) => {
+      const num = col[colIndex];
+      return num === 0 || (isNumberCalled(num) && isNumberDaubed(num));
+    })) {
       return true;
     }
     
-    if (bingoCard.every((col, colIndex) => col[4 - colIndex] === 0 || isNumberCalled(col[4 - colIndex]))) {
+    if (bingoCard.every((col, colIndex) => {
+      const num = col[4 - colIndex];
+      return num === 0 || (isNumberCalled(num) && isNumberDaubed(num));
+    })) {
       return true;
     }
     
     return false;
   };
 
-  // Check for BINGO when called numbers change
+  // Check for BINGO when daubed numbers change
   React.useEffect(() => {
     if (!bingoAchieved && checkBingo()) {
       onBingo();
     }
-  }, [calledNumbers, bingoAchieved, onBingo]);
+  }, [daubedNumbers, bingoAchieved, onBingo]);
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-2xl border-4 border-blue-400">
@@ -111,28 +138,43 @@ const BingoCard: React.FC<BingoCardProps> = ({ calledNumbers, onBingo, bingoAchi
           [0, 1, 2, 3, 4].map((colIndex) => {
             const number = bingoCard[colIndex][rowIndex];
             const isCalled = number === 0 || isNumberCalled(number);
+            const isDaubed = number === 0 || isNumberDaubed(number);
             const isHovered = hoveredCell === rowIndex * 5 + colIndex;
+            const canDaub = isCalled && !isDaubed && number !== 0;
             
             return (
               <div
                 key={`${rowIndex}-${colIndex}`}
-                className={`
-                  w-16 h-16 rounded-lg border-2 border-gray-300 flex items-center justify-center font-bold text-lg transition-all duration-200 cursor-pointer
-                  ${isCalled 
-                    ? 'bg-blue-400 text-white shadow-lg transform scale-105' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }
-                  ${isHovered ? 'ring-4 ring-yellow-300' : ''}
-                `}
+                onClick={() => handleCellClick(number)}
                 onMouseEnter={() => setHoveredCell(rowIndex * 5 + colIndex)}
                 onMouseLeave={() => setHoveredCell(null)}
+                className={`
+                  w-16 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all duration-200
+                  ${number === 0 
+                    ? 'bg-blue-500 text-white border-blue-600' 
+                    : isDaubed 
+                    ? 'bg-green-500 text-white border-green-600 shadow-lg transform scale-105' 
+                    : isCalled 
+                    ? 'bg-blue-400 text-white border-blue-500 cursor-pointer hover:bg-blue-300' 
+                    : 'bg-gray-100 text-gray-700 border-gray-300'
+                  }
+                  ${isHovered && canDaub ? 'ring-4 ring-yellow-300 ring-offset-2' : ''}
+                  ${canDaub ? 'cursor-pointer hover:scale-105' : ''}
+                `}
               >
                 {number === 0 ? (
-                  <div className="text-blue-400 text-2xl">💎</div>
+                  <div className="text-white text-2xl">💎</div>
                 ) : (
-                  <span className={isCalled ? 'animate-pulse' : ''}>
+                  <span className={isDaubed ? 'animate-pulse' : ''}>
                     {number}
                   </span>
+                )}
+                {isDaubed && number !== 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <div className="w-4 h-4 bg-white rounded-full"></div>
+                    </div>
+                  </div>
                 )}
               </div>
             );

@@ -1,151 +1,84 @@
-import React, { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react';
-import { X, Pause, Play } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../contexts/AudioContext';
+import { useToast } from '../hooks/use-toast';
 import BingoCard from './BingoCard';
+import { Timer, Star, Zap, Clock, Star as DoubleStar, Trophy, Users } from 'lucide-react';
 
-export interface GameInterfaceProps {
-  gameMode: string;
-  onExit: () => void;
+interface Powerup {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  description: string;
+  effect: string;
 }
 
-export interface GameInterfaceRef {
-  startGame: () => void;
-  pauseGame: () => void;
-  resumeGame: () => void;
-  endGame: () => void;
-}
+const POWERUPS: Powerup[] = [
+  {
+    id: 'triple',
+    name: 'Triple Points',
+    icon: <Zap className="w-6 h-6 text-yellow-400" />,
+    description: '3X Points',
+    effect: 'Triple points for next BINGO'
+  },
+  {
+    id: 'star',
+    name: 'Star Power',
+    icon: <Star className="w-6 h-6 text-blue-400" />,
+    description: 'Daub Any Space',
+    effect: 'Mark any single space on your card'
+  },
+  {
+    id: 'stopwatch',
+    name: 'Time Freeze',
+    icon: <Clock className="w-6 h-6 text-green-400" />,
+    description: 'Stop Timer 10s',
+    effect: 'Timer stops for 10 seconds'
+  },
+  {
+    id: 'doublestar',
+    name: 'Double Star',
+    icon: <DoubleStar className="w-6 h-6 text-purple-400" />,
+    description: 'Daub 2 Spaces',
+    effect: 'Mark any two spaces on your card'
+  }
+];
 
-const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMode, onExit }, ref) => {
-  const { setGameMusicMode, playGameStart, playBingo, playNumberCall } = useAudio();
+const GameInterface: React.FC = () => {
+  const { playNumberCall, playBingo, setGameMusicMode } = useAudio();
+  const { toast } = useToast();
+  
+  // Game state
+  const [gameStarted, setGameStarted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60); // 60 seconds
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [score, setScore] = useState(0);
+  const [bingos, setBingos] = useState(0);
   const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
   const [currentNumber, setCurrentNumber] = useState<number | null>(null);
-  const [gameStarted, setGameStarted] = useState(false);
   const [bingoAchieved, setBingoAchieved] = useState(false);
+  
+  // Powerup system
+  const [powerupSlots, setPowerupSlots] = useState<(Powerup | null)[]>([null, null, null]);
+  const [meterProgress, setMeterProgress] = useState(0);
+  const [daubCount, setDaubCount] = useState(0);
+  const [activePowerups, setActivePowerups] = useState<Set<string>>(new Set());
+  
+  // Multiplayer simulation
+  const [otherPlayers, setOtherPlayers] = useState([
+    { id: 1, name: 'Player2', score: 0, bingos: 0 },
+    { id: 2, name: 'Player3', score: 0, bingos: 0 },
+    { id: 3, name: 'Player4', score: 0, bingos: 0 },
+    { id: 4, name: 'Player5', score: 0, bingos: 0 }
+  ]);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const numberCallIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    startGame: () => {
-      setGameStarted(true);
-      setIsPlaying(true);
-      setIsPaused(false);
-      setTimeLeft(60);
-      setScore(0);
-      setCalledNumbers([]);
-      setCurrentNumber(null);
-      setBingoAchieved(false);
-      setGameMusicMode(true);
-      playGameStart();
-      
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            endGame();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-      // Start calling numbers
-      startCallingNumbers();
-    },
-    pauseGame: () => {
-      setIsPaused(true);
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (numberCallIntervalRef.current) clearInterval(numberCallIntervalRef.current);
-    },
-    resumeGame: () => {
-      setIsPaused(false);
-      if (gameStarted) {
-        timerRef.current = setInterval(() => {
-          setTimeLeft(prev => {
-            if (prev <= 1) {
-              endGame();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        startCallingNumbers();
-      }
-    },
-    endGame: () => {
-      endGame();
-    }
-  }));
-
-  const startCallingNumbers = () => {
-    numberCallIntervalRef.current = setInterval(() => {
-      if (calledNumbers.length >= 75) return; // All numbers called
-      
-      let newNumber: number;
-      do {
-        newNumber = Math.floor(Math.random() * 75) + 1;
-      } while (calledNumbers.includes(newNumber));
-      
-      setCurrentNumber(newNumber);
-      setCalledNumbers(prev => [...prev, newNumber]);
-      playNumberCall(newNumber);
-      
-      // Add score for each called number
-      setScore(prev => prev + 10);
-    }, 3000); // Call a new number every 3 seconds
-  };
-
-  const endGame = () => {
-    setIsPlaying(false);
-    setGameStarted(false);
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (numberCallIntervalRef.current) clearInterval(numberCallIntervalRef.current);
-    setGameMusicMode(false);
-  };
-
-  const handleBingo = () => {
-    if (!bingoAchieved) {
-      setBingoAchieved(true);
-      setScore(prev => prev + 500); // Bonus for BINGO
-      playBingo();
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getBingoLetter = (number: number) => {
-    if (number <= 15) return 'B';
-    if (number <= 30) return 'I';
-    if (number <= 45) return 'N';
-    if (number <= 60) return 'G';
-    return 'O';
-  };
-
-  const getBingoColor = (letter: string) => {
-    switch (letter) {
-      case 'B': return 'bg-red-500';
-      case 'I': return 'bg-orange-500';
-      case 'N': return 'bg-green-500';
-      case 'G': return 'bg-blue-500';
-      case 'O': return 'bg-purple-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  const powerupIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (numberCallIntervalRef.current) clearInterval(numberCallIntervalRef.current);
-      setGameMusicMode(false);
-    };
+    setGameMusicMode(true);
+    return () => setGameMusicMode(false);
   }, [setGameMusicMode]);
 
   // Auto-start the game when component mounts
@@ -155,7 +88,6 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
       // Small delay to ensure everything is loaded
       const timer = setTimeout(() => {
         console.log('Auto-starting game...');
-        // Start the game directly since we have access to the methods
         startGame();
       }, 1000);
       
@@ -167,13 +99,16 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     setGameStarted(true);
     setIsPlaying(true);
     setIsPaused(false);
-    setTimeLeft(60);
+    setTimeLeft(120); // 2 minutes
     setScore(0);
+    setBingos(0);
     setCalledNumbers([]);
     setCurrentNumber(null);
     setBingoAchieved(false);
-    setGameMusicMode(true);
-    playGameStart();
+    setMeterProgress(0);
+    setDaubCount(0);
+    setPowerupSlots([null, null, null]);
+    setActivePowerups(new Set());
     
     // Start timer
     timerRef.current = setInterval(() => {
@@ -188,95 +123,304 @@ const GameInterface = forwardRef<GameInterfaceRef, GameInterfaceProps>(({ gameMo
     
     // Start calling numbers
     startCallingNumbers();
+    
+    // Simulate other players
+    simulateOtherPlayers();
+  };
+
+  const simulateOtherPlayers = () => {
+    powerupIntervalRef.current = setInterval(() => {
+      setOtherPlayers(prev => prev.map(player => {
+        // Randomly increase scores and bingos
+        if (Math.random() < 0.3) {
+          return {
+            ...player,
+            score: player.score + Math.floor(Math.random() * 50) + 10,
+            bingos: Math.random() < 0.1 ? player.bingos + 1 : player.bingos
+          };
+        }
+        return player;
+      }));
+    }, 3000); // Update every 3 seconds
+  };
+
+  const startCallingNumbers = () => {
+    numberCallIntervalRef.current = setInterval(() => {
+      if (calledNumbers.length >= 75) return; // All numbers called
+      
+      let newNumber: number;
+      do {
+        newNumber = Math.floor(Math.random() * 75) + 1;
+      } while (calledNumbers.includes(newNumber));
+      
+      setCurrentNumber(newNumber);
+      setCalledNumbers(prev => [...prev, newNumber]);
+      playNumberCall(newNumber);
+      
+      // Clear current number after 2 seconds
+      setTimeout(() => setCurrentNumber(null), 2000);
+    }, 3000); // Call every 3 seconds
+  };
+
+  const handleBingo = () => {
+    if (bingoAchieved) return;
+    
+    setBingoAchieved(true);
+    setBingos(prev => prev + 1);
+    
+    // Calculate score with powerup multipliers
+    let bingoScore = 100;
+    if (activePowerups.has('triple')) {
+      bingoScore *= 3;
+      setActivePowerups(prev => {
+        const newSet = new Set(prev);
+        newSet.delete('triple');
+        return newSet;
+      });
+    }
+    
+    setScore(prev => prev + bingoScore);
+    playBingo();
+    
+    toast({
+      title: '🎉 BINGO!',
+      description: `You got a BINGO! +${bingoScore} points`,
+    });
+    
+    // Reset for next BINGO
+    setTimeout(() => setBingoAchieved(false), 2000);
+  };
+
+  const handleDaub = (number: number) => {
+    if (!calledNumbers.includes(number)) return;
+    
+    setDaubCount(prev => {
+      const newCount = prev + 1;
+      
+      // Update meter progress (1/3 for each daub)
+      const newProgress = Math.min((newCount % 3) / 3, 1);
+      setMeterProgress(newProgress);
+      
+      // Fill powerup slot every 3 daubs
+      if (newCount % 3 === 0 && newCount > 0) {
+        fillPowerupSlot();
+      }
+      
+      return newCount;
+    });
+  };
+
+  const fillPowerupSlot = () => {
+    const availableSlots = powerupSlots.findIndex(slot => slot === null);
+    if (availableSlots === -1) return; // All slots full
+    
+    const randomPowerup = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+    setPowerupSlots(prev => {
+      const newSlots = [...prev];
+      newSlots[availableSlots] = randomPowerup;
+      return newSlots;
+    });
+    
+    toast({
+      title: '⭐ Powerup Earned!',
+      description: `You got ${randomPowerup.name}!`,
+    });
+  };
+
+  const usePowerup = (slotIndex: number) => {
+    const powerup = powerupSlots[slotIndex];
+    if (!powerup) return;
+    
+    setActivePowerups(prev => new Set([...prev, powerup.id]));
+    setPowerupSlots(prev => {
+      const newSlots = [...prev];
+      newSlots[slotIndex] = null;
+      return newSlots;
+    });
+    
+    toast({
+      title: '🚀 Powerup Activated!',
+      description: powerup.effect,
+    });
+    
+    // Handle specific powerup effects
+    if (powerup.id === 'stopwatch') {
+      // Stop timer for 10 seconds
+      setIsPaused(true);
+      setTimeout(() => setIsPaused(false), 10000);
+    }
+  };
+
+  const endGame = () => {
+    setIsPlaying(false);
+    clearInterval(timerRef.current!);
+    clearInterval(numberCallIntervalRef.current!);
+    clearInterval(powerupIntervalRef.current!);
+    
+    // Determine winner
+    const allPlayers = [
+      { name: 'You', score, bingos },
+      ...otherPlayers
+    ];
+    
+    const winner = allPlayers.reduce((prev, current) => 
+      current.score > prev.score ? current : prev
+    );
+    
+    toast({
+      title: winner.name === 'You' ? '🏆 You Won!' : '🏆 Game Over',
+      description: `${winner.name} won with ${winner.score} points and ${winner.bingos} BINGOs!`,
+    });
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 z-50 overflow-y-auto">
-      {/* Top Section */}
-      <div className="flex justify-between items-center p-4 bg-black/20 backdrop-blur-sm">
-        {/* Timer */}
-        <div className="bg-blue-400 rounded-lg px-4 py-2 text-white font-bold text-lg">
-          {formatTime(timeLeft)}
-        </div>
-        
-        {/* Score */}
-        <div className="text-yellow-400 font-bold text-4xl">
-          {score}
-        </div>
-        
-        {/* Pause Button */}
-        <button
-          onClick={() => isPaused ? ref.current?.resumeGame() : ref.current?.pauseGame()}
-          className="bg-blue-400 rounded-lg p-2 text-white hover:bg-blue-500 transition-colors"
-        >
-          {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-2xl">
+          🎯 BINGO BATTLE
+        </h1>
+        <p className="text-white/80 text-lg">
+          Compete against {otherPlayers.length} other players for the prize!
+        </p>
       </div>
 
-      {/* Called Numbers Display */}
-      <div className="flex justify-center gap-4 p-4">
-        {calledNumbers.slice(-3).map((number, index) => (
-          <div
-            key={index}
-            className={`w-16 h-16 rounded-full ${getBingoColor(getBingoLetter(number))} flex flex-col items-center justify-center text-white font-bold shadow-lg`}
-          >
-            <div className="text-xs">{getBingoLetter(number)}</div>
-            <div className="text-lg">{number}</div>
+      {/* Game Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Timer */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <div className="flex items-center justify-center gap-2 text-white">
+            <Timer className="w-6 h-6 text-red-400" />
+            <span className="text-2xl font-bold">{formatTime(timeLeft)}</span>
           </div>
-        ))}
+          <p className="text-white/60 text-center text-sm mt-1">Time Remaining</p>
+        </div>
+
+        {/* Score */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <div className="text-center text-white">
+            <div className="text-2xl font-bold text-yellow-400">{score}</div>
+            <p className="text-white/60 text-sm">Your Score</p>
+          </div>
+        </div>
+
+        {/* BINGOs */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <div className="text-center text-white">
+            <div className="text-2xl font-bold text-green-400">{bingos}</div>
+            <p className="text-white/60 text-sm">BINGOs</p>
+          </div>
+        </div>
       </div>
+
+      {/* Current Number Display */}
+      {currentNumber && (
+        <div className="text-center mb-6">
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 inline-block">
+            <div className="text-6xl font-bold text-white drop-shadow-2xl">
+              {currentNumber}
+            </div>
+            <p className="text-white/90 text-lg mt-2">Number Called!</p>
+          </div>
+        </div>
+      )}
 
       {/* BINGO Card */}
-      <div className="flex justify-center p-4">
+      <div className="flex justify-center mb-6">
         <BingoCard 
           calledNumbers={calledNumbers}
           onBingo={handleBingo}
           bingoAchieved={bingoAchieved}
+          onDaub={handleDaub}
         />
       </div>
 
-      {/* Bottom Section */}
-      <div className="flex justify-center items-center gap-4 p-4">
-        {/* Power-up Slots */}
-        <div className="flex gap-2">
-          {[1, 2, 3].map((slot) => (
-            <div key={slot} className="w-12 h-12 bg-blue-800 rounded-full border-2 border-blue-600"></div>
+      {/* Powerup System */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+        <h3 className="text-white font-bold text-lg mb-4 text-center">⭐ Powerup System</h3>
+        
+        {/* Powerup Slots */}
+        <div className="flex justify-center gap-4 mb-4">
+          {powerupSlots.map((powerup, index) => (
+            <div
+              key={index}
+              onClick={() => powerup && usePowerup(index)}
+              className={`w-20 h-20 rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                powerup 
+                  ? 'border-white/40 bg-white/20 cursor-pointer hover:scale-110' 
+                  : 'border-white/20 bg-white/5'
+              }`}
+            >
+              {powerup ? (
+                <div className="text-center">
+                  {powerup.icon}
+                  <div className="text-white text-xs mt-1">{powerup.description}</div>
+                </div>
+              ) : (
+                <div className="text-white/40 text-2xl">?</div>
+              )}
+            </div>
           ))}
         </div>
-        
-        {/* Progress Bar */}
-        <div className="w-32 h-3 bg-blue-800 rounded-full border border-blue-600">
-          <div 
-            className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transition-all duration-300"
-            style={{ width: `${(calledNumbers.length / 75) * 100}%` }}
-          ></div>
+
+        {/* Meter Bar */}
+        <div className="text-center">
+          <div className="text-white/80 text-sm mb-2">Powerup Meter</div>
+          <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-gradient-to-r from-blue-400 to-purple-500 h-4 transition-all duration-300 ease-out"
+              style={{ width: `${meterProgress * 100}%` }}
+            ></div>
+          </div>
+          <div className="text-white/60 text-xs mt-1">
+            {daubCount % 3}/3 daubs to next powerup
+          </div>
         </div>
-        
-        {/* BINGO Button */}
+      </div>
+
+      {/* BINGO Button */}
+      <div className="text-center mb-6">
         <button
           onClick={handleBingo}
-          disabled={bingoAchieved}
-          className={`px-8 py-4 rounded-lg font-bold text-white text-xl shadow-lg transition-all duration-200 ${
-            bingoAchieved 
-              ? 'bg-green-500 cursor-not-allowed' 
-              : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 hover:scale-105'
+          disabled={!bingoAchieved}
+          className={`px-12 py-4 rounded-2xl font-bold text-2xl transition-all duration-200 ${
+            bingoAchieved
+              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:scale-105'
+              : 'bg-gray-500 text-gray-300 cursor-not-allowed'
           }`}
         >
-          {bingoAchieved ? 'BINGO!' : 'BINGO'}
+          🎯 BINGO!
         </button>
       </div>
 
-      {/* Exit Button */}
-      <button
-        onClick={onExit}
-        className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
-      >
-        <X className="w-6 h-6" />
-      </button>
+      {/* Other Players */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <h3 className="text-white font-bold text-lg mb-4 text-center flex items-center justify-center gap-2">
+          <Users className="w-5 h-5" />
+          Other Players
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {otherPlayers.map(player => (
+            <div key={player.id} className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="flex justify-between items-center text-white">
+                <span className="font-medium">{player.name}</span>
+                <div className="text-right">
+                  <div className="text-yellow-400 font-bold">{player.score}</div>
+                  <div className="text-xs text-white/60">{player.bingos} BINGOs</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
-});
-
-GameInterface.displayName = 'GameInterface';
+};
 
 export default GameInterface;
