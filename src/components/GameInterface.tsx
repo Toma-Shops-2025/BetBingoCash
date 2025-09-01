@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../contexts/AudioContext';
 import { useToast } from '../hooks/use-toast';
 import BingoCard from './BingoCard';
-import { Timer, Star, Zap, Clock, Star as DoubleStar, Trophy, Users } from 'lucide-react';
+import { Timer, Star, Zap, Clock, Star as DoubleStar, Trophy, Users, DollarSign, Medal, Award } from 'lucide-react';
 
 interface Powerup {
   id: string;
@@ -10,6 +10,33 @@ interface Powerup {
   icon: React.ReactNode;
   description: string;
   effect: string;
+}
+
+interface Player {
+  id: number;
+  name: string;
+  score: number;
+  bingos: number;
+  isCurrentPlayer: boolean;
+  accountBalance?: number;
+}
+
+interface GameResult {
+  playerId: number;
+  playerName: string;
+  finalScore: number;
+  bingos: number;
+  position: number;
+  prizeAmount: number;
+  powerupsUsed: number;
+  totalDaubs: number;
+}
+
+interface PrizeStructure {
+  firstPlace: number;
+  secondPlace: number;
+  thirdPlace: number;
+  totalPrize: number;
 }
 
 const POWERUPS: Powerup[] = [
@@ -57,20 +84,35 @@ const GameInterface: React.FC = () => {
   const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
   const [currentNumber, setCurrentNumber] = useState<number | null>(null);
   const [bingoAchieved, setBingoAchieved] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   
   // Powerup system
   const [powerupSlots, setPowerupSlots] = useState<(Powerup | null)[]>([null, null, null]);
   const [meterProgress, setMeterProgress] = useState(0);
   const [daubCount, setDaubCount] = useState(0);
   const [activePowerups, setActivePowerups] = useState<Set<string>>(new Set());
+  const [powerupsUsed, setPowerupsUsed] = useState(0);
   
   // Multiplayer simulation
   const [otherPlayers, setOtherPlayers] = useState([
-    { id: 1, name: 'Player2', score: 0, bingos: 0 },
-    { id: 2, name: 'Player3', score: 0, bingos: 0 },
-    { id: 3, name: 'Player4', score: 0, bingos: 0 },
-    { id: 4, name: 'Player5', score: 0, bingos: 0 }
+    { id: 1, name: 'Player2', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 150.00 },
+    { id: 2, name: 'Player3', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 89.50 },
+    { id: 3, name: 'Player4', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 234.75 },
+    { id: 4, name: 'Player5', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 67.25 }
   ]);
+  
+  // Game results and prizes
+  const [gameResults, setGameResults] = useState<GameResult[]>([]);
+  const [prizeStructure, setPrizeStructure] = useState<PrizeStructure>({
+    firstPlace: 0,
+    secondPlace: 0,
+    thirdPlace: 0,
+    totalPrize: 0
+  });
+  
+  // Game configuration
+  const [entryFee] = useState(5.00); // $5 entry fee
+  const [prizePool] = useState(25.00); // $25 total prize pool
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const numberCallIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -109,6 +151,9 @@ const GameInterface: React.FC = () => {
     setDaubCount(0);
     setPowerupSlots([null, null, null]);
     setActivePowerups(new Set());
+    setPowerupsUsed(0);
+    setGameEnded(false);
+    setGameResults([]);
     
     // Start timer
     timerRef.current = setInterval(() => {
@@ -133,10 +178,14 @@ const GameInterface: React.FC = () => {
       setOtherPlayers(prev => prev.map(player => {
         // Randomly increase scores and bingos
         if (Math.random() < 0.3) {
+          const scoreIncrease = Math.floor(Math.random() * 50) + 10;
+          const newScore = player.score + scoreIncrease;
+          const newBingos = Math.random() < 0.1 ? player.bingos + 1 : player.bingos;
+          
           return {
             ...player,
-            score: player.score + Math.floor(Math.random() * 50) + 10,
-            bingos: Math.random() < 0.1 ? player.bingos + 1 : player.bingos
+            score: newScore,
+            bingos: newBingos
           };
         }
         return player;
@@ -238,6 +287,8 @@ const GameInterface: React.FC = () => {
       return newSlots;
     });
     
+    setPowerupsUsed(prev => prev + 1);
+    
     toast({
       title: '🚀 Powerup Activated!',
       description: powerup.effect,
@@ -251,25 +302,81 @@ const GameInterface: React.FC = () => {
     }
   };
 
+  const calculatePrizeDistribution = (totalPrize: number): PrizeStructure => {
+    if (totalPrize >= 50.00) {
+      // High prize games: 1st, 2nd, 3rd place
+      return {
+        firstPlace: totalPrize * 0.60, // 60%
+        secondPlace: totalPrize * 0.30, // 30%
+        thirdPlace: totalPrize * 0.10,  // 10%
+        totalPrize
+      };
+    } else {
+      // Lower prize games: winner takes all
+      return {
+        firstPlace: totalPrize,
+        secondPlace: 0,
+        thirdPlace: 0,
+        totalPrize
+      };
+    }
+  };
+
   const endGame = () => {
     setIsPlaying(false);
+    setGameEnded(true);
     clearInterval(timerRef.current!);
     clearInterval(numberCallIntervalRef.current!);
     clearInterval(powerupIntervalRef.current!);
     
-    // Determine winner
-    const allPlayers = [
-      { name: 'You', score, bingos },
+    // Create final player list with current player
+    const allPlayers: Player[] = [
+      { id: 0, name: 'You', score, bingos, isCurrentPlayer: true, accountBalance: 100.00 },
       ...otherPlayers
     ];
     
-    const winner = allPlayers.reduce((prev, current) => 
-      current.score > prev.score ? current : prev
-    );
+    // Sort players by score (highest first)
+    const sortedPlayers = [...allPlayers].sort((a, b) => b.score - a.score);
     
+    // Calculate prize distribution
+    const prizes = calculatePrizeDistribution(prizePool);
+    setPrizeStructure(prizes);
+    
+    // Create game results
+    const results: GameResult[] = sortedPlayers.map((player, index) => {
+      let position = 0;
+      let prizeAmount = 0;
+      
+      if (index === 0) {
+        position = 1;
+        prizeAmount = prizes.firstPlace;
+      } else if (index === 1 && prizes.secondPlace > 0) {
+        position = 2;
+        prizeAmount = prizes.secondPlace;
+      } else if (index === 2 && prizes.thirdPlace > 0) {
+        position = 3;
+        prizeAmount = prizes.thirdPlace;
+      }
+      
+      return {
+        playerId: player.id,
+        playerName: player.name,
+        finalScore: player.score,
+        bingos: player.bingos,
+        position,
+        prizeAmount,
+        powerupsUsed: player.isCurrentPlayer ? powerupsUsed : Math.floor(Math.random() * 3),
+        totalDaubs: player.isCurrentPlayer ? daubCount : Math.floor(Math.random() * 20) + 10
+      };
+    });
+    
+    setGameResults(results);
+    
+    // Show winner announcement
+    const winner = results[0];
     toast({
-      title: winner.name === 'You' ? '🏆 You Won!' : '🏆 Game Over',
-      description: `${winner.name} won with ${winner.score} points and ${winner.bingos} BINGOs!`,
+      title: winner.playerName === 'You' ? '🏆 You Won!' : '🏆 Game Over',
+      description: `${winner.playerName} won with ${winner.finalScore} points and ${winner.bingos} BINGOs!`,
     });
   };
 
@@ -279,6 +386,134 @@ const GameInterface: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  // Game Results Display
+  if (gameEnded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-2xl">
+            🏆 Game Results
+          </h1>
+          <p className="text-white/80 text-lg">
+            Final standings and prize distribution
+          </p>
+        </div>
+
+        {/* Prize Pool Info */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+          <div className="text-center">
+            <h3 className="text-white font-bold text-2xl mb-2">💰 Prize Pool</h3>
+            <div className="text-4xl font-bold text-yellow-400 mb-2">
+              {formatCurrency(prizeStructure.totalPrize)}
+            </div>
+            <p className="text-white/60">
+              Entry Fee: {formatCurrency(entryFee)} | Players: {gameResults.length}
+            </p>
+          </div>
+        </div>
+
+        {/* Final Standings */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+          <h3 className="text-white font-bold text-xl mb-4 text-center">🏅 Final Standings</h3>
+          
+          {gameResults.map((result, index) => (
+            <div 
+              key={result.playerId}
+              className={`flex items-center justify-between p-4 rounded-xl mb-3 border-2 transition-all duration-200 ${
+                index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border-yellow-400' :
+                index === 1 ? 'bg-gradient-to-r from-gray-400/20 to-gray-500/20 border-gray-300' :
+                index === 2 ? 'bg-gradient-to-r from-orange-600/20 to-orange-700/20 border-orange-500' :
+                'bg-white/5 border-white/10'
+              }`}
+            >
+              {/* Position */}
+              <div className="flex items-center gap-3">
+                {index === 0 && <Medal className="w-8 h-8 text-yellow-400" />}
+                {index === 1 && <Medal className="w-8 h-8 text-gray-400" />}
+                {index === 2 && <Medal className="w-8 h-8 text-orange-600" />}
+                {index > 2 && <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-bold">
+                  {index + 1}
+                </span>}
+                
+                <div>
+                  <div className="text-white font-bold text-lg">{result.playerName}</div>
+                  <div className="text-white/60 text-sm">
+                    {result.bingos} BINGOs • {result.powerupsUsed} Powerups • {result.totalDaubs} Daubs
+                  </div>
+                </div>
+              </div>
+              
+              {/* Score and Prize */}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-white">{result.finalScore}</div>
+                <div className="text-sm text-white/60">points</div>
+                {result.prizeAmount > 0 && (
+                  <div className="text-lg font-bold text-green-400 mt-1">
+                    +{formatCurrency(result.prizeAmount)}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Prize Distribution */}
+        {prizeStructure.secondPlace > 0 && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+            <h3 className="text-white font-bold text-xl mb-4 text-center">🏆 Prize Distribution</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🥇</div>
+                <div className="text-white font-bold">1st Place</div>
+                <div className="text-yellow-400 font-bold text-xl">{formatCurrency(prizeStructure.firstPlace)}</div>
+                <div className="text-white/60 text-sm">60% of pool</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl mb-2">🥈</div>
+                <div className="text-white font-bold">2nd Place</div>
+                <div className="text-gray-400 font-bold text-xl">{formatCurrency(prizeStructure.secondPlace)}</div>
+                <div className="text-white/60 text-sm">30% of pool</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl mb-2">🥉</div>
+                <div className="text-white font-bold">3rd Place</div>
+                <div className="text-orange-600 font-bold text-xl">{formatCurrency(prizeStructure.thirdPlace)}</div>
+                <div className="text-white/60 text-sm">10% of pool</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Account Integration */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+          <h3 className="text-white font-bold text-xl mb-4 text-center">💳 Account Update</h3>
+          <div className="text-center text-white/80">
+            <p className="mb-2">Prizes will be automatically credited to your account within 24 hours.</p>
+            <p className="text-sm">Please contact support if you have any questions about your winnings.</p>
+          </div>
+        </div>
+
+        {/* Play Again Button */}
+        <div className="text-center">
+          <button
+            onClick={() => window.location.reload()}
+            className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all duration-200"
+          >
+            🎮 Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4">
       {/* Header */}
@@ -287,7 +522,7 @@ const GameInterface: React.FC = () => {
           🎯 BINGO BATTLE
         </h1>
         <p className="text-white/80 text-lg">
-          Compete against {otherPlayers.length} other players for the prize!
+          Compete against {otherPlayers.length} other players for {formatCurrency(prizePool)}!
         </p>
       </div>
 
