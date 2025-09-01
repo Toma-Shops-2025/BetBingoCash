@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   Menu, 
   X, 
@@ -22,16 +23,17 @@ import {
 } from 'lucide-react';
 
 interface AppLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
     { name: '🏠 Home', path: '/', icon: Home, color: 'from-blue-500 to-blue-700' },
-    { name: '🎯 BINGO Rooms', path: '/bingo', icon: Target, color: 'from-green-500 to-green-700' },
+    { name: '🎯 BINGO Rooms', path: '/classic-bingo', icon: Target, color: 'from-green-500 to-green-700' },
     { name: '🎰 Casino Hub', path: '/casino', icon: Dice6, color: 'from-purple-500 to-purple-700' },
     { name: '🏈 Sports Betting', path: '/sports', icon: Zap, color: 'from-orange-500 to-orange-700' },
     { name: '🏆 Tournaments', path: '/tournaments', icon: Trophy, color: 'from-yellow-500 to-yellow-700' },
@@ -43,12 +45,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   ];
 
   const quickAccessGames = [
-    { name: 'Classic BINGO', icon: '🎯', color: 'bg-green-500' },
-    { name: 'Speed BINGO', icon: '⚡', color: 'bg-blue-500' },
-    { name: 'Progressive BINGO', icon: '💰', color: 'bg-yellow-500' },
-    { name: 'Fortune Slots', icon: '🎰', color: 'bg-purple-500' },
-    { name: 'Live Blackjack', icon: '🃏', color: 'bg-red-500' },
-    { name: 'Sports Betting', icon: '🏈', color: 'bg-orange-500' }
+    { name: 'Classic BINGO', icon: '🎯', color: 'bg-green-500', path: '/classic-bingo' },
+    { name: 'Speed BINGO', icon: '⚡', color: 'bg-blue-500', path: '/speed-bingo' },
+    { name: 'Progressive BINGO', icon: '💰', color: 'bg-yellow-500', path: '/progressive-bingo' },
+    { name: 'Fortune Slots', icon: '🎰', color: 'bg-purple-500', path: '/fortune-slots' },
+    { name: 'Live Blackjack', icon: '🃏', color: 'bg-red-500', path: '/live-blackjack' },
+    { name: 'Sports Betting', icon: '🏈', color: 'bg-orange-500', path: '/sports-betting' }
   ];
 
   return (
@@ -253,6 +255,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               {navigationItems.slice(0, 6).map((item) => (
                 <button
                   key={item.name}
+                  onClick={() => navigate(item.path)}
                   className={`px-4 py-2 rounded-lg text-white/80 hover:text-white transition-all duration-200 hover:bg-white/10 flex items-center gap-2`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -302,6 +305,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             {navigationItems.map((item) => (
               <button
                 key={item.name}
+                onClick={() => {
+                  navigate(item.path);
+                  setIsMenuOpen(false);
+                }}
                 className={`w-full text-left px-4 py-3 rounded-lg text-white/80 hover:text-white transition-all duration-200 hover:bg-white/10 flex items-center gap-3`}
               >
                 <item.icon className="w-5 h-5" />
@@ -319,11 +326,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <p className="text-white/80 text-lg">Choose your game and start winning big!</p>
         </div>
 
-        {/* Quick Access Game Grid */}
+        {/* Quick Access Game Grid - Functional */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {quickAccessGames.map((game) => (
             <button
               key={game.name}
+              onClick={() => navigate(game.path)}
               className={`${game.color} hover:scale-105 transition-all duration-200 rounded-2xl p-6 text-white text-center shadow-lg hover:shadow-2xl casino-card`}
             >
               <div className="text-3xl mb-2">{game.icon}</div>
