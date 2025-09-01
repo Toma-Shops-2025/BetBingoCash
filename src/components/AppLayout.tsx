@@ -160,6 +160,57 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="casino-sparkle" style={{ bottom: '25%', right: '25%', animationDelay: '1.5s' }}></div>
           <div className="casino-sparkle" style={{ top: '50%', left: '50%', animationDelay: '2s' }}></div>
           <div className="casino-sparkle" style={{ top: '70%', right: '40%', animationDelay: '2.5s' }}></div>
+
+          {/* Additional Casino Elements */}
+          {/* Casino Tables */}
+          <div className="absolute top-1/2 left-1/4 w-32 h-24 opacity-6 animate-float">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-felt rounded-xl"></div>
+              <div className="absolute inset-2 bg-green-600/80 rounded-lg flex items-center justify-center text-lg">🃏</div>
+            </div>
+          </div>
+
+          {/* Casino Bar */}
+          <div className="absolute bottom-40 left-1/3 w-28 h-20 opacity-6 animate-bounce-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-amber-800 to-amber-900 rounded-lg"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-amber-700 to-amber-800 rounded-lg flex items-center justify-center text-lg">🍸</div>
+            </div>
+          </div>
+
+          {/* Casino Security Camera */}
+          <div className="absolute top-32 right-1/4 w-16 h-16 opacity-8 animate-pulse">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-gray-700 to-gray-800 rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-gray-600 to-gray-700 rounded-full flex items-center justify-center text-sm">📹</div>
+            </div>
+          </div>
+
+          {/* Casino ATM */}
+          <div className="absolute bottom-60 right-1/4 w-20 h-16 opacity-6 animate-bounce-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-blue-700 to-blue-800 rounded-lg"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-sm">🏧</div>
+            </div>
+          </div>
+
+          {/* Casino VIP Lounge Entrance - Enhanced */}
+          <div className="absolute top-1/3 right-1/3 w-24 h-20 opacity-7 animate-glow casino-pulse-glow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-lg casino-lights"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-yellow-300 to-yellow-500 rounded-lg flex items-center justify-center text-lg casino-bling">👑</div>
+            </div>
+          </div>
+
+          {/* Casino Slot Machine Row - Enhanced */}
+          <div className="absolute bottom-1/4 left-1/2 transform -translate-x-1/2 w-48 h-16 opacity-5">
+            <div className="w-full h-full relative flex space-x-2">
+              <div className="w-12 h-16 casino-slot rounded-lg flex items-center justify-center text-lg casino-lights">🎰</div>
+              <div className="w-12 h-16 casino-slot rounded-lg flex items-center justify-center text-lg casino-lights" style={{ animationDelay: '0.5s' }}>🎰</div>
+              <div className="w-12 h-16 casino-slot rounded-lg flex items-center justify-center text-lg casino-lights" style={{ animationDelay: '1s' }}>🎰</div>
+              <div className="w-12 h-16 casino-slot rounded-lg flex items-center justify-center text-lg casino-lights" style={{ animationDelay: '1.5s' }}>🎰</div>
+            </div>
+          </div>
         </div>
 
         {/* Subtle Grid Pattern - Casino Floor */}
@@ -333,6 +384,207 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <div className="text-white font-semibold">Craps</div>
                 <div className="text-white/70 text-sm">High Stakes</div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino VIP Lounge */}
+        <div className="bg-gradient-to-r from-yellow-900/30 via-amber-800/30 to-yellow-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-yellow-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 via-amber-400/10 to-yellow-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-yellow-300 mb-4 casino-neon">👑 VIP Casino Lounge</h3>
+            <p className="text-yellow-200/90 text-lg mb-6">Exclusive high-roller experience with premium amenities</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-yellow-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-yellow-500/30">
+                <div className="text-4xl mb-4">💎</div>
+                <h4 className="text-yellow-200 font-bold text-xl mb-2">Diamond VIP</h4>
+                <p className="text-yellow-200/70 mb-3">$100K+ monthly play</p>
+                <ul className="text-yellow-200/80 text-sm space-y-1">
+                  <li>• Personal Account Manager</li>
+                  <li>• 100% Welcome Bonus</li>
+                  <li>• Exclusive Tournaments</li>
+                  <li>• Private Gaming Rooms</li>
+                </ul>
+              </div>
+              
+              <div className="bg-yellow-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-yellow-500/30">
+                <div className="text-4xl mb-4">🏆</div>
+                <h4 className="text-yellow-200 font-bold text-xl mb-2">Platinum VIP</h4>
+                <p className="text-yellow-200/70 mb-3">$50K+ monthly play</p>
+                <ul className="text-yellow-200/80 text-sm space-y-1">
+                  <li>• Priority Support</li>
+                  <li>• 75% Welcome Bonus</li>
+                  <li>• VIP Tournaments</li>
+                  <li>• Cashback Rewards</li>
+                </ul>
+              </div>
+              
+              <div className="bg-yellow-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-yellow-500/30">
+                <div className="text-4xl mb-4">⭐</div>
+                <h4 className="text-yellow-200 font-bold text-xl mb-2">Gold VIP</h4>
+                <p className="text-yellow-200/70 mb-3">$25K+ monthly play</p>
+                <ul className="text-yellow-200/80 text-sm space-y-1">
+                  <li>• Dedicated Support</li>
+                  <li>• 50% Welcome Bonus</li>
+                  <li>• Special Events</li>
+                  <li>• Loyalty Points</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Promotions & Jackpots */}
+        <div className="bg-gradient-to-r from-purple-900/30 via-pink-800/30 to-purple-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-purple-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 via-pink-400/10 to-purple-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-purple-300 mb-4 casino-neon">🎁 Promotions & Jackpots</h3>
+            <p className="text-purple-200/90 text-lg mb-6">Massive jackpots and exclusive promotions waiting for you</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-purple-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-purple-500/30">
+                <div className="text-4xl mb-4">💰</div>
+                <h4 className="text-purple-200 font-bold text-xl mb-2">Progressive Jackpots</h4>
+                <div className="text-3xl font-bold text-yellow-400 mb-3 casino-neon">$2,847,392</div>
+                <p className="text-purple-200/70 mb-3">Current Mega Jackpot</p>
+                <div className="space-y-2 text-purple-200/80 text-sm">
+                  <div className="flex justify-between">
+                    <span>Mega Fortune:</span>
+                    <span className="text-yellow-400">$847,392</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Hall of Gods:</span>
+                    <span className="text-yellow-400">$1,234,567</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Mega Moolah:</span>
+                    <span className="text-yellow-400">$765,433</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-purple-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-purple-500/30">
+                <div className="text-4xl mb-4">🎯</div>
+                <h4 className="text-purple-200 font-bold text-xl mb-2">Current Promotions</h4>
+                <div className="space-y-4 text-purple-200/80">
+                  <div className="bg-purple-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🎉 Welcome Package</div>
+                    <div className="text-sm">200% up to $2000 + 200 Free Spins</div>
+                  </div>
+                  <div className="bg-purple-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🔥 Hot Streak</div>
+                    <div className="text-sm">Win 3 games in a row, get 50% bonus</div>
+                  </div>
+                  <div className="bg-purple-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">💎 Crypto Bonus</div>
+                    <div className="text-sm">25% extra on all crypto deposits</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Statistics & Leaderboard */}
+        <div className="bg-gradient-to-r from-blue-900/30 via-cyan-800/30 to-blue-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-blue-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-cyan-400/10 to-blue-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-blue-300 mb-4 casino-neon">📊 Casino Statistics & Winners</h3>
+            <p className="text-blue-200/90 text-lg mb-6">Real-time casino statistics and recent big winners</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-blue-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-blue-500/30">
+                <div className="text-4xl mb-4">🎰</div>
+                <h4 className="text-blue-200 font-bold text-xl mb-2">Active Players</h4>
+                <div className="text-3xl font-bold text-cyan-400 mb-2 casino-neon">1,847</div>
+                <p className="text-blue-200/70 text-sm">Currently Online</p>
+              </div>
+              
+              <div className="bg-blue-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-blue-500/30">
+                <div className="text-4xl mb-4">🏆</div>
+                <h4 className="text-blue-200 font-bold text-xl mb-2">Total Payouts</h4>
+                <div className="text-3xl font-bold text-cyan-400 mb-2 casino-neon">$12.4M</div>
+                <p className="text-blue-200/70 text-sm">This Month</p>
+              </div>
+              
+              <div className="bg-blue-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-blue-500/30">
+                <div className="text-4xl mb-4">🎲</div>
+                <h4 className="text-blue-200 font-bold text-xl mb-2">Games Played</h4>
+                <div className="text-3xl font-bold text-cyan-400 mb-2 casino-neon">847K</div>
+                <p className="text-blue-200/70 text-sm">Today</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-900/40 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
+              <h4 className="text-blue-200 font-bold text-xl mb-4">🏅 Recent Big Winners</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between bg-blue-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <div>
+                      <div className="text-blue-200 font-semibold">LuckyPlayer_847</div>
+                      <div className="text-blue-200/70 text-sm">Won $847,392 on Mega Fortune</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$847,392</div>
+                </div>
+                
+                <div className="flex items-center justify-between bg-blue-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <div>
+                      <div className="text-blue-200 font-semibold">HighRoller_2024</div>
+                      <div className="text-blue-200/70 text-sm">Won $234,567 on Hall of Gods</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$234,567</div>
+                </div>
+                
+                <div className="flex items-center justify-between bg-blue-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                    <div>
+                      <div className="text-blue-200 font-semibold">SlotMaster_99</div>
+                      <div className="text-blue-200/70 text-sm">Won $165,433 on Mega Moolah</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$165,433</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Grand Entrance */}
+        <div className="bg-gradient-to-r from-red-900/30 via-pink-800/30 to-red-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-red-500/30 casino-smoke">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-400/10 via-pink-400/10 to-red-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-4xl font-bold text-red-300 mb-4 casino-neon casino-bling">🎰 WELCOME TO BETBINGO CASH 🎰</h3>
+            <p className="text-red-200/90 text-lg mb-6">The Ultimate Casino Gaming Experience</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-red-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-red-500/30 casino-3d-card">
+                <div className="text-5xl mb-4">🎊</div>
+                <h4 className="text-red-200 font-bold text-xl mb-2 casino-neon">Grand Opening</h4>
+                <p className="text-red-200/70 mb-3">Celebrating our launch with massive bonuses</p>
+                <div className="text-2xl font-bold text-yellow-400 casino-neon">24/7 Gaming</div>
+                <p className="text-red-200/60 text-sm">Never stop winning</p>
+              </div>
+              
+              <div className="bg-red-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-red-500/30 casino-3d-card">
+                <div className="text-5xl mb-4">🚀</div>
+                <h4 className="text-red-200 font-bold text-xl mb-2 casino-neon">Instant Play</h4>
+                <p className="text-red-200/70 mb-3">No downloads, play instantly</p>
+                <div className="text-2xl font-bold text-yellow-400 casino-neon">Mobile Ready</div>
+                <p className="text-red-200/60 text-sm">Play anywhere, anytime</p>
+              </div>
+            </div>
+            
+            <div className="mt-8">
+              <button className="casino-button px-8 py-4 rounded-xl text-xl font-bold casino-neon-border">
+                🎯 START PLAYING NOW
+              </button>
             </div>
           </div>
         </div>
