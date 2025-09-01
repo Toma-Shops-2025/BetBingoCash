@@ -1,520 +1,283 @@
 import React, { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
-import { Menu, X, Gamepad2, Trophy, Gift, Coins, BarChart3, ChevronUp, Zap, Star, Target } from 'lucide-react';
-import GameModes from './GameModes';
-import TournamentLobby from './TournamentLobby';
-import BonusSystem from './BonusSystem';
-import MiniGames from './MiniGames';
-import AuthModal from './AuthModal';
-import PaymentModal from './PaymentModal';
-import UserProfileModal from './UserProfileModal';
-import GemShopModal from './GemShopModal';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  Menu, 
+  X, 
+  Home, 
+  Gamepad2, 
+  Trophy, 
+  Crown, 
+  DollarSign, 
+  Users, 
+  Settings,
+  LogOut,
+  Wallet,
+  Star,
+  Target,
+  TrendingUp,
+  Award,
+  Casino,
+  Football,
+  Basketball,
+  Zap
+} from 'lucide-react';
 
-const AppLayout: React.FC = () => {
-  const { user, balance, gems, isAuthenticated, logout } = useAppContext();
-  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [gemShopModalOpen, setGemShopModalOpen] = useState(false);
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
 
-  const handleLogout = async () => {
-    await logout();
-  };
+const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const { user, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setShowHamburgerMenu(false);
-    }
-  };
+  const navigationItems = [
+    { name: '🏠 Home', path: '/', icon: Home, color: 'from-blue-500 to-blue-700' },
+    { name: '🎯 BINGO Rooms', path: '/bingo', icon: Target, color: 'from-green-500 to-green-700' },
+    { name: '🎰 Casino Hub', path: '/casino', icon: Casino, color: 'from-purple-500 to-purple-700' },
+    { name: '🏈 Sports Betting', path: '/sports', icon: Football, color: 'from-orange-500 to-orange-700' },
+    { name: '🏆 Tournaments', path: '/tournaments', icon: Trophy, color: 'from-yellow-500 to-yellow-700' },
+    { name: '👑 VIP Membership', path: '/vip', icon: Crown, color: 'from-yellow-400 to-orange-500' },
+    { name: '⭐ Achievements', path: '/achievements', icon: Star, color: 'from-indigo-500 to-indigo-700' },
+    { name: '💎 Crypto Payments', path: '/crypto', icon: DollarSign, color: 'from-emerald-500 to-emerald-700' },
+    { name: '👤 User Dashboard', path: '/dashboard', icon: Users, color: 'from-blue-600 to-blue-800' },
+    { name: '⚙️ Settings', path: '/settings', icon: Settings, color: 'from-gray-500 to-gray-700' }
+  ];
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setShowHamburgerMenu(false);
-  };
+  const quickAccessGames = [
+    { name: 'Classic BINGO', icon: '🎯', color: 'bg-green-500' },
+    { name: 'Speed BINGO', icon: '⚡', color: 'bg-blue-500' },
+    { name: 'Progressive BINGO', icon: '💰', color: 'bg-yellow-500' },
+    { name: 'Fortune Slots', icon: '🎰', color: 'bg-purple-500' },
+    { name: 'Live Blackjack', icon: '🃏', color: 'bg-red-500' },
+    { name: 'Sports Betting', icon: '🏈', color: 'bg-orange-500' }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Professional Casino Background */}
       <div className="fixed inset-0 z-0">
-        {/* Floating Bubbles - Spread across entire screen with much better spacing */}
-        <div className="absolute top-8 right-8 w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
-        <div className="absolute top-16 left-16 w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
-        <div className="absolute top-32 right-1/3 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
-        <div className="absolute top-48 left-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
-        <div className="absolute top-64 right-1/6 w-18 h-18 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1.5s', animationDuration: '4.5s' }}></div>
-        <div className="absolute top-80 left-1/6 w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '2.5s', animationDuration: '3.8s' }}></div>
-        <div className="absolute top-96 right-2/3 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '0.8s', animationDuration: '4.2s' }}></div>
-        <div className="absolute top-40 left-2/3 w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-float" style={{ animationDelay: '1.8s', animationDuration: '5.2s' }}></div>
+        {/* Main Casino Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"></div>
         
-        {/* Floating Stars - Distributed across screen with much better spacing */}
-        <div className="absolute top-24 left-1/4 text-yellow-300 text-2xl animate-pulse" style={{ animationDelay: '0s' }}>⭐</div>
-        <div className="absolute top-56 right-1/3 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
-        <div className="absolute top-88 left-1/2 text-purple-300 text-3xl animate-pulse" style={{ animationDelay: '2s' }}>🌟</div>
-        <div className="absolute top-40 right-1/2 text-green-300 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>💫</div>
-        <div className="absolute top-72 right-1/8 text-pink-300 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>⭐</div>
-        <div className="absolute top-32 left-3/4 text-cyan-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>✨</div>
-        
-        {/* Floating Coins - Spread out with much better distribution */}
-        <div className="absolute top-48 right-1/5 text-yellow-400 text-2xl animate-float" style={{ animationDelay: '0.5s', animationDuration: '4s' }}>💰</div>
-        <div className="absolute top-72 left-1/5 text-green-400 text-xl animate-float" style={{ animationDelay: '1.5s', animationDuration: '3s' }}>💎</div>
-        <div className="absolute top-56 right-3/4 text-blue-400 text-lg animate-float" style={{ animationDelay: '2.5s', animationDuration: '5s' }}>💎</div>
-        <div className="absolute top-64 left-3/4 text-purple-400 text-lg animate-float" style={{ animationDelay: '1.2s', animationDuration: '4.8s' }}>💰</div>
-        
-        {/* Moving Clouds - Different positions */}
-        <div className="absolute top-16 right-0 w-32 h-16 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '6s' }}></div>
-        <div className="absolute top-32 left-0 w-24 h-12 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '8s', animationDelay: '2s' }}></div>
-        <div className="absolute top-64 right-1/2 w-20 h-10 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }}></div>
-        <div className="absolute top-80 left-1/2 w-16 h-8 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" style={{ animationDuration: '9s', animationDelay: '0.5s' }}></div>
-        
-        {/* Animated Grid Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
+        {/* Casino Floor Pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="w-full h-full" style={{
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 40% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 90% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%)
             `,
-            backgroundSize: '50px 50px',
-            animation: 'gridMove 20s linear infinite'
+            backgroundSize: '400px 400px, 300px 300px, 500px 500px, 350px 350px'
           }}></div>
         </div>
-        
-        {/* Gradient Orbs - Spread out */}
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '1s' }}></div>
-        
-        {/* Gaming Icons - Top Left Quadrant - Much better spaced */}
-        <div className="absolute top-1/6 left-1/6 text-purple-400 text-lg animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🎲</div>
-        <div className="absolute top-1/8 left-1/8 text-blue-400 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>🎯</div>
-        <div className="absolute top-1/4 left-1/8 text-yellow-400 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>🏅</div>
-        
-        {/* Gaming Icons - Top Right Quadrant - Much better spaced */}
-        <div className="absolute top-1/6 right-1/6 text-green-400 text-lg animate-float" style={{ animationDuration: '4s', animationDelay: '1.5s' }}>🎮</div>
-        <div className="absolute top-1/8 right-1/8 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1s' }}>🥇</div>
-        <div className="absolute top-1/4 right-1/8 text-red-400 text-lg animate-pulse" style={{ animationDelay: '1.5s' }}>🔥</div>
-        
-        {/* Gaming Icons - Top Center - Much better spaced */}
-        <div className="absolute top-1/6 left-1/2 text-pink-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.3s' }}>🍀</div>
-        <div className="absolute top-1/8 left-1/2 text-cyan-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.8s' }}>💫</div>
-        <div className="absolute top-1/4 left-3/4 text-yellow-300 text-xl animate-float" style={{ animationDuration: '6s', animationDelay: '1.2s' }}>⭐</div>
-        
-        {/* Middle Left Area - Much better distributed */}
-        <div className="absolute top-2/5 left-1/6 text-indigo-400 text-lg animate-spin-slow" style={{ animationDuration: '15s' }}>🌀</div>
-        <div className="absolute top-1/3 left-1/4 text-emerald-400 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.7s' }}>🌊</div>
-        <div className="absolute top-2/5 left-1/8 text-purple-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.1s' }}>🌈</div>
-        <div className="absolute top-3/5 left-1/5 text-blue-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.8s' }}>💎</div>
-        <div className="absolute top-4/5 left-1/4 text-green-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.3s' }}>🎪</div>
-        
-        {/* Middle Right Area - Much better distributed */}
-        <div className="absolute top-2/5 right-1/6 text-red-300 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '0.4s' }}>⚡</div>
-        <div className="absolute top-1/3 right-1/4 text-blue-300 text-xl animate-float" style={{ animationDuration: '8s', animationDelay: '0.9s' }}>💎</div>
-        <div className="absolute top-2/5 right-1/8 text-green-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1.3s' }}>🎪</div>
-        <div className="absolute top-3/5 right-1/5 text-purple-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.2s' }}>🎭</div>
-        <div className="absolute top-4/5 right-1/4 text-orange-300 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '0.6s' }}>🎨</div>
-        
-        {/* Center Area - Much better distributed */}
-        <div className="absolute top-1/2 left-1/8 text-yellow-400 text-xl animate-pulse" style={{ animationDelay: '0.2s' }}>👑</div>
-        <div className="absolute top-1/2 right-1/8 text-gray-400 text-lg animate-pulse" style={{ animationDelay: '0.7s' }}>🥈</div>
-        <div className="absolute top-1/2 left-3/4 text-orange-400 text-xl animate-pulse" style={{ animationDelay: '1.2s' }}>🥉</div>
-        <div className="absolute top-1/2 left-1/2 text-pink-400 text-lg animate-pulse" style={{ animationDelay: '0.9s' }}>💖</div>
-        <div className="absolute top-1/2 right-2/3 text-cyan-400 text-lg animate-pulse" style={{ animationDelay: '1.4s' }}>💫</div>
-        
-        {/* Bottom Left Quadrant - Much better distributed */}
-        <div className="absolute bottom-1/6 left-1/6 text-orange-400 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '0.4s' }}>🎨</div>
-        <div className="absolute bottom-1/4 left-1/6 text-indigo-400 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.9s' }}>🎭</div>
-        <div className="absolute bottom-1/3 left-1/8 text-emerald-400 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '1.1s' }}>🎪</div>
-        <div className="absolute bottom-2/5 left-1/4 text-blue-400 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '0.6s' }}>🌊</div>
-        <div className="absolute bottom-1/8 left-1/3 text-yellow-400 text-lg animate-float" style={{ animationDuration: '7s', animationDelay: '1.5s' }}>⭐</div>
-        
-        {/* Bottom Right Quadrant - Much better distributed */}
-        <div className="absolute bottom-1/6 right-1/6 text-red-300 text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💥</div>
-        <div className="absolute bottom-1/4 right-1/6 text-blue-300 text-xl animate-pulse" style={{ animationDelay: '1.1s' }}>⚡</div>
-        <div className="absolute bottom-1/3 right-1/8 text-green-300 text-lg animate-pulse" style={{ animationDelay: '0.8s' }}>🎯</div>
-        <div className="absolute bottom-2/5 right-1/4 text-purple-400 text-lg animate-pulse" style={{ animationDelay: '1.3s' }}>🌈</div>
-        <div className="absolute bottom-1/8 right-1/3 text-pink-400 text-lg animate-pulse" style={{ animationDelay: '0.4s' }}>💖</div>
-        
-        {/* Bottom Center - Much better distributed */}
-        <div className="absolute bottom-1/6 left-1/2 text-green-300 text-xl animate-float" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>🍀</div>
-        <div className="absolute bottom-1/4 left-1/2 text-yellow-300 text-lg animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}>⭐</div>
-        <div className="absolute bottom-1/3 left-1/2 text-pink-300 text-xl animate-float" style={{ animationDuration: '7s', animationDelay: '0.7s' }}>💖</div>
-        <div className="absolute bottom-2/5 left-1/2 text-cyan-300 text-lg animate-float" style={{ animationDuration: '8s', animationDelay: '1.4s' }}>💫</div>
-        <div className="absolute bottom-1/8 left-1/2 text-blue-300 text-lg animate-float" style={{ animationDuration: '9s', animationDelay: '0.9s' }}>🌟</div>
-        
-        {/* Additional Floating Bubbles - Spread out with much better spacing */}
-        <div className="absolute top-2/3 right-1/6 w-8 h-8 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-30 animate-float" style={{ animationDuration: '4s', animationDelay: '0.6s' }}></div>
-        <div className="absolute top-2/3 left-1/6 w-12 h-12 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-25 animate-float" style={{ animationDuration: '5s', animationDelay: '1.1s' }}></div>
-        <div className="absolute top-2/3 right-2/3 w-6 h-6 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-35 animate-float" style={{ animationDuration: '6s', animationDelay: '0.8s' }}></div>
-        <div className="absolute top-1/3 right-2/3 w-10 h-10 bg-gradient-to-br from-green-300 to-emerald-400 rounded-full opacity-30 animate-float" style={{ animationDuration: '7s', animationDelay: '1.3s' }}></div>
-        <div className="absolute top-3/4 right-1/3 w-8 h-8 bg-gradient-to-br from-purple-300 to-indigo-400 rounded-full opacity-25 animate-float" style={{ animationDuration: '8s', animationDelay: '0.7s' }}></div>
-        <div className="absolute top-3/4 left-2/3 w-6 h-6 bg-gradient-to-br from-orange-300 to-red-400 rounded-full opacity-30 animate-float" style={{ animationDuration: '9s', animationDelay: '1.6s' }}></div>
-        
-        {/* More Stars and Sparkles - Distributed with much better spacing */}
-        <div className="absolute top-3/4 right-1/5 text-yellow-200 text-lg animate-pulse" style={{ animationDelay: '0.3s' }}>✨</div>
-        <div className="absolute top-3/4 left-1/5 text-blue-200 text-xl animate-pulse" style={{ animationDelay: '0.8s' }}>🌟</div>
-        <div className="absolute top-3/4 right-1/2 text-purple-200 text-lg animate-pulse" style={{ animationDelay: '1.3s' }}>💫</div>
-        <div className="absolute top-1/4 right-1/5 text-green-200 text-lg animate-pulse" style={{ animationDelay: '0.4s' }}>⭐</div>
-        <div className="absolute top-1/4 left-1/5 text-pink-200 text-lg animate-pulse" style={{ animationDelay: '0.9s' }}>✨</div>
-        <div className="absolute top-1/4 right-2/3 text-cyan-200 text-lg animate-pulse" style={{ animationDelay: '1.4s' }}>🌟</div>
-        
-        {/* Glowing Lines - Different positions with much better spacing */}
-        <div className="absolute top-1/2 right-0 w-1 h-32 bg-gradient-to-b from-transparent via-purple-400 to-transparent opacity-30 animate-pulse" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute top-1/2 left-0 w-1 h-32 bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-30 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
-        <div className="absolute top-1/6 right-3/4 w-1 h-24 bg-gradient-to-b from-transparent via-pink-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '5s' }}></div>
-        <div className="absolute top-1/3 left-3/4 w-1 h-20 bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }}></div>
-        <div className="absolute top-2/3 right-1/8 w-1 h-16 bg-gradient-to-b from-transparent via-green-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '6s', animationDelay: '0.5s' }}></div>
-        <div className="absolute top-1/4 right-1/2 w-1 h-20 bg-gradient-to-b from-transparent via-yellow-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '8s', animationDelay: '0.7s' }}></div>
-        <div className="absolute top-3/4 left-1/2 w-1 h-18 bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-25 animate-pulse" style={{ animationDuration: '7s', animationDelay: '1.2s' }}></div>
-        
-        {/* Floating Particles - Spread across screen with much better distribution */}
-        <div className="absolute top-1/8 right-1/3 w-1.5 h-1.5 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '4s', animationDelay: '0.3s' }}></div>
-        <div className="absolute top-1/8 left-1/3 w-1 h-1 bg-yellow-300 rounded-full opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.8s' }}></div>
-        <div className="absolute top-1/8 right-2/3 w-2 h-2 bg-purple-300 rounded-full opacity-40 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1.2s' }}></div>
-        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-yellow-300 rounded-full opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/3 w-1.5 h-1.5 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
-        <div className="absolute top-1/4 left-1/2 w-1 h-1 bg-pink-300 rounded-full opacity-50 animate-pulse" style={{ animationDuration: '6s', animationDelay: '0.9s' }}></div>
-        <div className="absolute top-2/3 left-1/2 w-1.5 h-1.5 bg-green-300 rounded-full opacity-40 animate-pulse" style={{ animationDuration: '5s', animationDelay: '1.5s' }}></div>
-        <div className="absolute top-1/6 right-1/2 w-1 h-1 bg-orange-300 rounded-full opacity-45 animate-pulse" style={{ animationDuration: '7s', animationDelay: '0.6s' }}></div>
-        <div className="absolute top-5/6 left-1/4 w-1.5 h-1.5 bg-purple-300 rounded-full opacity-35 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1.8s' }}></div>
+
+        {/* Floating Casino Elements */}
+        <div className="absolute inset-0">
+          {/* Slot Machine Reels */}
+          <div className="absolute top-20 left-10 w-32 h-32 opacity-10 animate-spin-slow">
+            <div className="w-full h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full"></div>
+          </div>
+          
+          {/* Poker Chips */}
+          <div className="absolute top-40 right-20 w-24 h-24 opacity-10 animate-bounce-slow">
+            <div className="w-full h-full bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
+          </div>
+          
+          {/* Dice */}
+          <div className="absolute bottom-32 left-32 w-20 h-20 opacity-10 animate-pulse">
+            <div className="w-full h-full bg-gradient-to-b from-blue-400 to-purple-500 rounded-lg"></div>
+          </div>
+          
+          {/* Roulette Wheel */}
+          <div className="absolute bottom-20 right-32 w-28 h-28 opacity-10 animate-spin-slow">
+            <div className="w-full h-full bg-gradient-to-b from-green-400 to-teal-500 rounded-full"></div>
+          </div>
+        </div>
+
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
       </div>
 
-      {/* Full Navigation Bar */}
-      <nav className="bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-blue-900/80 border-b border-purple-700/50 sticky top-0 z-50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* Navigation Header */}
+      <header className="relative z-10 bg-black/20 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo and Brand */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <img
-                src="/logo.png"
-                alt="BetBingoCash Logo"
-                className="h-8 w-auto sm:h-10"
-              />
-              <div className="text-lg sm:text-xl font-black text-white">
-                <span className="hidden sm:inline">BET BINGO CASH</span>
-                <span className="sm:hidden">BINGO CASH</span>
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <span className="text-2xl">🎰</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">BetBingoCash</h1>
+                <p className="text-xs text-white/60">Ultimate Gaming Empire</p>
               </div>
             </div>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-6">
-              <a href="#tournaments" className="text-white/80 hover:text-white transition-colors">
-                🏆 Tournaments
-              </a>
-              <a href="#leaderboard" className="text-white/80 hover:text-white transition-colors">
-                📊 Leaderboard
-              </a>
-              <a href="#rewards" className="text-white/80 hover:text-white transition-colors">
-                🎁 Rewards
-              </a>
-              <a href="#cashout" className="text-white/80 hover:text-white transition-colors">
-                💰 Cashout
-              </a>
-            </div>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex space-x-1">
+              {navigationItems.slice(0, 6).map((item) => (
+                <button
+                  key={item.name}
+                  className={`px-4 py-2 rounded-lg text-white/80 hover:text-white transition-all duration-200 hover:bg-white/10 flex items-center gap-2`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span className="text-sm">{item.name.split(' ')[1]}</span>
+                </button>
+              ))}
+            </nav>
 
-            {/* User Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {isAuthenticated && user ? (
-                <>
-                  {/* Mobile: Compact User Info */}
-                  <div className="lg:hidden flex items-center gap-2">
-                    <button
-                      onClick={() => setGemShopModalOpen(true)}
-                      className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-1 px-2 rounded-full text-xs transition-colors"
-                    >
-                      <span>💎</span>
-                      <span className="hidden xs:inline">{gems || 0}</span>
-                    </button>
-                    <div className="text-green-400 text-xs font-bold">
-                      ${(balance || 0).toFixed(0)}
-                    </div>
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <p className="text-sm text-white font-medium">{user.username}</p>
+                    <p className="text-xs text-white/60">Balance: ${(user.balance.usdc + user.balance.usdt).toFixed(2)}</p>
                   </div>
-
-                  {/* Desktop: Full User Info */}
-                  <div className="hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                    <button
-                      onClick={() => setGemShopModalOpen(true)}
-                      className="flex items-center gap-2 hover:bg-white/20 rounded-full px-2 py-1 transition-colors"
-                    >
-                      <div className="text-yellow-400">💎</div>
-                      <span className="text-white font-bold">{gems || 0}</span>
-                    </button>
-                    <div className="w-px h-4 bg-white/30"></div>
-                    <div className="text-green-400">💰</div>
-                    <span className="text-white font-bold">${(balance || 0).toFixed(2)}</span>
-                  </div>
-
-                  {/* Mobile: Compact Action Buttons */}
-                  <div className="lg:hidden flex items-center gap-1">
-                    <button
-                      onClick={() => setPaymentModalOpen(true)}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-1 px-2 rounded-full text-xs transition-all duration-200"
-                    >
-                      💸
-                    </button>
-                    <button
-                      onClick={() => setProfileModalOpen(true)}
-                      className="bg-white/10 backdrop-blur-sm rounded-full p-1 border border-white/20"
-                    >
-                      <div className="w-5 h-5 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        {user?.username?.charAt(0) || 'U'}
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Desktop: Full Action Buttons */}
-                  <div className="hidden lg:flex items-center gap-3">
-                    <button
-                      onClick={() => setGemShopModalOpen(true)}
-                      className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
-                    >
-                      💎 Gem Shop
-                    </button>
-
-                    <button
-                      onClick={() => setPaymentModalOpen(true)}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm transition-all duration-200"
-                    >
-                      💸 Add Funds
-                    </button>
-
-                    <div className="relative group">
-                      <button className="bg-white/10 backdrop-blur-sm rounded-full p-2 border border-white/20">
-                        <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                          {user?.username?.charAt(0) || 'U'}
-                        </div>
-                      </button>
-
-                      <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                        <div className="p-3 border-b border-gray-700">
-                          <div className="text-white font-semibold">{user?.username || 'User'}</div>
-                          <div className="text-white/60 text-sm">{user?.email}</div>
-                        </div>
-                        <div className="p-2 space-y-1">
-                          <button
-                            onClick={() => setProfileModalOpen(true)}
-                            className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
-                          >
-                            👤 Profile
-                          </button>
-                          <button
-                            onClick={handleLogout}
-                            className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
-                          >
-                            🚪 Sign Out
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
                   <button
-                    onClick={() => setAuthModalOpen(true)}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 sm:px-6 rounded-full text-sm transition-all duration-200"
+                    onClick={logout}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
                   >
-                    <span className="hidden sm:inline">🔐 Sign In</span>
-                    <span className="sm:hidden">🔐</span>
+                    <LogOut className="w-4 h-4" />
+                    Logout
                   </button>
-                </>
+                </div>
+              ) : (
+                <button className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105">
+                  Connect Wallet
+                </button>
               )}
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+              >
+                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hamburger Menu Button */}
-      <button
-        onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
-        className="fixed top-20 right-4 z-40 p-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-200"
-        title="Quick Navigation"
-      >
-        {showHamburgerMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Hamburger Menu Dropdown */}
-      {showHamburgerMenu && (
-        <div className="fixed top-28 right-4 z-40 bg-gradient-to-r from-purple-800/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl p-4 border border-purple-400/30 shadow-2xl min-w-48">
-          <div className="text-white font-bold text-sm mb-3 text-center">
-            🚀 Quick Navigation
-          </div>
-          
-          <div className="space-y-2">
-            <button
-              onClick={() => scrollToSection('game-modes')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Gamepad2 className="w-4 h-4" />
-              🎯 BINGO Rooms
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('tournaments')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Trophy className="w-4 h-4" />
-              🏆 Tournaments
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('bonus')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Zap className="w-4 h-4" />
-              ⚡ Bonus System
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('mini-games')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Star className="w-4 h-4" />
-              🎮 Mini Games
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('leaderboard')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <BarChart3 className="w-4 h-4" />
-              📊 Leaderboard
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('rewards')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Gift className="w-4 h-4" />
-              🎁 Daily Rewards
-            </button>
-            
-            <button
-              onClick={() => scrollToSection('cashout')}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <Coins className="w-4 h-4" />
-              💰 Cashout
-            </button>
-            
-            <button
-              onClick={scrollToTop}
-              className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-purple-700/50 rounded-md transition-colors flex items-center gap-2"
-            >
-              <ChevronUp className="w-4 h-4" />
-              🔝 Back to Top
-            </button>
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden relative z-20 bg-black/95 backdrop-blur-md border-b border-white/10">
+          <div className="px-4 py-6 space-y-3">
+            {navigationItems.map((item) => (
+              <button
+                key={item.name}
+                className={`w-full text-left px-4 py-3 rounded-lg text-white/80 hover:text-white transition-all duration-200 hover:bg-white/10 flex items-center gap-3`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
-        {/* Header Logo */}
-        <div className="mb-4 flex justify-center">
-          <img 
-            src="/hero logo.png" 
-            alt="BetBingoCash Logo" 
-            className="h-32 w-auto object-contain mix-blend-multiply"
-            style={{ filter: 'contrast(1.2) brightness(1.1)' }}
-          />
+      {/* Quick Access Gaming Hub */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold text-white mb-4">🎰 Welcome to the Ultimate Gaming Empire</h2>
+          <p className="text-white/80 text-lg">Choose your game and start winning big!</p>
         </div>
-        
-        {/* Main Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-4 drop-shadow-2xl">
-          BINGO Game Rooms
-        </h1>
 
-        <div id="game-modes">
-          <GameModes />
+        {/* Quick Access Game Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          {quickAccessGames.map((game) => (
+            <button
+              key={game.name}
+              className={`${game.color} hover:scale-105 transition-all duration-200 rounded-2xl p-6 text-white text-center shadow-lg hover:shadow-2xl`}
+            >
+              <div className="text-3xl mb-2">{game.icon}</div>
+              <div className="text-sm font-medium">{game.name}</div>
+            </button>
+          ))}
         </div>
-        
-        {/* Tournaments Section */}
-        <div id="tournaments" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            🏆 Tournaments
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              Exciting BINGO tournaments coming soon! Compete against players worldwide for massive prizes.
-            </p>
+
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">🏆</div>
+            <h3 className="text-white font-bold text-xl mb-2">Massive Tournaments</h3>
+            <p className="text-white/60">Compete for prizes up to $100,000 in epic tournaments</p>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">👑</div>
+            <h3 className="text-white font-bold text-xl mb-2">VIP Benefits</h3>
+            <p className="text-white/60">Get up to 100% bonus on all winnings with VIP membership</p>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">💎</div>
+            <h3 className="text-white font-bold text-xl mb-2">Crypto Ready</h3>
+            <p className="text-white/60">Deposit and withdraw with USDC, USDT, BTC, and ETH</p>
           </div>
         </div>
-        
-        {/* Mini Games Section */}
-        <div id="mini-games" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            🎮 Mini Games
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              Fun mini-games and side activities to earn extra rewards while playing BINGO!
-            </p>
-          </div>
-        </div>
-        
-        {/* Leaderboard Section */}
-        <div id="leaderboard" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            📊 Leaderboard
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              See who's on top! Check the leaderboard for the highest earners and biggest winners.
-            </p>
-          </div>
-        </div>
-        
-        {/* Daily Rewards Section */}
-        <div id="rewards" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            🎁 Daily Rewards
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              Log in daily to collect rewards, bonuses, and special prizes!
-            </p>
-          </div>
-        </div>
-        
-        {/* Bonus System Section */}
-        <div id="bonus" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            ⚡ Bonus System
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              Unlock amazing bonuses, multipliers, and special features as you play!
-            </p>
-          </div>
-        </div>
-        
-        {/* Cashout Section */}
-        <div id="cashout" className="w-full max-w-6xl mx-auto mt-16 px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 drop-shadow-xl">
-            💰 Cashout
-          </h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <p className="text-white/80 text-center text-lg">
-              Convert your winnings to real cash! Fast, secure, and reliable payment processing.
-            </p>
-          </div>
-        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10">
+        {children}
       </main>
 
-      {/* User Profile Modals */}
-      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
-      <PaymentModal 
-        isOpen={paymentModalOpen} 
-        onClose={() => setPaymentModalOpen(false)}
-        amount={25}
-        onSuccess={(amount) => {
-          console.log(`Payment successful: $${amount}`);
-        }}
-      />
-      <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
-      <GemShopModal isOpen={gemShopModalOpen} onClose={() => setGemShopModalOpen(false)} />
+      {/* Footer */}
+      <footer className="relative z-10 bg-black/20 backdrop-blur-md border-t border-white/10 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">BetBingoCash</h3>
+              <p className="text-white/60 text-sm">The ultimate gaming destination with massive jackpots and endless entertainment.</p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-bold mb-4">Games</h4>
+              <ul className="space-y-2 text-sm text-white/60">
+                <li>BINGO Rooms</li>
+                <li>Casino Games</li>
+                <li>Sports Betting</li>
+                <li>Live Casino</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-bold mb-4">Features</h4>
+              <ul className="space-y-2 text-sm text-white/60">
+                <li>VIP Membership</li>
+                <li>Tournaments</li>
+                <li>Achievements</li>
+                <li>Crypto Payments</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-bold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-white/60">
+                <li>Help Center</li>
+                <li>Live Chat</li>
+                <li>Terms of Service</li>
+                <li>Privacy Policy</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-white/10 mt-8 pt-8 text-center">
+            <p className="text-white/60 text-sm">© 2024 BetBingoCash. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
