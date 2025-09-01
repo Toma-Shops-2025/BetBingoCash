@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
+import NavigationHeader from './NavigationHeader';
 
 interface Transaction {
   id: string;
@@ -258,6 +259,7 @@ const PaymentSystem: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 p-6">
+      <NavigationHeader />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
