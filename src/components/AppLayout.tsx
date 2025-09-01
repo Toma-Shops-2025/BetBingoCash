@@ -588,6 +588,313 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
           </div>
         </div>
+
+        {/* Casino Audio & Atmosphere Controls */}
+        <div className="bg-gradient-to-r from-indigo-900/30 via-purple-800/30 to-indigo-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-indigo-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/10 via-purple-400/10 to-indigo-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-indigo-300 mb-4 casino-neon">🎵 Casino Atmosphere Controls</h3>
+            <p className="text-indigo-200/90 text-lg mb-6">Customize your casino experience with audio and visual effects</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-indigo-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-indigo-500/30">
+                <div className="text-4xl mb-4">🎵</div>
+                <h4 className="text-indigo-200 font-bold text-xl mb-2">Background Music</h4>
+                <div className="space-y-3">
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🎰 Slot Machine Sounds
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🃏 Poker Room Ambience
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🎡 Roulette Excitement
+                  </button>
+                </div>
+              </div>
+              
+              <div className="bg-indigo-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-indigo-500/30">
+                <div className="text-4xl mb-4">🔊</div>
+                <h4 className="text-indigo-200 font-bold text-xl mb-2">Sound Effects</h4>
+                <div className="space-y-3">
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🎲 Dice Rolling
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🪙 Coin Dropping
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🏆 Win Celebrations
+                  </button>
+                </div>
+              </div>
+              
+              <div className="bg-indigo-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-indigo-500/30">
+                <div className="text-4xl mb-4">✨</div>
+                <h4 className="text-indigo-200 font-bold text-xl mb-2">Visual Effects</h4>
+                <div className="space-y-3">
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🌟 Enhanced Sparkles
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    💫 Neon Glows
+                  </button>
+                  <button className="w-full bg-indigo-700/60 hover:bg-indigo-600/60 text-white px-4 py-2 rounded-lg transition-colors">
+                    🎭 3D Animations
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Live Dealers */}
+        <div className="bg-gradient-to-r from-emerald-900/30 via-teal-800/30 to-emerald-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-emerald-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-emerald-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-emerald-300 mb-4 casino-neon">👥 Live Casino Dealers</h3>
+            <p className="text-emerald-200/90 text-lg mb-6">Meet our professional live dealers for an authentic casino experience</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-emerald-500/30 casino-3d-card">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center text-3xl">👨‍💼</div>
+                <h4 className="text-emerald-200 font-bold text-lg mb-2">Alex Thompson</h4>
+                <p className="text-emerald-200/70 text-sm mb-2">Blackjack Specialist</p>
+                <div className="text-xs text-emerald-200/60">5+ years experience</div>
+                <div className="mt-3">
+                  <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded-full">LIVE</span>
+                </div>
+              </div>
+              
+              <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-emerald-500/30 casino-3d-card">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-red-600 rounded-full flex items-center justify-center text-3xl">👩‍💼</div>
+                <h4 className="text-emerald-200 font-bold text-lg mb-2">Sarah Chen</h4>
+                <p className="text-emerald-200/70 text-sm mb-2">Roulette Expert</p>
+                <div className="text-xs text-emerald-200/60">7+ years experience</div>
+                <div className="mt-3">
+                  <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded-full">LIVE</span>
+                </div>
+              </div>
+              
+              <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-emerald-500/30 casino-3d-card">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full flex items-center justify-center text-3xl">👨‍💼</div>
+                <h4 className="text-emerald-200 font-bold text-lg mb-2">Mike Rodriguez</h4>
+                <p className="text-emerald-200/70 text-sm mb-2">Poker Master</p>
+                <div className="text-xs text-emerald-200/60">10+ years experience</div>
+                <div className="mt-3">
+                  <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded-full">LIVE</span>
+                </div>
+              </div>
+              
+              <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-emerald-500/30 casino-3d-card">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full flex items-center justify-center text-3xl">👩‍💼</div>
+                <h4 className="text-emerald-200 font-bold text-lg mb-2">Emma Wilson</h4>
+                <p className="text-emerald-200/70 text-sm mb-2">Craps Professional</p>
+                <div className="text-xs text-emerald-200/60">6+ years experience</div>
+                <div className="mt-3">
+                  <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded-full">LIVE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Tournament System */}
+        <div className="bg-gradient-to-r from-orange-900/30 via-red-800/30 to-orange-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-orange-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-400/10 via-red-400/10 to-orange-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-orange-300 mb-4 casino-neon">🏆 Casino Tournament System</h3>
+            <p className="text-orange-200/90 text-lg mb-6">Compete in epic tournaments with massive prize pools</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-orange-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-orange-500/30">
+                <div className="text-4xl mb-4">🔥</div>
+                <h4 className="text-orange-200 font-bold text-xl mb-2">Daily Tournaments</h4>
+                <div className="space-y-3 text-orange-200/80">
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🎰 Slot Masters</div>
+                    <div className="text-sm">Prize Pool: $50,000</div>
+                    <div className="text-xs text-orange-200/60">Starts in 2 hours</div>
+                  </div>
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🃏 Poker Champions</div>
+                    <div className="text-sm">Prize Pool: $75,000</div>
+                    <div className="text-xs text-orange-200/60">Starts in 4 hours</div>
+                  </div>
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🎡 Roulette Royale</div>
+                    <div className="text-sm">Prize Pool: $30,000</div>
+                    <div className="text-xs text-orange-200/60">Starts in 6 hours</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-orange-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-orange-500/30">
+                <div className="text-4xl mb-4">💎</div>
+                <h4 className="text-orange-200 font-bold text-xl mb-2">Weekly Championships</h4>
+                <div className="space-y-3 text-orange-200/80">
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">👑 VIP Masters</div>
+                    <div className="text-sm">Prize Pool: $250,000</div>
+                    <div className="text-xs text-orange-200/60">VIP Players Only</div>
+                  </div>
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🌍 Global Cup</div>
+                    <div className="text-sm">Prize Pool: $500,000</div>
+                    <div className="text-xs text-orange-200/60">International Event</div>
+                  </div>
+                  <div className="bg-orange-800/40 rounded-lg p-3">
+                    <div className="text-lg font-semibold text-yellow-300">🚀 Crypto Kings</div>
+                    <div className="text-sm">Prize Pool: $100,000</div>
+                    <div className="text-xs text-orange-200/60">Crypto Players</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-orange-900/40 backdrop-blur-sm rounded-xl p-6 border border-orange-500/30">
+              <h4 className="text-orange-200 font-bold text-xl mb-4">🏅 Tournament Leaderboard</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between bg-orange-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <div>
+                      <div className="text-orange-200 font-semibold">TournamentKing_2024</div>
+                      <div className="text-orange-200/70 text-sm">Won 15 tournaments</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$847,392</div>
+                </div>
+                
+                <div className="flex items-center justify-between bg-orange-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <div>
+                      <div className="text-orange-200 font-semibold">PokerQueen_99</div>
+                      <div className="text-orange-200/70 text-sm">Won 12 tournaments</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$634,567</div>
+                </div>
+                
+                <div className="flex items-center justify-between bg-orange-800/40 rounded-lg p-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                    <div>
+                      <div className="text-orange-200 font-semibold">SlotMaster_Pro</div>
+                      <div className="text-orange-200/70 text-sm">Won 10 tournaments</div>
+                    </div>
+                  </div>
+                  <div className="text-yellow-400 font-bold">$465,433</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Game Themes */}
+        <div className="bg-gradient-to-r from-pink-900/30 via-rose-800/30 to-pink-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-pink-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-rose-400/10 to-pink-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-pink-300 mb-4 casino-neon">🎭 Casino Game Themes</h3>
+            <p className="text-pink-200/90 text-lg mb-6">Explore different casino atmospheres and game themes</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-pink-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-pink-500/30 casino-3d-card">
+                <div className="text-4xl mb-4">🏰</div>
+                <h4 className="text-pink-200 font-bold text-xl mb-2">Royal Palace</h4>
+                <p className="text-pink-200/70 mb-3">Luxury casino with gold accents</p>
+                <div className="space-y-2 text-pink-200/80 text-sm">
+                  <div>• High-end table games</div>
+                  <div>• VIP treatment</div>
+                  <div>• Premium cocktails</div>
+                </div>
+              </div>
+              
+              <div className="bg-pink-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-pink-500/30 casino-3d-card">
+                <div className="text-4xl mb-4">🌴</div>
+                <h4 className="text-pink-200 font-bold text-xl mb-2">Tropical Paradise</h4>
+                <p className="text-pink-200/70 mb-3">Beach-themed casino experience</p>
+                <div className="space-y-2 text-pink-200/80 text-sm">
+                  <div>• Island music</div>
+                  <div>• Beach cocktails</div>
+                  <div>• Relaxed atmosphere</div>
+                </div>
+              </div>
+              
+              <div className="bg-pink-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-pink-500/30 casino-3d-card">
+                <div className="text-4xl mb-4">🚀</div>
+                <h4 className="text-pink-200 font-bold text-xl mb-2">Cyber Future</h4>
+                <p className="text-pink-200/70 mb-3">High-tech neon casino</p>
+                <div className="space-y-2 text-pink-200/80 text-sm">
+                  <div>• Neon lights</div>
+                  <div>• Electronic music</div>
+                  <div>• Futuristic games</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Casino Loyalty Program */}
+        <div className="bg-gradient-to-r from-cyan-900/30 via-blue-800/30 to-cyan-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden border border-cyan-500/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 via-blue-400/10 to-cyan-400/10 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-cyan-300 mb-4 casino-neon">🎁 Casino Loyalty Program</h3>
+            <p className="text-cyan-200/90 text-lg mb-6">Earn points and unlock exclusive rewards as you play</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div className="bg-cyan-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-cyan-500/30">
+                <div className="text-4xl mb-4">⭐</div>
+                <h4 className="text-cyan-200 font-bold text-lg mb-2">Bronze</h4>
+                <p className="text-cyan-200/70 text-sm mb-2">0-999 points</p>
+                <div className="text-xs text-cyan-200/60">Basic rewards</div>
+              </div>
+              
+              <div className="bg-cyan-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-cyan-500/30">
+                <div className="text-4xl mb-4">🥈</div>
+                <h4 className="text-cyan-200 font-bold text-lg mb-2">Silver</h4>
+                <p className="text-cyan-200/70 text-sm mb-2">1000-4999 points</p>
+                <div className="text-xs text-cyan-200/60">Enhanced rewards</div>
+              </div>
+              
+              <div className="bg-cyan-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-cyan-500/30">
+                <div className="text-4xl mb-4">🥇</div>
+                <h4 className="text-cyan-200 font-bold text-lg mb-2">Gold</h4>
+                <p className="text-cyan-200/70 text-sm mb-2">5000-19999 points</p>
+                <div className="text-xs text-cyan-200/60">Premium rewards</div>
+              </div>
+              
+              <div className="bg-cyan-900/40 backdrop-blur-sm rounded-xl p-6 text-center border border-cyan-500/30">
+                <div className="text-4xl mb-4">💎</div>
+                <h4 className="text-cyan-200 font-bold text-lg mb-2">Platinum</h4>
+                <p className="text-cyan-200/70 text-sm mb-2">20000+ points</p>
+                <div className="text-xs text-cyan-200/60">Elite rewards</div>
+              </div>
+            </div>
+
+            <div className="bg-cyan-900/40 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/30">
+              <h4 className="text-cyan-200 font-bold text-xl mb-4">🎯 Current Status</h4>
+              <div className="flex items-center justify-center space-x-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400 casino-neon">2,847</div>
+                  <div className="text-cyan-200/70 text-sm">Points Earned</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400 casino-neon">Silver</div>
+                  <div className="text-cyan-200/70 text-sm">Current Tier</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400 casino-neon">2,153</div>
+                  <div className="text-cyan-200/70 text-sm">To Next Tier</div>
+                </div>
+              </div>
+              <div className="w-full bg-cyan-800/40 rounded-full h-3">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full" style={{ width: '57%' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
