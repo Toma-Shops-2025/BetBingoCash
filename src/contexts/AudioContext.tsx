@@ -325,34 +325,63 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log('Nuclear option: Resetting entire audio system...');
     
     try {
-      // Stop all audio elements EXCEPT Adam's voice (which should be short)
+      // FIRST: Force stop background music specifically
+      if (backgroundMusicRef.current) {
+        try {
+          backgroundMusicRef.current.pause();
+          backgroundMusicRef.current.currentTime = 0;
+          backgroundMusicRef.current.src = '';
+          backgroundMusicRef.current.load();
+          backgroundMusicRef.current = null;
+          console.log('Background music ref stopped and cleared');
+        } catch (e) {
+          console.error('Error stopping background music ref:', e);
+        }
+      }
+      
+      // SECOND: Stop all audio elements EXCEPT Adam's voice
       const allAudioElements = document.querySelectorAll('audio');
-      allAudioElements.forEach(audio => {
-        // Don't stop Adam's voice if it's currently playing
-        if (!audio.src.includes('adam-voice')) {
-          audio.pause();
-          audio.currentTime = 0;
-          audio.src = '';
-          audio.load(); // Force reload
+      console.log(`Found ${allAudioElements.length} audio elements to stop`);
+      
+      allAudioElements.forEach((audio, index) => {
+        try {
+          // Don't stop Adam's voice if it's currently playing
+          if (!audio.src.includes('adam-voice')) {
+            console.log(`Stopping audio element ${index}:`, audio.src);
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = '';
+            audio.load(); // Force reload
+            audio.remove(); // Remove from DOM completely
+          }
+        } catch (e) {
+          console.error(`Error stopping audio element ${index}:`, e);
         }
       });
       
-      // Cancel all speech synthesis
+      // THIRD: Cancel all speech synthesis
       if ('speechSynthesis' in window) {
         speechSynthesis.cancel();
+        console.log('Speech synthesis cancelled');
       }
       
-      // Clear all refs
+      // FOURTH: Clear all refs
       backgroundMusicRef.current = null;
       gameMusicRef.current = null;
       fallbackAudioRef.current = null;
       
-      // Force page audio context to reset
+      // FIFTH: Force page audio context to reset
       if (window.AudioContext || (window as any).webkitAudioContext) {
         try {
           const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
           audioContext.close();
+          console.log('Audio context closed');
         } catch (e) {}
+      }
+      
+      // SIXTH: Force garbage collection hint and wait
+      if ((window as any).gc) {
+        (window as any).gc();
       }
       
       console.log('Audio system reset complete');
@@ -361,20 +390,74 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  // Global audio stop - the most aggressive approach
+  const forceStopAllAudio = () => {
+    console.log('FORCE STOP ALL AUDIO - Most aggressive approach');
+    
+    try {
+      // Method 1: Stop all HTML audio elements
+      const allAudioElements = document.querySelectorAll('audio');
+      allAudioElements.forEach((audio, index) => {
+        try {
+          console.log(`Force stopping audio ${index}:`, audio.src);
+          audio.pause();
+          audio.currentTime = 0;
+          audio.src = '';
+          audio.load();
+          audio.remove();
+        } catch (e) {
+          console.error(`Error force stopping audio ${index}:`, e);
+        }
+      });
+      
+      // Method 2: Stop all media elements
+      const allMediaElements = document.querySelectorAll('video, audio');
+      allMediaElements.forEach((media, index) => {
+        try {
+          if (media instanceof HTMLAudioElement) {
+            media.pause();
+            media.currentTime = 0;
+            media.src = '';
+            media.load();
+            media.remove();
+          }
+        } catch (e) {
+          console.error(`Error force stopping media ${index}:`, e);
+        }
+      });
+      
+      // Method 3: Cancel all speech
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+      
+      // Method 4: Clear all refs
+      backgroundMusicRef.current = null;
+      gameMusicRef.current = null;
+      fallbackAudioRef.current = null;
+      
+      // Method 5: Force page reload if needed
+      console.log('All audio elements force stopped');
+      
+    } catch (error) {
+      console.error('Error in force stop:', error);
+    }
+  };
+
   // Dynamic music volume control
   const setGameMusicMode = (isGameActive: boolean) => {
     console.log('Setting game music mode:', isGameActive);
     
     if (isGameActive) {
-      // Nuclear option - reset everything
-      console.log('Using nuclear option to stop all audio');
-      resetAudioSystem();
+      // Use the most aggressive approach
+      console.log('Using FORCE STOP ALL AUDIO approach');
+      forceStopAllAudio();
       
-      // Wait a moment then start game music
+      // Wait longer to ensure everything is stopped
       setTimeout(() => {
-        console.log('Starting game music after reset...');
+        console.log('Starting game music after force stop...');
         playGameMusic();
-      }, 100);
+      }, 500);
       
     } else {
       // Stop game music and resume background music
