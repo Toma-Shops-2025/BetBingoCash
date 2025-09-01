@@ -118,23 +118,24 @@ const GameInterface: React.FC = () => {
     
     switch (roomId) {
       case 'room-1':
-        roomConfig = { playerCount: 5, prizePool: 25.00 };
+        roomConfig = { playerCount: 5, prizePool: 75.00, entryFee: 15.00 };
         break;
       case 'room-2':
-        roomConfig = { playerCount: 10, prizePool: 50.00 };
+        roomConfig = { playerCount: 10, prizePool: 200.00, entryFee: 20.00 };
         break;
       case 'room-3':
-        roomConfig = { playerCount: 15, prizePool: 75.00 };
+        roomConfig = { playerCount: 15, prizePool: 375.00, entryFee: 25.00 };
         break;
       case 'room-4':
-        roomConfig = { playerCount: 20, prizePool: 100.00 };
+        roomConfig = { playerCount: 20, prizePool: 600.00, entryFee: 30.00 };
         break;
       default:
-        roomConfig = { playerCount: 5, prizePool: 25.00 };
+        roomConfig = { playerCount: 5, prizePool: 75.00, entryFee: 15.00 };
     }
     
     setPlayerCount(roomConfig.playerCount);
     setPrizePool(roomConfig.prizePool);
+    setEntryFee(roomConfig.entryFee);
     
     // Generate other players (excluding current player)
     const otherPlayerCount = roomConfig.playerCount - 1;
@@ -528,6 +529,50 @@ const GameInterface: React.FC = () => {
           <div className="text-center text-white/80">
             <p className="mb-2">Prizes will be automatically credited to your account within 24 hours.</p>
             <p className="text-sm">Please contact support if you have any questions about your winnings.</p>
+          </div>
+        </div>
+
+        {/* Crypto Payment Info */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
+          <h3 className="text-white font-bold text-xl mb-4 text-center">💎 Crypto Payments</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="text-center">
+              <h4 className="text-white font-bold text-lg mb-3">Supported Cryptocurrencies</h4>
+              <div className="space-y-2">
+                <div className="flex items-center justify-center gap-2 text-white/80">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
+                  <span>USDC (Stablecoin)</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-white/80">
+                  <div className="w-6 h-6 bg-green-500 rounded-full"></div>
+                  <span>USDT (Stablecoin)</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-white/80">
+                  <div className="w-6 h-6 bg-orange-500 rounded-full"></div>
+                  <span>Bitcoin (BTC)</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-white/80">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full"></div>
+                  <span>Ethereum (ETH)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <h4 className="text-white font-bold text-lg mb-3">Benefits</h4>
+              <div className="space-y-2 text-white/80 text-sm">
+                <div>✅ Lower fees (0.1-1%)</div>
+                <div>✅ No chargebacks</div>
+                <div>✅ Global accessibility</div>
+                <div>✅ Instant deposits</div>
+                <div>✅ Gaming-friendly</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-4 text-white/60 text-sm">
+            <p>All transactions are processed securely on the blockchain</p>
+            <p>Winnings are automatically credited to your crypto wallet</p>
           </div>
         </div>
 

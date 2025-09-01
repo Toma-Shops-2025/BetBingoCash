@@ -19,12 +19,14 @@ const GameModes: React.FC = () => {
       description: 'Fast-paced 5-player BINGO battle with quick rounds and instant action!',
       features: ['5 Players', '2-Minute Timer', 'Powerups', '1st/2nd/3rd Prizes'],
       specialInfo: '5 Players',
-      entryFee: 5.00,
-      prizePool: 25.00,
+      entryFee: 15.00,
+      prizePool: 75.00,
       minPlayers: 5,
       currentPlayers: 5,
       bingoPattern: 'Any 5 in a row',
-      playerCount: 5
+      playerCount: 5,
+      houseEdge: '30%',
+      payout: '70%'
     },
     {
       id: 'room-2',
@@ -32,12 +34,14 @@ const GameModes: React.FC = () => {
       description: 'Medium-sized tournament with 10 competitive players and bigger prize pools!',
       features: ['10 Players', '2-Minute Timer', 'Powerups', '1st/2nd/3rd Prizes'],
       specialInfo: '10 Players',
-      entryFee: 5.00,
-      prizePool: 50.00,
+      entryFee: 20.00,
+      prizePool: 200.00,
       minPlayers: 10,
       currentPlayers: 10,
       bingoPattern: 'Any 5 in a row',
-      playerCount: 10
+      playerCount: 10,
+      houseEdge: '30%',
+      payout: '70%'
     },
     {
       id: 'room-3',
@@ -45,12 +49,14 @@ const GameModes: React.FC = () => {
       description: 'Large tournament with 15 players competing for substantial prizes!',
       features: ['15 Players', '2-Minute Timer', 'Powerups', '1st/2nd/3rd Prizes'],
       specialInfo: '15 Players',
-      entryFee: 5.00,
-      prizePool: 75.00,
+      entryFee: 25.00,
+      prizePool: 375.00,
       minPlayers: 15,
       currentPlayers: 15,
       bingoPattern: 'Any 5 in a row',
-      playerCount: 15
+      playerCount: 15,
+      houseEdge: '30%',
+      payout: '70%'
     },
     {
       id: 'room-4',
@@ -58,12 +64,14 @@ const GameModes: React.FC = () => {
       description: 'Epic 20-player championship with massive prize pools and ultimate glory!',
       features: ['20 Players', '2-Minute Timer', 'Powerups', '1st/2nd/3rd Prizes'],
       specialInfo: '20 Players',
-      entryFee: 5.00,
-      prizePool: 100.00,
+      entryFee: 30.00,
+      prizePool: 600.00,
       minPlayers: 20,
       currentPlayers: 20,
       bingoPattern: 'Any 5 in row',
-      playerCount: 20
+      playerCount: 20,
+      houseEdge: '30%',
+      payout: '70%'
     }
   ];
 
@@ -248,7 +256,14 @@ const GameModes: React.FC = () => {
                     {/* Right Section - Entry & Play (White/Gray) */}
                     <div className="w-1/3 bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-r-lg flex flex-col justify-center items-center text-center">
                       <div className="text-2xl font-bold text-gray-800 mb-2">Entry</div>
-                      <div className="text-3xl font-black text-green-600 mb-4">${room.entryFee}</div>
+                      <div className="text-3xl font-black text-green-600 mb-2">${room.entryFee}</div>
+                      
+                      {/* House Edge & Payout Info */}
+                      <div className="text-xs text-gray-600 mb-3 space-y-1">
+                        <div>Prize Pool: ${room.prizePool}</div>
+                        <div className="text-red-600 font-semibold">House Edge: {room.houseEdge}</div>
+                        <div className="text-blue-600 font-semibold">Payout: {room.payout}</div>
+                      </div>
                       
                       <Button
                         onClick={() => handlePlayGame(room)}
