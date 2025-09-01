@@ -16,7 +16,7 @@ import {
   Target,
   TrendingUp,
   Award,
-  Casino,
+  Dice6,
   Football,
   Basketball,
   Zap
@@ -33,7 +33,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigationItems = [
     { name: '🏠 Home', path: '/', icon: Home, color: 'from-blue-500 to-blue-700' },
     { name: '🎯 BINGO Rooms', path: '/bingo', icon: Target, color: 'from-green-500 to-green-700' },
-    { name: '🎰 Casino Hub', path: '/casino', icon: Casino, color: 'from-purple-500 to-purple-700' },
+    { name: '🎰 Casino Hub', path: '/casino', icon: Dice6, color: 'from-purple-500 to-purple-700' },
     { name: '🏈 Sports Betting', path: '/sports', icon: Football, color: 'from-orange-500 to-orange-700' },
     { name: '🏆 Tournaments', path: '/tournaments', icon: Trophy, color: 'from-yellow-500 to-yellow-700' },
     { name: '👑 VIP Membership', path: '/vip', icon: Crown, color: 'from-yellow-400 to-orange-500' },
