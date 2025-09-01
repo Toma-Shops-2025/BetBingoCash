@@ -55,54 +55,130 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     <div className="min-h-screen relative overflow-hidden">
       {/* Professional Casino Background */}
       <div className="fixed inset-0 z-0">
-        {/* Main Casino Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"></div>
+        {/* Main Casino Background - Dark Casino Interior */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 via-slate-800 to-slate-900"></div>
         
-        {/* Casino Floor Pattern */}
-        <div className="absolute inset-0 opacity-20">
+        {/* Casino Floor Pattern - Marble-like Texture */}
+        <div className="absolute inset-0 opacity-15">
           <div className="w-full h-full" style={{
             backgroundImage: `
-              radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 40% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 90% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%)
+              radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 40% 80%, rgba(255, 69, 0, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 90% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 60% 50%, rgba(255, 20, 147, 0.06) 0%, transparent 50%)
             `,
-            backgroundSize: '400px 400px, 300px 300px, 500px 500px, 350px 350px'
+            backgroundSize: '400px 400px, 300px 300px, 500px 500px, 350px 350px, 600px 600px'
           }}></div>
         </div>
 
-        {/* Floating Casino Elements */}
-        <div className="absolute inset-0">
-          {/* Slot Machine Reels */}
-          <div className="absolute top-20 left-10 w-32 h-32 opacity-10 animate-spin-slow">
-            <div className="w-full h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full"></div>
-          </div>
-          
-          {/* Poker Chips */}
-          <div className="absolute top-40 right-20 w-24 h-24 opacity-10 animate-bounce-slow">
-            <div className="w-full h-full bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
-          </div>
-          
-          {/* Dice */}
-          <div className="absolute bottom-32 left-32 w-20 h-20 opacity-10 animate-pulse">
-            <div className="w-full h-full bg-gradient-to-b from-blue-400 to-purple-500 rounded-lg"></div>
-          </div>
-          
-          {/* Roulette Wheel */}
-          <div className="absolute bottom-20 right-32 w-28 h-28 opacity-10 animate-spin-slow">
-            <div className="w-full h-full bg-gradient-to-b from-green-400 to-teal-500 rounded-full"></div>
-          </div>
+        {/* Casino Wall Pattern - Subtle Stripes */}
+        <div className="absolute inset-0 opacity-8">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 215, 0, 0.03) 2px,
+                rgba(255, 215, 0, 0.03) 4px
+              )
+            `,
+            backgroundSize: '20px 20px'
+          }}></div>
         </div>
 
-        {/* Subtle Grid Pattern */}
+        {/* Floating Casino Elements - Enhanced */}
+        <div className="absolute inset-0">
+          {/* Slot Machine Reels - More Realistic */}
+          <div className="absolute top-20 left-10 w-32 h-32 opacity-8 animate-spin-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-slot rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-yellow-300 to-orange-400 rounded-full"></div>
+              <div className="absolute inset-4 bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full flex items-center justify-center text-2xl">🎰</div>
+            </div>
+          </div>
+          
+          {/* Poker Chips Stack - More Realistic */}
+          <div className="absolute top-40 right-20 w-24 h-24 opacity-8 animate-bounce-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-chip rounded-full"></div>
+              <div className="absolute inset-1 bg-gradient-to-b from-red-400 to-pink-500 rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-red-300 to-pink-400 rounded-full"></div>
+              <div className="absolute inset-3 bg-gradient-to-b from-red-200 to-pink-300 rounded-full flex items-center justify-center text-lg">🃏</div>
+            </div>
+          </div>
+          
+          {/* Dice - More Realistic */}
+          <div className="absolute bottom-32 left-32 w-20 h-20 opacity-8 animate-float">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-dice rounded-lg shadow-lg"></div>
+              <div className="absolute inset-1 bg-gradient-to-br from-blue-300 to-purple-500 rounded-lg"></div>
+              <div className="absolute inset-2 bg-gradient-to-br from-blue-200 to-purple-400 rounded-lg flex items-center justify-center text-sm">🎲</div>
+            </div>
+          </div>
+          
+          {/* Roulette Wheel - More Realistic */}
+          <div className="absolute bottom-20 right-32 w-28 h-28 opacity-8 animate-spin-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-roulette rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-green-300 via-teal-400 to-blue-500 rounded-full"></div>
+              <div className="absolute inset-4 bg-gradient-to-b from-green-200 via-teal-300 to-blue-400 rounded-full flex items-center justify-center text-xl">🎡</div>
+            </div>
+          </div>
+
+          {/* Additional Casino Elements */}
+          {/* Golden Coins */}
+          <div className="absolute top-60 left-1/4 w-16 h-16 opacity-6 animate-float">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full animate-glow"></div>
+              <div className="absolute inset-2 bg-gradient-to-b from-yellow-300 to-orange-400 rounded-full flex items-center justify-center text-lg">🪙</div>
+            </div>
+          </div>
+
+          {/* Playing Cards */}
+          <div className="absolute top-80 right-1/3 w-20 h-16 opacity-6 animate-bounce-slow">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 casino-poker rounded-lg shadow-lg"></div>
+              <div className="absolute inset-1 bg-gradient-to-br from-white to-gray-100 rounded-lg flex items-center justify-center text-sm">🃏</div>
+            </div>
+          </div>
+
+          {/* Casino Chandelier Effect */}
+          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-40 h-40 opacity-4">
+            <div className="w-full h-full relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-200/20 to-transparent rounded-full animate-pulse"></div>
+              <div className="absolute inset-10 bg-gradient-to-b from-transparent via-yellow-300/15 to-transparent rounded-full animate-pulse delay-1000"></div>
+              <div className="absolute inset-20 bg-gradient-to-b from-transparent via-yellow-400/10 to-transparent rounded-full animate-pulse delay-2000"></div>
+            </div>
+          </div>
+
+          {/* Casino Sparkles */}
+          <div className="casino-sparkle" style={{ top: '15%', left: '20%', animationDelay: '0s' }}></div>
+          <div className="casino-sparkle" style={{ top: '25%', right: '15%', animationDelay: '0.5s' }}></div>
+          <div className="casino-sparkle" style={{ bottom: '30%', left: '15%', animationDelay: '1s' }}></div>
+          <div className="casino-sparkle" style={{ bottom: '25%', right: '25%', animationDelay: '1.5s' }}></div>
+          <div className="casino-sparkle" style={{ top: '50%', left: '50%', animationDelay: '2s' }}></div>
+          <div className="casino-sparkle" style={{ top: '70%', right: '40%', animationDelay: '2.5s' }}></div>
+        </div>
+
+        {/* Subtle Grid Pattern - Casino Floor */}
         <div className="absolute inset-0 opacity-5">
           <div className="w-full h-full" style={{
             backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
+              linear-gradient(rgba(255, 215, 0, 0.08) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 215, 0, 0.08) 1px, transparent 1px)
             `,
             backgroundSize: '50px 50px'
           }}></div>
+        </div>
+
+        {/* Ambient Lighting Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-yellow-200/10 via-transparent to-transparent"></div>
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-purple-200/10 via-transparent to-transparent"></div>
+          <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-blue-200/10 via-transparent to-transparent"></div>
+          <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-red-200/10 via-transparent to-transparent"></div>
         </div>
       </div>
 
@@ -188,7 +264,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* Quick Access Gaming Hub */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-white mb-4">🎰 Welcome to the Ultimate Gaming Empire</h2>
+          <h2 className="text-4xl font-bold text-white mb-4 casino-neon">🎰 Welcome to the Ultimate Gaming Empire</h2>
           <p className="text-white/80 text-lg">Choose your game and start winning big!</p>
         </div>
 
@@ -197,7 +273,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {quickAccessGames.map((game) => (
             <button
               key={game.name}
-              className={`${game.color} hover:scale-105 transition-all duration-200 rounded-2xl p-6 text-white text-center shadow-lg hover:shadow-2xl`}
+              className={`${game.color} hover:scale-105 transition-all duration-200 rounded-2xl p-6 text-white text-center shadow-lg hover:shadow-2xl casino-card`}
             >
               <div className="text-3xl mb-2">{game.icon}</div>
               <div className="text-sm font-medium">{game.name}</div>
@@ -207,22 +283,57 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
         {/* Feature Highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+          <div className="casino-card rounded-2xl p-6 text-center">
             <div className="text-4xl mb-4">🏆</div>
-            <h3 className="text-white font-bold text-xl mb-2">Massive Tournaments</h3>
+            <h3 className="text-white font-bold text-xl mb-2 casino-neon">Massive Tournaments</h3>
             <p className="text-white/60">Compete for prizes up to $100,000 in epic tournaments</p>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+          <div className="casino-card rounded-2xl p-6 text-center">
             <div className="text-4xl mb-4">👑</div>
-            <h3 className="text-white font-bold text-xl mb-2">VIP Benefits</h3>
+            <h3 className="text-white font-bold text-xl mb-2 casino-neon">VIP Benefits</h3>
             <p className="text-white/60">Get up to 100% bonus on all winnings with VIP membership</p>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+          <div className="casino-card rounded-2xl p-6 text-center">
             <div className="text-4xl mb-4">💎</div>
-            <h3 className="text-white font-bold text-xl mb-2">Crypto Ready</h3>
+            <h3 className="text-white font-bold text-xl mb-2 casino-neon">Crypto Ready</h3>
             <p className="text-white/60">Deposit and withdraw with USDC, USDT, BTC, and ETH</p>
+          </div>
+        </div>
+
+        {/* Casino Table Felt Area */}
+        <div className="casino-felt rounded-3xl p-8 mb-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/20 rounded-3xl"></div>
+          <div className="relative z-10 text-center">
+            <h3 className="text-3xl font-bold text-white mb-4 casino-neon">🎲 Live Casino Tables</h3>
+            <p className="text-white/90 text-lg mb-6">Experience the thrill of live casino games with real dealers</p>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center border border-white/30">
+                <div className="text-2xl mb-2">🃏</div>
+                <div className="text-white font-semibold">Blackjack</div>
+                <div className="text-white/70 text-sm">Live Dealers</div>
+              </div>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center border border-white/30">
+                <div className="text-2xl mb-2">🎡</div>
+                <div className="text-white font-semibold">Roulette</div>
+                <div className="text-white/70 text-sm">Multiple Tables</div>
+              </div>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center border border-white/30">
+                <div className="text-2xl mb-2">🎰</div>
+                <div className="text-white font-semibold">Slots</div>
+                <div className="text-white/70 text-sm">Progressive Jackpots</div>
+              </div>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center border border-white/30">
+                <div className="text-2xl mb-2">🎲</div>
+                <div className="text-white font-semibold">Craps</div>
+                <div className="text-white/70 text-sm">High Stakes</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
