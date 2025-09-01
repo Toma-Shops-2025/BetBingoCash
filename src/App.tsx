@@ -16,6 +16,9 @@ import SportsBetting from './components/SportsBetting';
 import ClassicBingo from './components/ClassicBingo';
 import FortuneSlots from './components/FortuneSlots';
 import LiveBlackjack from './components/LiveBlackjack';
+import SpeedBingo from './components/SpeedBingo';
+import ProgressiveBingo from './components/ProgressiveBingo';
+import PaymentSystem from './components/PaymentSystem';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
@@ -34,8 +37,11 @@ const AppContent: React.FC = () => {
         
         {/* Game Routes */}
         <Route path="/classic-bingo" element={<ClassicBingo />} />
+        <Route path="/speed-bingo" element={<SpeedBingo />} />
+        <Route path="/progressive-bingo" element={<ProgressiveBingo />} />
         <Route path="/fortune-slots" element={<FortuneSlots />} />
         <Route path="/live-blackjack" element={<LiveBlackjack />} />
+        <Route path="/payment" element={<PaymentSystem />} />
         
         {/* Feature Routes */}
         <Route path="/dashboard" element={isAuthenticated ? <UserDashboard /> : <Navigate to="/" />} />
