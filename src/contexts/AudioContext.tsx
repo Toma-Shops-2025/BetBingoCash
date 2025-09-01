@@ -320,71 +320,44 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Nuclear option - completely reset audio system
+  // Nuclear option - simplified to preserve background music
   const resetAudioSystem = () => {
-    console.log('Nuclear option: Resetting entire audio system...');
+    console.log('Nuclear option: Resetting audio system (preserving background music)...');
     
     try {
-      // FIRST: Force stop background music specifically
-      if (backgroundMusicRef.current) {
-        try {
-          backgroundMusicRef.current.pause();
-          backgroundMusicRef.current.currentTime = 0;
-          backgroundMusicRef.current.src = '';
-          backgroundMusicRef.current.load();
-          backgroundMusicRef.current = null;
-          console.log('Background music ref stopped and cleared');
-        } catch (e) {
-          console.error('Error stopping background music ref:', e);
-        }
-      }
-      
-      // SECOND: Stop all audio elements EXCEPT Adam's voice
+      // Stop all audio elements EXCEPT background music and Adam's voice
       const allAudioElements = document.querySelectorAll('audio');
-      console.log(`Found ${allAudioElements.length} audio elements to stop`);
+      console.log(`Found ${allAudioElements.length} audio elements to check`);
       
       allAudioElements.forEach((audio, index) => {
         try {
-          // Don't stop Adam's voice if it's currently playing
-          if (!audio.src.includes('adam-voice')) {
+          // Don't stop background music or Adam's voice
+          if (!audio.src.includes('adam-voice') && !audio.src.includes('background-music')) {
             console.log(`Stopping audio element ${index}:`, audio.src);
             audio.pause();
             audio.currentTime = 0;
             audio.src = '';
-            audio.load(); // Force reload
-            audio.remove(); // Remove from DOM completely
+            audio.load();
+            audio.remove();
+          } else {
+            console.log(`Preserving audio element ${index}:`, audio.src);
           }
         } catch (e) {
-          console.error(`Error stopping audio element ${index}:`, e);
+          console.error(`Error handling audio element ${index}:`, e);
         }
       });
       
-      // THIRD: Cancel all speech synthesis
+      // Cancel all speech synthesis
       if ('speechSynthesis' in window) {
         speechSynthesis.cancel();
         console.log('Speech synthesis cancelled');
       }
       
-      // FOURTH: Clear all refs
-      backgroundMusicRef.current = null;
+      // Clear game music refs but keep background music
       gameMusicRef.current = null;
       fallbackAudioRef.current = null;
       
-      // FIFTH: Force page audio context to reset
-      if (window.AudioContext || (window as any).webkitAudioContext) {
-        try {
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          audioContext.close();
-          console.log('Audio context closed');
-        } catch (e) {}
-      }
-      
-      // SIXTH: Force garbage collection hint and wait
-      if ((window as any).gc) {
-        (window as any).gc();
-      }
-      
-      console.log('Audio system reset complete');
+      console.log('Audio system reset complete (background music preserved)');
     } catch (error) {
       console.error('Error resetting audio system:', error);
     }
@@ -444,65 +417,28 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Dynamic music volume control
+  // Dynamic music volume control - simplified to keep background music always playing
   const setGameMusicMode = (isGameActive: boolean) => {
     console.log('Setting game music mode:', isGameActive);
     
     if (isGameActive) {
-      // Use the most aggressive approach
-      console.log('Using FORCE STOP ALL AUDIO approach');
-      forceStopAllAudio();
-      
-      // Wait longer to ensure everything is stopped
-      setTimeout(() => {
-        console.log('Starting game music after force stop...');
-        playGameMusic();
-      }, 500);
-      
+      // Just adjust volume for game mode, don't stop background music
+      console.log('Game started - keeping background music playing');
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.volume = settings.backgroundMusicVolume * 0.5; // Lower volume during games
+      }
     } else {
-      // Stop game music and resume background music
-      console.log('Stopping game music, resuming background music');
-      stopGameMusic();
-      playBackgroundMusic();
-    }
-  };
-
-  // Game music functions
-  const playGameMusic = () => {
-    try {
-      if (settings.musicEnabled && typeof window !== 'undefined') {
-        // Play game music
-        const gameAudio = new Audio('/audio/bingo-game-music.mp3');
-        gameAudio.loop = true;
-        gameAudio.volume = settings.gameMusicVolume;
-        
-        gameAudio.addEventListener('canplaythrough', () => {
-          gameAudio.play().catch(error => {
-            console.warn('Could not play game music:', error);
-          });
-        });
-        
-        // Store reference for controls
-        gameMusicRef.current = gameAudio;
-        console.log('Game music started');
-      }
-    } catch (error) {
-      console.warn('Could not play game music:', error);
-    }
-  };
-
-  const stopGameMusic = () => {
-    if (gameMusicRef.current) {
-      try {
-        gameMusicRef.current.pause();
-        gameMusicRef.current.currentTime = 0;
-        gameMusicRef.current = null;
-        console.log('Game music stopped');
-      } catch (error) {
-        console.warn('Error stopping game music:', error);
+      // Game ended - restore full background music volume
+      console.log('Game ended - restoring full background music volume');
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.volume = settings.backgroundMusicVolume;
       }
     }
   };
+
+  // Game music functions - no longer needed since background music stays on
+  // const playGameMusic = () => { ... };
+  // const stopGameMusic = () => { ... };
 
   // Simple number-to-text mapping for clear pronunciation
   const numberToText = (num: number): string => {
