@@ -93,14 +93,14 @@ const GameInterface: React.FC = () => {
   const [activePowerups, setActivePowerups] = useState<Set<string>>(new Set());
   const [powerupsUsed, setPowerupsUsed] = useState(0);
   
-  // Multiplayer simulation
-  const [otherPlayers, setOtherPlayers] = useState([
-    { id: 1, name: 'Player2', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 150.00 },
-    { id: 2, name: 'Player3', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 89.50 },
-    { id: 3, name: 'Player4', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 234.75 },
-    { id: 4, name: 'Player5', score: 0, bingos: 0, isCurrentPlayer: false, accountBalance: 67.25 }
-  ]);
+  // Game configuration - will be set based on selected room
+  const [entryFee, setEntryFee] = useState(5.00);
+  const [prizePool, setPrizePool] = useState(25.00);
+  const [playerCount, setPlayerCount] = useState(5);
   
+  // Multiplayer simulation - dynamically sized based on room
+  const [otherPlayers, setOtherPlayers] = useState<Player[]>([]);
+
   // Game results and prizes
   const [gameResults, setGameResults] = useState<GameResult[]>([]);
   const [prizeStructure, setPrizeStructure] = useState<PrizeStructure>({
@@ -110,9 +110,49 @@ const GameInterface: React.FC = () => {
     totalPrize: 0
   });
   
-  // Game configuration
-  const [entryFee] = useState(5.00); // $5 entry fee
-  const [prizePool] = useState(25.00); // $25 total prize pool
+  // Initialize other players based on room selection
+  useEffect(() => {
+    // Get room info from URL or localStorage (you can implement this based on your routing)
+    const roomId = localStorage.getItem('selectedRoom') || 'room-1';
+    let roomConfig;
+    
+    switch (roomId) {
+      case 'room-1':
+        roomConfig = { playerCount: 5, prizePool: 25.00 };
+        break;
+      case 'room-2':
+        roomConfig = { playerCount: 10, prizePool: 50.00 };
+        break;
+      case 'room-3':
+        roomConfig = { playerCount: 15, prizePool: 75.00 };
+        break;
+      case 'room-4':
+        roomConfig = { playerCount: 20, prizePool: 100.00 };
+        break;
+      default:
+        roomConfig = { playerCount: 5, prizePool: 25.00 };
+    }
+    
+    setPlayerCount(roomConfig.playerCount);
+    setPrizePool(roomConfig.prizePool);
+    
+    // Generate other players (excluding current player)
+    const otherPlayerCount = roomConfig.playerCount - 1;
+    const newOtherPlayers: Player[] = [];
+    
+    for (let i = 1; i <= otherPlayerCount; i++) {
+      newOtherPlayers.push({
+        id: i,
+        name: `Player${i + 1}`,
+        score: 0,
+        bingos: 0,
+        isCurrentPlayer: false,
+        accountBalance: Math.floor(Math.random() * 200) + 50
+      });
+    }
+    
+    setOtherPlayers(newOtherPlayers);
+  }, []);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const numberCallIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -218,9 +258,9 @@ const GameInterface: React.FC = () => {
     setBingos(prev => prev + 1);
     
     // Calculate score with powerup multipliers
-    let bingoScore = 100;
+    let bingoScore = 1500; // Base score increased to 1500
     if (activePowerups.has('triple')) {
-      bingoScore *= 3;
+      bingoScore *= 3; // 1500 * 3 = 4500
       setActivePowerups(prev => {
         const newSet = new Set(prev);
         newSet.delete('triple');
@@ -303,23 +343,13 @@ const GameInterface: React.FC = () => {
   };
 
   const calculatePrizeDistribution = (totalPrize: number): PrizeStructure => {
-    if (totalPrize >= 50.00) {
-      // High prize games: 1st, 2nd, 3rd place
-      return {
-        firstPlace: totalPrize * 0.60, // 60%
-        secondPlace: totalPrize * 0.30, // 30%
-        thirdPlace: totalPrize * 0.10,  // 10%
-        totalPrize
-      };
-    } else {
-      // Lower prize games: winner takes all
-      return {
-        firstPlace: totalPrize,
-        secondPlace: 0,
-        thirdPlace: 0,
-        totalPrize
-      };
-    }
+    // All rooms now use 1st, 2nd, 3rd place distribution
+    return {
+      firstPlace: totalPrize * 0.60, // 60%
+      secondPlace: totalPrize * 0.30, // 30%
+      thirdPlace: totalPrize * 0.10,  // 10%
+      totalPrize
+    };
   };
 
   const endGame = () => {
@@ -519,11 +549,14 @@ const GameInterface: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-2xl">
-          🎯 BINGO BATTLE
+          🎯 BINGO Battle
         </h1>
         <p className="text-white/80 text-lg">
           Compete against {otherPlayers.length} other players for {formatCurrency(prizePool)}!
         </p>
+        <div className="mt-2 text-white/60 text-sm">
+          Room: {playerCount} Players • Entry: {formatCurrency(entryFee)} • Prize Pool: {formatCurrency(prizePool)}
+        </div>
       </div>
 
       {/* Game Stats Row */}
