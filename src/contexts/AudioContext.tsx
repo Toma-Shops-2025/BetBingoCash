@@ -325,16 +325,19 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log('Nuclear option: Resetting entire audio system...');
     
     try {
-      // Stop all audio elements
+      // Stop all audio elements EXCEPT Adam's voice (which should be short)
       const allAudioElements = document.querySelectorAll('audio');
       allAudioElements.forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.src = '';
-        audio.load(); // Force reload
+        // Don't stop Adam's voice if it's currently playing
+        if (!audio.src.includes('adam-voice')) {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.src = '';
+          audio.load(); // Force reload
+        }
       });
       
-      // Cancel all speech
+      // Cancel all speech synthesis
       if ('speechSynthesis' in window) {
         speechSynthesis.cancel();
       }
