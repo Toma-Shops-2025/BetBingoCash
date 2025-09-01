@@ -10,13 +10,15 @@ import VIPSubscription from './components/VIPSubscription';
 import AchievementSystem from './components/AchievementSystem';
 import AdvancedTournamentSystem from './components/AdvancedTournamentSystem';
 import CryptoPaymentProcessor from './components/CryptoPaymentProcessor';
+import CasinoHub from './components/CasinoHub';
+import SportsBetting from './components/SportsBetting';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
 // Main App Content with Navigation
 const AppContent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const [currentView, setCurrentView] = useState<'main' | 'dashboard' | 'admin' | 'vip' | 'achievements' | 'tournaments' | 'crypto'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'dashboard' | 'admin' | 'vip' | 'achievements' | 'tournaments' | 'crypto' | 'casino' | 'sports'>('main');
 
   // Check if user is admin (you can implement proper admin logic)
   const isAdmin = user?.username === 'admin' || user?.email === 'admin@betbingo.com';
@@ -46,6 +48,14 @@ const AppContent: React.FC = () => {
     return <CryptoPaymentProcessor />;
   }
 
+  if (currentView === 'casino') {
+    return <CasinoHub />;
+  }
+
+  if (currentView === 'sports') {
+    return <SportsBetting />;
+  }
+
   return (
     <AppLayout>
       {/* Navigation for authenticated users */}
@@ -66,6 +76,18 @@ const AppContent: React.FC = () => {
                 👤 Dashboard
               </button>
               <button
+                onClick={() => setCurrentView('casino')}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                🎰 Casino
+              </button>
+              <button
+                onClick={() => setCurrentView('sports')}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                🏈 Sports
+              </button>
+              <button
                 onClick={() => setCurrentView('vip')}
                 className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
               >
@@ -73,7 +95,7 @@ const AppContent: React.FC = () => {
               </button>
               <button
                 onClick={() => setCurrentView('achievements')}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
               >
                 🏆 Achievements
               </button>
